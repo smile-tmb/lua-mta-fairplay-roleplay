@@ -1,0 +1,5 @@
+script
+*.sql
+*.db
+*.DS_Store
+*.log
