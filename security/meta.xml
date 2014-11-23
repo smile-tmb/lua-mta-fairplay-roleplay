@@ -1,0 +1,8 @@
+<meta>
+	<info name="security@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="server/security.lua" />
+	
+	<export function="modifyElementData" />
+	<export function="hashString" />
+</meta>
