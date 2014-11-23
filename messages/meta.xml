@@ -1,0 +1,8 @@
+<meta>
+	<info name="messages@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="client/messages.lua" type="client" cache="false" />
+	
+	<export function="createMessage" type="client" />
+	<export function="destroyMessage" type="client" />
+</meta>
