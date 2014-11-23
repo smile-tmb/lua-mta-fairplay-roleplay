@@ -1,0 +1,16 @@
+<meta>
+	<info name="database@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="server/database.lua"/>
+	<script src="server/verification.lua" />
+	
+	<export function="disconnect" />
+	<export function="ping" />
+	<export function="query" />
+	<export function="query_single"  />
+	<export function="execute" />
+	<export function="insert_id" />
+	<export function="free_result" />
+	<export function="escape_string" />
+	<export function="verify_table" />
+</meta>
