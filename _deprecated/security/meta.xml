@@ -1,0 +1,13 @@
+<meta>
+	<info name="security@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="client/security.lua" type="client" cache="false" />
+	<script src="server/security.lua" />
+	
+	<export function="modifyElementData" />
+	<export function="hashString" />
+	<export function="encryptNetworkData" type="shared" />
+	<export function="decryptNetworkData" type="shared" />
+	<export function="batchNetworkData" type="shared" />
+	<export function="networkDataHandler" />
+</meta>
