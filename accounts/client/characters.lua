@@ -38,7 +38,13 @@ function showCharacterSelection( forceClose )
 	
 	addEventHandler( "onClientGUIClick", character_selection.button.play,
 		function( )
+			local row, column = guiGridListGetSelectedItem( character_selection.characters )
 			
+			--if ( row ~= -1 ) and ( column ~= -1 ) then
+				local characterName = guiGridListGetItemText( character_selection.characters, row, column )
+				
+				triggerServerEvent( "accounts:play", localPlayer, characterName )
+			--end
 		end, false
 	)
 	
@@ -182,8 +188,9 @@ addEventHandler( "accounts:addCharacters", root,
 	function( characters )
 		if ( isElement( character_selection.window ) ) then
 			for _, character in ipairs( characters ) do
-				local row = guiGridListAddRow ( playerList )
-				guiGridListSetItemText ( playerList, row, column, getPlayerName ( playeritem ), false, false )
+				local row = guiGridListAddRow( character_selection.characters )
+				guiGridListSetItemText( character_selection.characters, row, 1, character.name, false, false )
+				guiGridListSetItemText( character_selection.characters, row, 2, character.last_played, false, false )
 			end
 		end
 	end
