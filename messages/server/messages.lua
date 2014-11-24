@@ -27,3 +27,16 @@ function destroyGlobalMessage( messageGlobalID )
 		end
 	end
 end
+
+addEvent( "messages:ready", true )
+addEventHandler( "messages:ready", root,
+	function( )
+		if ( source ~= client ) then
+			return
+		end
+		
+		for index, message in pairs( messages ) do
+			createMessage( client, message.message, message.messageType, index, message.hideButton, message.disableInput )
+		end
+	end
+)
