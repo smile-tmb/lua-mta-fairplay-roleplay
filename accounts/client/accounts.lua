@@ -1,10 +1,9 @@
-accounts_login_view = {
+local screenWidth, screenHeight = guiGetScreenSize( )
+local accounts_login_view = {
 	button = { },
 	label = { },
 	edit = { }
 }
-
-local screenWidth, screenHeight = guiGetScreenSize( )
 
 local minimumUsernameLength = 2
 local maximumUsernameLength = 30
@@ -16,14 +15,14 @@ function showLoginMenu( forceClose )
 	if ( isElement( accounts_login_view.window ) ) then
 		destroyElement( accounts_login_view.window )
 		
-		guiSetInputMode( "allow_binds" )
+		guiSetInputEnabled( false )
 	end
 	
 	if ( forceClose ) then
 		return
 	end
 	
-	guiSetInputMode( "no_binds" )
+	guiSetInputEnabled( true )
 	
 	accounts_login_view.window = guiCreateWindow( ( screenWidth - 273 ) / 2, ( screenHeight - 310 ) / 2, 273, 310, "FairPlay Gaming", false )
 	guiWindowSetSizable( accounts_login_view.window, false )
@@ -84,7 +83,7 @@ function showLoginMenu( forceClose )
 				if ( not password:find( username ) ) then
 					if ( password:len( ) >= minimumPasswordLength ) then
 						if ( password:len( ) <= maximumPasswordLength ) then
-							exports.messages:createMessage( "Logging in, please wait.", "login", true )
+							exports.messages:createMessage( "Logging in, please wait.", "login", nil, true )
 							guiSetEnabled( accounts_login_view.window, false )
 							
 							triggerServerEvent( "accounts:login", localPlayer, username, password )
@@ -117,7 +116,7 @@ function showLoginMenu( forceClose )
 				if ( not password:find( username ) ) then
 					if ( password:len( ) >= minimumPasswordLength ) then
 						if ( password:len( ) <= maximumPasswordLength ) then
-							exports.messages:createMessage( "Registering account, please wait.", "login", true )
+							exports.messages:createMessage( "Registering account, please wait.", "login", nil, true )
 							guiSetEnabled( accounts_login_view.window, false )
 							
 							triggerServerEvent( "accounts:register", localPlayer, username, password )
