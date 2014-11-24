@@ -19,6 +19,7 @@ function login( player, username, password )
 		exports.security:modifyElementData( player, "database:id", account.id, false )
 		exports.security:modifyElementData( player, "account:username", account.username, true )
 		exports.security:modifyElementData( player, "account:rank", account.rank, true )
+		exports.security:modifyElementData( player, "player:name", getPlayerName( player ), true )
 		
 		triggerClientEvent( player, "accounts:onLogin", player )
 		
@@ -58,6 +59,8 @@ addEventHandler( "accounts:login", root,
 				triggerClientEvent( client, "messages:create", client, "Username and/or passwors is incorrect. Please try again.", "login" )
 			else
 				triggerClientEvent( client, "accounts:onLogin", client )
+				
+				updateCharacters( client )
 			end
 		else
 			triggerClientEvent( client, "messages:create", client, "Oops, something went wrong. Please try again.", "login" )
@@ -95,11 +98,23 @@ addEventHandler( "accounts:ready", root,
 			return
 		end
 		
-		if ( not getElementData( client, "database:id" ) ) then
+		local accountID = tonumber( getElementData( client, "database:id" ) )
+		
+		if ( not accountID ) then
 			triggerClientEvent( client, "accounts:showLogin", client )
+			
+			fadeCamera( client, true )
 		else
 			if ( not getElementData( client, "player:playing" ) ) then
+				exports.messages:createMessage( client, "Loading characters. Please wait.", "selection", nil, true, true )
+				
 				triggerClientEvent( client, "accounts:showCharacterSelection", client )
+				
+				updateCharacters( client )
+				
+				exports.messages:destroyMessage( client, "selection" )
+				
+				fadeCamera( client, true )
 			end
 		end
 	end
