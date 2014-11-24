@@ -97,6 +97,10 @@ addEventHandler( "accounts:ready", root,
 		
 		if ( not getElementData( client, "database:id" ) ) then
 			triggerClientEvent( client, "accounts:showLogin", client )
+		else
+			if ( not getElementData( client, "player:playing" ) ) then
+				triggerClientEvent( client, "accounts:showCharacterSelection", client )
+			end
 		end
 	end
 )
