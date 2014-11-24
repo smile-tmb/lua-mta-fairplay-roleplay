@@ -1,33 +1,6 @@
-local keyChars = { { 48, 57 }, { 65, 90 }, { 97, 122 } }
-local keyCharsLength = 64
-
-local serverKey = ""
-
 local cleanedFunctions = { setElementData = setElementData, getElementData = getElementData, removeElementData = removeElementData }
-
-function findByValue( _table, value )
-	for i, v in pairs( _table ) do
-		if ( v == value ) then
-			return i
-		end
-	end
-	
-	return false
-end
-
-function getRandomString( length )
-	local buffer = ""
-	
-	for i = 0, length do
-		math.randomseed( getTickCount( ) .. i .. i .. math.random( 123, 789 ) )
-		
-		local chars = keyChars[ math.random( #keyChars ) ]
-		
-		buffer = buffer .. string.char( math.random( chars[ 1 ], chars[ 2 ] ) )
-	end
-	
-	return buffer
-end
+local keyCharsLength = 64
+local serverKey = ""
 
 local function createServerKey( forceCreate )
 	if ( not fileExists( "server.key" ) ) or ( forceCreate ) then
@@ -43,7 +16,7 @@ local function createServerKey( forceCreate )
 			local networkData = getNetworkUsageData( )[ "out" ]
 				  networkData = #networkData > 0 and networkData[ math.random( #networkData ) ] or hash( "md5", getTickCount( ) )
 			
-			local keyString = getRandomString( keyCharsLength )
+			local keyString = exports.common:getRandomString( keyCharsLength )
 				  keyString = hash( "sha512", keyString .. hash( "sha224", networkData .. getServerName( ) ) )
 			
 			fileWrite( serverKeyFile, keyString )
