@@ -1,12 +1,13 @@
-local messages = { global = { }, local = { } }
+local messages = { global = { }, client = { } }
 local screenWidth, screenHeight = guiGetScreenSize( )
 local messageWidth, messageHeight = 316, 152
 
 function createMessage( message, messageType, messageGlobalID, hideButton, disableInput )
-	destroyMessage( nil, messageType )
+	destroyMessage( messageType )
+	destroyMessage( nil, nil, messageGlobalID )
 
 	local messageID = messageGlobalID or exports.common:nextIndex( messages )
-	local messageRealm = messageGlobalID and "global" or "local"
+	local messageRealm = messageGlobalID and "global" or "client"
 	local messageHolder
 	
 	messages[ messageRealm ][ messageID ] = { messageType = messageType or "other", disableInput = disableInput }
@@ -65,24 +66,26 @@ addEventHandler( "messages:create", root, createMessage )
 
 function destroyMessage( messageType, messageGlobalID )
 	if ( messageType ) then
-		local message = exports.common:findByValue( messages, messageType, true )
-
-		for index, message in ipairs( message ) do
+		for _, messageID in ipairs( exports.common:findByValue( messages.client, messageType, true ) ) do
+			local message = messages.client[ messageID ]
+			
 			if ( isElement( message.window ) ) then
 				destroyElement( message.window )
 			end
 			
-			message[ index ] = nil
+			message = nil
 		end
 	else
-		local message = messages.global[ messageGlobalID ]
+		if ( messageGlobalID ) then
+			local message = messages.global[ messageGlobalID ]
 
-		if ( message ) then
-			if ( isElement( message.window ) ) then
-				destroyElement( message.window )
+			if ( message ) then
+				if ( isElement( message.window ) ) then
+					destroyElement( message.window )
+				end
+				
+				messages.global[ messageGlobalID ] = nil
 			end
-			
-			messages.global[ messageGlobalID ] = nil
 		end
 	end
 end
