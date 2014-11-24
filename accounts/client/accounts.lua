@@ -14,7 +14,6 @@ local maximumPasswordLength = 100
 function showLoginMenu( forceClose )
 	if ( isElement( accounts_login_view.window ) ) then
 		destroyElement( accounts_login_view.window )
-		
 		guiSetInputEnabled( false )
 	end
 	
