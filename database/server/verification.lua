@@ -1,4 +1,4 @@
-database.configuration.automated_resources = { accounts = { "accounts" }, vehicles = { "vehicles" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, vehicles = { "vehicles" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -14,6 +14,27 @@ database.verification = {
 		{ name = "last_action", type = "datetime", default = "0000-00-00 00:00:00" },
 		{ name = "last_ip", type = "varchar", length = 128, default = "0.0.0.0" },
 		{ name = "last_serial", type = "varchar", length = 32, default = "13371337133713371337133713371337" }
+	},
+	characters = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "account", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "skin_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "name", type = "varchar", length = 255, default = "" },
+		{ name = "gender", type = "varchar", length = 255, default = "" },
+		{ name = "skin_color", type = "varchar", length = 255, default = "" },
+		{ name = "date_of_birth", type = "datetime", default = "0000-00-00 00:00:00" },
+		{ name = "origin", type = "varchar", length = 255, default = "" },
+		{ name = "look", type = "varchar", length = 255, default = "" },
+		{ name = "pos_x", type = "float", default = 0 },
+		{ name = "pos_y", type = "float", default = 0 },
+		{ name = "pos_z", type = "float", default = 0 },
+		{ name = "rotation", type = "float", default = 0 },
+		{ name = "interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
+		{ name = "health", type = "smallint", length = 3, default = 100, is_unsigned = true },
+		{ name = "armor", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "last_played", type = "datetime", default = "0000-00-00 00:00:00" },
+		{ name = "created_time", type = "datetime", default = "0000-00-00 00:00:00" }
 	},
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -38,7 +59,6 @@ database.verification = {
 		{ name = "variant_1", type = "tinyint", length = 3, default = 255, is_unsigned = true },
 		{ name = "variant_2", type = "tinyint", length = 3, default = 255, is_unsigned = true },
 		{ name = "account_id", type = "int", length = 11, default = 0, is_unsigned = true },
-		{ name = "group_id", type = "int", length = 11, default = 0, is_unsigned = true },
 		{ name = "health", type = "smallint", length = 4, default = 1000, is_unsigned = true },
 		{ name = "color", type = "varchar", length = 255, default = "[ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 0, 0, 0], [ 0, 0, 0 ] ]" },
 		{ name = "headlight_color", type = "varchar", length = 255, default = "[ [ 0, 0, 0 ] ]" },
