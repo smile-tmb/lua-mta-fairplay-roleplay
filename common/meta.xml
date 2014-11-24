@@ -1,0 +1,12 @@
+<meta>
+	<info name="common@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="shared/common.lua" type="shared" cache="false" />
+	
+	<export function="nextIndex" type="shared" />
+	<export function="findByValue" type="shared" />
+	<export function="count" type="shared" />
+	<export function="isLeapYear" type="shared" />
+	<export function="getDaysInMonth" type="shared" />
+	<export function="getValidPedModelsByGenderAndColor" type="shared" />
+</meta>
