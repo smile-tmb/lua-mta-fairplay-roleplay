@@ -24,15 +24,27 @@ function nextIndex( table )
 	end
 end
 
-function findByValue( table, value, multiple, strict )
-	local result
-
-	for k, v in pairs( table ) do
-		if ( v == value ) and ( type( v ) == type( value ) ) then
-			if ( multiple ) then
-				table.insert( result, v )
-			else
-				return v
+function findByValue( _table, value, multiple, strict )
+	local result = { }
+	
+	for k, v in pairs( _table ) do
+		if ( type( v ) == "table" ) then
+			for _k, _v in pairs( v ) do
+				if ( _v == value ) and ( ( not strict ) or ( ( strict ) and ( type( _v ) == type( value ) ) ) ) then
+					if ( multiple ) then
+						table.insert( result, k )
+					else
+						return k
+					end
+				end
+			end
+		else
+			if ( v == value ) and ( ( not strict ) or ( ( strict ) and ( type( v ) == type( value ) ) ) ) then
+				if ( multiple ) then
+					table.insert( result, k )
+				else
+					return k
+				end
 			end
 		end
 	end
