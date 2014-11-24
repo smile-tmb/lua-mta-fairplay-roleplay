@@ -2,7 +2,10 @@
 	<info name="messages@fairplay" author="socialz@fairplay" type="script" />
 	
 	<script src="client/messages.lua" type="client" cache="false" />
+	<script src="server/messages.lua" />
 	
-	<export function="createMessage" type="client" />
-	<export function="destroyMessage" type="client" />
+	<export function="createMessage" type="shared" />
+	<export function="destroyMessage" type="shared" />
+	<export function="createGlobalMessage" />
+	<export function="destroyGlobalMessage" />
 </meta>
