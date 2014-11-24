@@ -1,9 +1,10 @@
 <meta>
 	<info name="accounts@fairplay" author="socialz@fairplay" type="script" />
 	
-	<script src="client/characters.lua" type="client" cache="false" />
 	<script src="client/accounts.lua" type="client" cache="false" />
+	<script src="client/characters.lua" type="client" cache="false" />
 	<script src="server/accounts.lua" />
+	<script src="server/characters.lua" />
 	
 	<export function="get" />
 	<export function="new" />
