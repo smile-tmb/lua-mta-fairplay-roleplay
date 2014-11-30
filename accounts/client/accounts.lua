@@ -14,14 +14,14 @@ local maximumPasswordLength = 100
 function showLoginMenu( forceClose )
 	if ( isElement( accounts_login_view.window ) ) then
 		destroyElement( accounts_login_view.window )
-		guiSetInputEnabled( false )
+		showCursor( false, false )
 	end
 	
 	if ( forceClose ) then
 		return
 	end
 	
-	guiSetInputEnabled( true )
+	showCursor( true, true )
 	
 	accounts_login_view.window = guiCreateWindow( ( screenWidth - 273 ) / 2, ( screenHeight - 310 ) / 2, 273, 310, "FairPlay Gaming", false )
 	guiWindowSetSizable( accounts_login_view.window, false )
@@ -165,21 +165,31 @@ addEventHandler( "accounts:closeLogin", root,
 	end
 )
 
+function onLogin( )
+	triggerEvent( "accounts:closeLogin", localPlayer )
+end
 addEvent( "accounts:onLogin", true )
-addEventHandler( "accounts:onLogin", root,
-	function( )
-		triggerEvent( "accounts:closeLogin", localPlayer )
-	end
-)
+addEventHandler( "accounts:onLogin", root, onLogin )
+addEvent( "accounts:onLogin.accounts", true )
+addEventHandler( "accounts:onLogin.accounts", root, onLogin )
 
+function onLogout( )
+	showLoginMenu( )
+end
+addEvent( "accounts:onLogout", true )
+addEventHandler( "accounts:onLogout", root, onLogout )
+addEvent( "accounts:onLogout.accounts", true )
+addEventHandler( "accounts:onLogout.accounts", root, onLogout )
+
+function onRegister( )
+	showLoginMenu( )
+	exports.messages:createMessage( "You have successfully registered an account! You may now log in with your account.", "login" )
+	guiSetEnabled( accounts_login_view.window, false )
+end
 addEvent( "accounts:onRegister", true )
-addEventHandler( "accounts:onRegister", root,
-	function( )
-		showLoginMenu( )
-		exports.messages:createMessage( "You have successfully registered an account! You may now log in with your account.", "login" )
-		guiSetEnabled( accounts_login_view.window, false )
-	end
-)
+addEventHandler( "accounts:onRegister", root, onRegister )
+addEvent( "accounts:onRegister.accounts", true )
+addEventHandler( "accounts:onRegister.accounts", root, onRegister )
 
 addEvent( "accounts:enableGUI", true )
 addEventHandler( "accounts:enableGUI", root,
