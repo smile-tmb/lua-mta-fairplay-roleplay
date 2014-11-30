@@ -34,6 +34,29 @@ addEventHandler( "accounts:play", root,
 	end
 )
 
+function characterSelection( player )
+	exports.database:query( "UPDATE `characters` SET `last_played` = NOW( ) WHERE `id` = ?", getElementData( player, "character:id" ) )
+	
+	removeElementData( player, "player:playing" )
+	
+	removeElementData( player, "character:id" )
+	removeElementData( player, "character:name" )
+	removeElementData( player, "character:gender" )
+	removeElementData( player, "character:skin_color" )
+	removeElementData( player, "character:origin" )
+	removeElementData( player, "character:look" )
+	removeElementData( player, "character:date_of_birth" )
+	
+	spawnPlayer( player, 0, 0, 0 )
+	setElementDimension( player, 6000 )
+	
+	setCameraMatrix( player, 0, 0, 100, 100, 100, 100 )
+	
+	triggerClientEvent( player, "accounts:showCharacterSelection", player )
+	
+	updateCharacters( player )
+end
+
 function spawnCharacter( player, character, fade )
 	local character = type( character ) == "number" and getCharacter( character ) or ( type( character ) == "table" and character or nil )
 	

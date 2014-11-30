@@ -29,6 +29,25 @@ function login( player, username, password )
 	return false
 end
 
+function logout( player )
+	characterSelection( player )
+	
+	exports.database:query( "UPDATE `accounts` SET `last_action` = NOW( ) WHERE `id` = ?", getElementData( player, "database:id" ) )
+	
+	removeElementData( player, "database:id" )
+	removeElementData( player, "account:username" )
+	removeElementData( player, "account:rank" )
+	removeElementData( player, "player:name" )
+	
+	spawnPlayer( player, 0, 0, 0 )
+	setElementDimension( player, 6000 )
+	
+	setCameraMatrix( player, 0, 0, 100, 100, 100, 100 )
+	
+	triggerClientEvent( player, "accounts:onLogout.characters", player )
+	triggerClientEvent( player, "accounts:onLogout.accounts", player )
+end
+
 function register( username, password )
 	local query = exports.database:query_single( "SELECT NULL FROM `accounts` WHERE `username` = ?", username )
 	
@@ -56,7 +75,7 @@ addEventHandler( "accounts:login", root,
 			local status = login( client, username, password )
 			
 			if ( not status ) then
-				triggerClientEvent( client, "messages:create", client, "Username and/or passwors is incorrect. Please try again.", "login" )
+				triggerClientEvent( client, "messages:create", client, "Username and/or password is incorrect. Please try again.", "login" )
 			else
 				triggerClientEvent( client, "accounts:onLogin", client )
 				
