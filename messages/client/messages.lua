@@ -39,24 +39,7 @@ function createMessage( message, messageType, messageGlobalID, hideButton, disab
 		
 		addEventHandler( "onClientGUIClick", messageHolder.button,
 			function( )
-				local parent = getElementParent( source )
-				local id = tonumber( getElementData( parent, "messages:id" ) )
-				local realm = getElementData( parent, "messages:realm" )
-				local disableInput = getElementData( parent, "messages:disableInput" )
-				
-				destroyElement( getElementParent( source ) )
-				
-				if ( messages[ realm ][ id ] ) then
-					messages[ realm ][ id ] = nil
-				end
-				
-				showCursor( false )
-
-				if ( disableInput ) then
-					guiSetInputEnabled( false )
-				end
-				
-				triggerEvent( "accounts:enableGUI", localPlayer )
+				destroyMessage( messageHolder.messageType )
 			end, false
 		)
 	end
@@ -73,6 +56,8 @@ function destroyMessage( messageType, messageGlobalID )
 				destroyElement( message.window )
 			end
 			
+			triggerEvent( "messages:onContinue", localPlayer, messageID, message.messageType, "client", message.disableInput )
+			
 			message = nil
 		end
 	else
@@ -84,6 +69,8 @@ function destroyMessage( messageType, messageGlobalID )
 					destroyElement( message.window )
 				end
 				
+				triggerEvent( "messages:onContinue", localPlayer, messageID, message.messageType, "global", message.disableInput )
+				
 				messages.global[ messageGlobalID ] = nil
 			end
 		end
@@ -91,6 +78,17 @@ function destroyMessage( messageType, messageGlobalID )
 end
 addEvent( "messages:destroy", true )
 addEventHandler( "messages:destroy", root, destroyMessage )
+
+addEvent( "messages:onContinue", true )
+addEventHandler( "messages:onContinue", root,
+	function( id, type, realm, disableInput )
+		if ( type == "login" ) then
+			triggerEvent( "accounts:enableGUI", localPlayer )
+		elseif ( type == "selection" ) then
+			triggerEvent( "characters:enableGUI", localPlayer )
+		end
+	end
+)
 
 addEventHandler( "onClientResourceStop", root,
 	function( resource )
