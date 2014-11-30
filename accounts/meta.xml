@@ -10,6 +10,7 @@
 	<export function="new" />
 	<export function="login" />
 	<export function="logout" />
+	<export function="characterSelection" />
 	
 	<file src="images/models/0.png" />
 	<file src="images/models/1.png" />
