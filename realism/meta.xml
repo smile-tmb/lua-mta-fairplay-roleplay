@@ -1,0 +1,5 @@
+<meta>
+	<info name="realism@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="server/realism.lua" />
+</meta>
