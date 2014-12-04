@@ -1,4 +1,5 @@
 <meta>
 	<info name="builder@fpg" author="socialz@github" type="script" />
+	
 	<script src="server/builder.lua" />
 </meta>
