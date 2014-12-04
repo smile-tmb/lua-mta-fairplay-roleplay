@@ -1,0 +1,7 @@
+<meta>
+	<info name="chat@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="server/chat.lua" />
+	
+	<export function="outputLocalActionMe" />
+</meta>
