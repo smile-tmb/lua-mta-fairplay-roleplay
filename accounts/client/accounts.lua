@@ -14,14 +14,17 @@ local maximumPasswordLength = 100
 function showLoginMenu( forceClose )
 	if ( isElement( accounts_login_view.window ) ) then
 		destroyElement( accounts_login_view.window )
-		showCursor( false, false )
 	end
+	
+	showCursor( false )
+	guiSetInputEnabled( false )
 	
 	if ( forceClose ) then
 		return
 	end
 	
-	showCursor( true, true )
+	showCursor( true )
+	guiSetInputEnabled( true )
 	
 	accounts_login_view.window = guiCreateWindow( ( screenWidth - 273 ) / 2, ( screenHeight - 310 ) / 2, 273, 310, "FairPlay Gaming", false )
 	guiWindowSetSizable( accounts_login_view.window, false )
@@ -100,8 +103,10 @@ function showLoginMenu( forceClose )
 	
 	addEventHandler( "onClientKey", root,
 		function( button, pressOrRelease )
-			if ( button == "enter" ) and ( pressOrRelease ) and ( guiGetEnabled( accounts_login_view.button.login ) ) then
-				processLogin( )
+			if ( isElement( accounts_login_view.window ) ) then
+				if ( button == "enter" ) and ( pressOrRelease ) and ( guiGetEnabled( accounts_login_view.button.login ) ) then
+					processLogin( )
+				end
 			end
 		end
 	)
@@ -157,16 +162,16 @@ addEventHandler( "accounts:showLogin", root,
 	end
 )
 
-addEvent( "accounts:closeLogin", true )
-addEventHandler( "accounts:closeLogin", root,
+addEvent( "accounts:closeGUI", true )
+addEventHandler( "accounts:closeGUI", root,
 	function( )
-		showLoginMenu( true )
 		exports.messages:destroyMessage( "login" )
+		showLoginMenu( true )
 	end
 )
 
 function onLogin( )
-	triggerEvent( "accounts:closeLogin", localPlayer )
+	triggerEvent( "accounts:closeGUI", localPlayer )
 end
 addEvent( "accounts:onLogin", true )
 addEventHandler( "accounts:onLogin", root, onLogin )
@@ -174,6 +179,7 @@ addEvent( "accounts:onLogin.accounts", true )
 addEventHandler( "accounts:onLogin.accounts", root, onLogin )
 
 function onLogout( )
+	exports.messages:destroyMessage( "login" )
 	showLoginMenu( )
 end
 addEvent( "accounts:onLogout", true )

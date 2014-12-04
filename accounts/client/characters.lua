@@ -10,25 +10,20 @@ local character_selection = {
 
 local selectedSkin = 1
 
-local minimumNameLength, maximumNameLength = 5, 25
-
-local minimumBirthDay, maximumBirthDay = 1, 31
-local minimumBirthMonth, maximumBirthMonth = 1, 12
-local minimumBirthYear, maximumBirthYear = 1900, 2004
-
-local minimumOriginLength, maximumOriginLength = 2, 100
-
 function showCharacterSelection( forceClose )
 	if ( isElement( character_selection.window ) ) then
 		destroyElement( character_selection.window )
-		showCursor( false, false )
 	end
+	
+	showCursor( false )
+	guiSetInputEnabled( false )
 	
 	if ( forceClose ) then
 		return
 	end
 	
-	showCursor( true, true )
+	showCursor( true )
+	guiSetInputEnabled( true )
 	
 	character_selection.window = guiCreateWindow( ( screenWidth - 536 ) / 2, ( screenHeight - 346 ) / 2, 536, 376, "Character Selection", false )
 	guiWindowSetSizable( character_selection.window, false )
@@ -50,7 +45,7 @@ function showCharacterSelection( forceClose )
 		if ( row ~= -1 ) and ( column ~= -1 ) then
 			local characterName = guiGridListGetItemText( character_selection.characters, row, column )
 			
-			triggerServerEvent( "accounts:play", localPlayer, characterName )
+			triggerServerEvent( "characters:play", localPlayer, characterName )
 		end
 	end
 	
@@ -191,7 +186,7 @@ function showCharacterSelection( forceClose )
 			local characterOrigin = guiGetText( character_selection.edit.origin )
 			local characterLook = guiGetText( character_selection.memo.look )
 			
-			characterName = characterName:gsub( "%c%d\_\!\?\=\)\(\\\/\"\#\&\%\[\]\{\}\*\^\~\:\;\>\<", "" )
+			characterName = characterName:gsub( "%c%d\!\?\=\)\(\\\/\"\#\&\%\[\]\{\}\*\^\~\:\;\>\<", "" ):gsub( "_", " " )
 			guiSetText( character_selection.edit.character_name, characterName )
 			
 			function invalidDateOfBirth( )
@@ -202,18 +197,18 @@ function showCharacterSelection( forceClose )
 			if ( characterName:len( ) >= minimumNameLength ) then
 				if ( characterName:len( ) <= maximumNameLength ) then
 					if ( not birthDay:find( "%D" ) ) and ( not birthMonth:find( "%D" ) ) and ( not birthYear:find( "%D" ) ) then
-						if ( birthDay >= minimumBirthDay ) then
-							if ( birthDay <= maximumBirthDay ) then
-								if ( birthMonth >= minimumBirthMonth ) then
-									if ( birthMonth <= maximumBirthMonth ) then
-										if ( birthYear >= minimumBirthYear ) then
-											if ( birthYear <= maximumBirthYear ) then
+						if ( tonumber( birthDay ) >= minimumBirthDay ) then
+							if ( tonumber( birthDay ) <= maximumBirthDay ) then
+								if ( tonumber( birthMonth ) >= minimumBirthMonth ) then
+									if ( tonumber( birthMonth ) <= maximumBirthMonth ) then
+										if ( tonumber( birthYear ) >= minimumBirthYear ) then
+											if ( tonumber( birthYear ) <= maximumBirthYear ) then
 												if ( characterOrigin:len( ) >= minimumOriginLength ) then
 													if ( characterOrigin:len( ) <= maximumOriginLength ) then
 														exports.messages:createMessage( "Creating character, please wait.", "selection", nil, true )
 														guiSetEnabled( character_selection.window, false )
 														
-														triggerServerEvent( "characters:create", localPlayer, characterName, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook )
+														triggerServerEvent( "characters:create", localPlayer, selectedSkin, characterName, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook )
 													else
 														exports.messages:createMessage( "Character origin must be at most " .. maximumOriginLength .. " characters long.", "selection" )
 														guiSetEnabled( character_selection.window, false )
@@ -294,7 +289,7 @@ addEventHandler( "accounts:addCharacters", root,
 		if ( isElement( character_selection.window ) ) then
 			for _, character in ipairs( characters ) do
 				local row = guiGridListAddRow( character_selection.characters )
-				guiGridListSetItemText( character_selection.characters, row, 1, character.name, false, false )
+				guiGridListSetItemText( character_selection.characters, row, 1, character.name:gsub( "_", " " ), false, false )
 				guiGridListSetItemText( character_selection.characters, row, 2, character.last_played, false, false )
 			end
 		end
@@ -310,7 +305,7 @@ addEvent( "accounts:onLogin.characters", true )
 addEventHandler( "accounts:onLogin.characters", root, onLogin )
 
 function onLogout( )
-	showCharacterSelection( true )
+	triggerEvent( "characters:closeGUI", localPlayer )
 end
 addEvent( "accounts:onLogout", true )
 addEventHandler( "accounts:onLogout", root, onLogout )
@@ -324,11 +319,25 @@ addEventHandler( "accounts:showCharacterSelection", root,
 	end
 )
 
-addEvent( "accounts:closeCharacterSelection", true )
-addEventHandler( "accounts:closeCharacterSelection", root,
+addEvent( "characters:closeGUI", true )
+addEventHandler( "characters:closeGUI", root,
 	function( )
-		showCharacterSelection( true )
 		exports.messages:destroyMessage( "selection" )
+		showCharacterSelection( true )
+	end
+)
+
+addEvent( "characters:onSpawn", true )
+addEventHandler( "characters:onSpawn", root,
+	function( )
+		setPedCameraRotation( localPlayer, getPedRotation( localPlayer ) - 180 )
+	end
+)
+
+addEvent( "characters:onCreate", true )
+addEventHandler( "characters:onCreate", root,
+	function( )
+		triggerEvent( "characters:closeGUI", localPlayer )
 	end
 )
 

@@ -16,12 +16,16 @@ function login( player, username, password )
 	local account = exports.database:query_single( "SELECT * FROM `accounts` WHERE `username` = ? AND `password` = ?", username, exports.security:hashString( password ) )
 	
 	if ( account ) then
+		exports.database:execute( "UPDATE `accounts` SET `last_login` = NOW( ) WHERE `id` = ?", account.id )
+		
 		exports.security:modifyElementData( player, "database:id", account.id, false )
 		exports.security:modifyElementData( player, "account:username", account.username, true )
-		exports.security:modifyElementData( player, "account:rank", account.rank, true )
+		exports.security:modifyElementData( player, "account:level", account.level, true )
+		exports.security:modifyElementData( player, "account:duty", true, true )
 		exports.security:modifyElementData( player, "player:name", getPlayerName( player ), true )
 		
 		triggerClientEvent( player, "accounts:onLogin", player )
+		triggerClientEvent( player, "admin:showHUD", player )
 		
 		return true
 	end
@@ -32,11 +36,12 @@ end
 function logout( player )
 	characterSelection( player )
 	
-	exports.database:query( "UPDATE `accounts` SET `last_action` = NOW( ) WHERE `id` = ?", getElementData( player, "database:id" ) )
+	exports.database:execute( "UPDATE `accounts` SET `last_action` = NOW( ) WHERE `id` = ?", getElementData( player, "database:id" ) )
 	
 	removeElementData( player, "database:id" )
 	removeElementData( player, "account:username" )
-	removeElementData( player, "account:rank" )
+	removeElementData( player, "account:level" )
+	removeElementData( player, "account:duty" )
 	removeElementData( player, "player:name" )
 	
 	spawnPlayer( player, 0, 0, 0 )
@@ -46,6 +51,7 @@ function logout( player )
 	
 	triggerClientEvent( player, "accounts:onLogout.characters", player )
 	triggerClientEvent( player, "accounts:onLogout.accounts", player )
+	triggerClientEvent( player, "admin:hideHUD", player )
 end
 
 function register( username, password )
@@ -55,7 +61,7 @@ function register( username, password )
 		local accountID = exports.database:insert_id( "INSERT INTO `accounts` (`username`, `password`) VALUES (?, ?)", username, exports.security:hashString( password ) )
 		
 		if ( accountID ) then
-			return true
+			return accountID
 		else
 			return -2
 		end
@@ -119,6 +125,8 @@ addEventHandler( "accounts:ready", root,
 		
 		local accountID = tonumber( getElementData( client, "database:id" ) )
 		
+		triggerClientEvent( client, "admin:updateHUD", client )
+		
 		if ( not accountID ) then
 			triggerClientEvent( client, "accounts:showLogin", client )
 			
@@ -136,5 +144,8 @@ addEventHandler( "accounts:ready", root,
 				fadeCamera( client, true )
 			end
 		end
+		
+		setPlayerHudComponentVisible( client, "all", false )
+		setPlayerHudComponentVisible( client, "clock", true )
 	end
 )
