@@ -1,0 +1,6 @@
+<meta>
+	<info name="superman@fpg" author="socialz@github" type="script" />
+	
+	<script src="client/superman.lua" type="client" cache="false" />
+	<script src="server/superman.lua" />
+</meta>
