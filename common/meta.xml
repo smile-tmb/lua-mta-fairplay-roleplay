@@ -2,6 +2,9 @@
 	<info name="common@fairplay" author="socialz@fairplay" type="script" />
 	
 	<script src="shared/common.lua" type="shared" cache="false" />
+	<script src="shared/admin.lua" type="shared" cache="false" />
+	<script src="client/utility.lua" type="client" cache="false" />
+	<script src="client/cursor.lua" type="client" cache="false" />
 	
 	<export function="nextIndex" type="shared" />
 	<export function="findByValue" type="shared" />
@@ -9,4 +12,32 @@
 	<export function="isLeapYear" type="shared" />
 	<export function="getDaysInMonth" type="shared" />
 	<export function="getValidPedModelsByGenderAndColor" type="shared" />
+	<export function="getRandomString" type="shared" />
+	<export function="isPlayerPlaying" type="shared" />
+	<export function="getPlayerFromPartialName" type="shared" />
+	<export function="howToWrite" type="shared" />
+	<export function="getCharacterID" type="shared" />
+	<export function="getRealPlayerName" type="shared" />
+	<export function="getAccountName" type="shared" />
+	
+	<export function="getLevels" type="shared" />
+	<export function="getLevelPriority" type="shared" />
+	<export function="getLevelName" type="shared" />
+	<export function="isCommunityAdmin" type="shared" />
+	<export function="isPriorityHigher" type="shared" />
+	<export function="getPlayerLevel" type="shared" />
+	<export function="isPlayerCommunityAdmin" type="shared" />
+	<export function="isPlayerPriorityHigher" type="shared" />
+	<export function="getPriorityPlayers" type="shared" />
+	<export function="isOnDuty" type="shared" />
+	
+	<export function="isPlayerServerTrialAdmin" type="shared" />
+	<export function="isPlayerServerJuniorAdmin" type="shared" />
+	<export function="isPlayerServerAdmin" type="shared" />
+	<export function="isPlayerServerSeniorAdmin" type="shared" />
+	<export function="isPlayerServerManager" type="shared" />
+	<export function="isPlayerCommunityModerator" type="shared" />
+	<export function="isPlayerCommunityAdmin" type="shared" />
+	<export function="isPlayerCommunitySeniorAdmin" type="shared" />
+	<export function="isPlayerCommunityDirector" type="shared" />
 </meta>

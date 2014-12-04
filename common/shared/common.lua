@@ -88,3 +88,69 @@ function getRandomString( length )
 	
 	return buffer
 end
+
+function isPlayerPlaying( player )
+	return getElementData( player, "player:playing" ) and true or false
+end
+
+function getPlayerFromPartialName( string, player )
+	if ( not string ) then
+		return false
+	end
+	
+	if ( not tonumber( string ) ) and ( string == "*" ) and ( getElementType( player ) == "player" ) then
+		return isPlayerPlaying( player ) and player or false
+	else
+		if ( tonumber( string ) ) and ( tonumber( string ) > 0 ) then
+			return getPlayerByID( tonumber( string ), player )
+		end
+		
+		local matches = { }
+		
+		for _, player in ipairs( getElementsByType( "player" ) ) do
+			if ( getPlayerName( player ) == string ) and ( isPlayerPlaying( player ) ) then
+				return player
+			end
+			
+			local playerName = getPlayerName( player ):gsub( "#%x%x%x%x%x%x", "" )
+			playerName = playerName:lower( )
+			
+			if ( playerName:find( string:lower( ), 0 ) ) and ( isPlayerPlaying( player ) ) then
+				table.insert( matches, player )
+			end
+		end
+		
+		if ( #matches == 1 ) then
+			return matches[ 1 ]
+		end
+		
+		return false, #matches
+	end
+end
+
+function howToWrite( string )
+	local selectorLetters = { s = true }
+	local lastLetter = string:sub( #string, #string )
+	
+	if ( selectorLetters[ lastLetter ] ) then
+		return true
+	end
+	
+	return false
+end
+
+function formatString( string )
+	return howToWrite( string ) and string .. "'" or string .. "'s"
+end
+
+function getCharacterID( player )
+	return getElementData( player, "character:id" ) and tonumber( getElementData( player, "character:id" ) ) or false
+end
+
+function getRealPlayerName( player )
+	return getPlayerName( player ):gsub( "_", " " )
+end
+
+function getAccountName( player )
+	return getElementData( player, "account:username" )
+end
