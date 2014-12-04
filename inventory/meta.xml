@@ -1,0 +1,26 @@
+<meta>
+	<info name="inventory@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="client/inventory.lua" type="client" cache="false" />
+	<script src="server/inventory.lua" />
+	
+	<file src="images/backpack.png" />
+	<file src="images/keys.png" />
+	<file src="images/weapons.png" />
+	<file src="images/1.png" />
+	<file src="images/2.png" />
+	<file src="images/3.png" />
+	<file src="images/4.png" />
+	<file src="images/5.png" />
+	<file src="images/6.png" />
+	<file src="images/7.png" />
+	<file src="images/8.png" />
+	<file src="images/9.png" />
+	<file src="images/10.png" />
+	<file src="images/11.png" />
+	<file src="images/12.png" />
+	<file src="images/13.png" />
+	<file src="images/14.png" />
+	<file src="images/w30.png" />
+	<file src="images/w31.png" />
+</meta>
