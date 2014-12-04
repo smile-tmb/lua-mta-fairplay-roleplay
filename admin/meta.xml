@@ -1,0 +1,10 @@
+<meta>
+	<info name="admin@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="client/admin.lua" type="client" cache="false" />
+	<script src="client/admin_hud.lua" type="client" cache="false" />
+	<script src="client/tickets.lua" type="client" cache="false" />
+	<script src="shared/admin.lua" type="shared" cache="false" />
+	<script src="server/utility.lua" />
+	<script src="server/player_admin.lua" />
+</meta>
