@@ -1,4 +1,4 @@
-database.configuration.automated_resources = { accounts = { "accounts", "characters" }, vehicles = { "vehicles" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -8,7 +8,7 @@ database.verification = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "username", type = "varchar", length = 25, default = "" },
 		{ name = "password", type = "varchar", length = 1000, default = "" },
-		{ name = "rank", type = "tinyint", length = 3, default = 0 },
+		{ name = "level", type = "tinyint", length = 3, default = 0 },
 		{ name = "is_deleted", type = "tinyint", length = 1, default = 0 },
 		{ name = "last_login", type = "datetime", default = "0000-00-00 00:00:00" },
 		{ name = "last_action", type = "datetime", default = "0000-00-00 00:00:00" },
@@ -34,6 +34,15 @@ database.verification = {
 		{ name = "health", type = "smallint", length = 3, default = 100, is_unsigned = true },
 		{ name = "armor", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "last_played", type = "datetime", default = "0000-00-00 00:00:00" },
+		{ name = "created_time", type = "datetime", default = "0000-00-00 00:00:00" }
+	},
+	inventory = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "character_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "item_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "value", type = "varchar", length = 1000, default = "" },
+		{ name = "ringtone_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "created_time", type = "datetime", default = "0000-00-00 00:00:00" }
 	},
 	vehicles = {
@@ -72,6 +81,24 @@ database.verification = {
 		{ name = "is_bulletproof", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "created_time", type = "datetime", default = "0000-00-00 00:00:00" },
 		{ name = "created_by", type = "int", length = 11, default = 0, is_unsigned = true }
+	},
+	worlditems = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "item_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "value", type = "varchar", length = 1000, default = "" },
+		{ name = "pos_x", type = "float", default = 0 },
+		{ name = "pos_y", type = "float", default = 0 },
+		{ name = "pos_z", type = "float", default = 0 },
+		{ name = "rot_x", type = "float", default = 0 },
+		{ name = "rot_y", type = "float", default = 0 },
+		{ name = "rot_z", type = "float", default = 0 },
+		{ name = "interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
+		{ name = "ringtone_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "user_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "protection", type = "int", length = 10, default = 0 },
+		{ name = "created_time", type = "datetime", default = "0000-00-00 00:00:00" }
 	}
 }
 
