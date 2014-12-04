@@ -30,9 +30,8 @@ function createMessage( message, messageType, messageGlobalID, hideButton, disab
 	guiLabelSetHorizontalAlign( messageHolder.message, "center", true )
 	guiLabelSetVerticalAlign( messageHolder.message, "center" )
 
-	if ( disableInput ) then
-		guiSetInputEnabled( true )
-	end
+	showCursor( true )
+	guiSetInputEnabled( disableInput or false )
 	
 	if ( not hideButton ) then
 		messageHolder.button = guiCreateButton( 16, 109, 284, 25, "Continue", false, messageHolder.window )	
@@ -49,7 +48,7 @@ addEventHandler( "messages:create", root, createMessage )
 
 function destroyMessage( messageType, messageGlobalID )
 	if ( messageType ) then
-		for _, messageID in ipairs( exports.common:findByValue( messages.client, messageType, true ) ) do
+		for messageIndex, messageID in ipairs( exports.common:findByValue( messages.client, messageType, true ) ) do
 			local message = messages.client[ messageID ]
 			
 			if ( isElement( message.window ) ) then
@@ -58,7 +57,7 @@ function destroyMessage( messageType, messageGlobalID )
 			
 			triggerEvent( "messages:onContinue", localPlayer, messageID, message.messageType, "client", message.disableInput )
 			
-			message = nil
+			messages.client[ messageIndex ] = nil
 		end
 	else
 		if ( messageGlobalID ) then
@@ -74,6 +73,11 @@ function destroyMessage( messageType, messageGlobalID )
 				messages.global[ messageGlobalID ] = nil
 			end
 		end
+	end
+	
+	if ( #messages.client == 0 ) and ( #messages.global == 0 ) then
+		showCursor( false )
+		guiSetInputEnabled( false )
 	end
 end
 addEvent( "messages:destroy", true )
@@ -98,6 +102,7 @@ addEventHandler( "onClientResourceStop", root,
 		
 		if ( getResourceName( resource ) == "accounts" ) then
 			destroyMessage( "login" )
+			destroyMessage( "selection" )
 		end
 	end
 )
