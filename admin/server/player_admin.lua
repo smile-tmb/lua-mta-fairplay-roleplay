@@ -55,7 +55,7 @@ addCommandHandler( { "makeadmin", "setlevel", "setadminlevel" },
 				
 				triggerClientEvent( root, "admin:updateHUD", root )
 				
-				outputChatBox( "Updated " .. exports.common:formatString( getPlayerName( targetPlayer ) ) .. " level to " .. level .. " (" .. levelName .. ").", player, 230, 180, 95, false )
+				outputChatBox( "Updated " .. exports.common:formatString( getPlayerName( targetPlayer ) ) .. " level to " .. level .. " (" .. levelName .. ").", player, 95, 230, 95, false )
 			else
 				outputChatBox( "Such level does not exist.", player, 230, 95, 95, false )
 				
