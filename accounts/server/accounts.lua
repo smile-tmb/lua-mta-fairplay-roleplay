@@ -44,6 +44,8 @@ function logout( player )
 	removeElementData( player, "account:duty" )
 	removeElementData( player, "player:name" )
 	
+	triggerClientEvent( player, "superman:stop", player )
+	
 	spawnPlayer( player, 0, 0, 0 )
 	setElementDimension( player, 6000 )
 	

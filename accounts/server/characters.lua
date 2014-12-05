@@ -169,6 +169,8 @@ function characterSelection( player )
 	removeElementData( player, "character:weight" )
 	removeElementData( player, "character:max_weight" )
 	
+	triggerClientEvent( player, "superman:stop", player )
+	
 	spawnPlayer( player, 0, 0, 0 )
 	setElementDimension( player, 6000 )
 	
