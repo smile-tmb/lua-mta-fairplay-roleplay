@@ -1,4 +1,4 @@
-﻿local data = { }
+﻿data = { }
 
 function getPlayerItems( player )
 	if ( data[ player ] ) then
@@ -20,15 +20,17 @@ function loadItems( player )
 	
 	if ( query ) then
 		for result, row in ipairs( query ) do
-			if ( getItems( )[ row.item_id ] ) then
+			if ( getItem( row.item_id ) ) then
 				giveItem( player, row.item_id, row.value, row.id, row.ringtone_id, row.messagetone_id )
 			end
 		end
+		
+		loadWeapons( player )
 	end
 end
 
 function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID )
-	if ( getItems( )[ itemID ]) then
+	if ( getItems( itemID ) ) then
 		if ( ( tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ) ) > ( tonumber( getElementData( player, "character:max_weight" ) ) ) ) then
 			return false
 		end
@@ -50,6 +52,8 @@ function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID )
 		table.insert( data[ player ].items, { db_id = dbID, item_id = itemID, value = value, ringtone_id = ringtoneID or 1, messagetone_id = messagetoneID or 1 } )
 		
 		triggerClientEvent( player, "inventory:synchronize", player, data[ player ].items )
+		
+		loadWeapons( player )
 		
 		return true
 	else
@@ -91,6 +95,8 @@ function takeItem( player, itemID, value, dbID )
 				end
 			end
 		end
+		
+		loadWeapons( player )
 	else
 		return false
 	end
@@ -144,13 +150,15 @@ function getPlayerItemValue( player, itemID, dbID )
 	end
 end
 
-addEventHandler("onResourceStop", resourceRoot,
+addEventHandler( "onResourceStop", resourceRoot,
 	function( )
 		for _, player in ipairs( getElementsByType( "player" ) ) do
 			if ( exports.common:isPlayerPlaying( player ) ) then
 				exports.security:modifyElementData( player, "character:weight", 0, true )
 				exports.security:modifyElementData( player, "character:max_weight", 10, true )
 			end
+			
+			takeAllWeapons( player )
 		end
 	end
 )
@@ -163,6 +171,17 @@ addEventHandler( "items:get", root,
 		end
 		
 		loadItems( client )
+	end
+)
+
+addEvent( "items:synchronize", true)
+addEventHandler( "items:synchronize", root,
+	function( )
+		if ( source ~= client ) then
+			return
+		end
+		
+		triggerClientEvent( client, "inventory:synchronize", client, data[ client ].items )
 	end
 )
 
