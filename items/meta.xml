@@ -2,11 +2,16 @@
 	<info name="items@fairplay" author="socialz@fairplay" type="script" />
 	
 	<script src="client/items.lua" type="client" cache="false" />
+	<script src="client/weapons.lua" type="client" cache="false" />
 	<script src="client/worlditems.lua" type="client" cache="false" />
+	
 	<script src="shared/items.lua" type="shared" cache="false" />
+	<script src="shared/weapons.lua" type="shared" cache="false" />
+	
 	<script src="server/utility.lua" />
 	<script src="server/items.lua" />
 	<script src="server/itemuse.lua" />
+	<script src="server/weapons.lua" />
 	<script src="server/worlditems.lua" />
 	
 	<export function="getItem" type="shared" />
@@ -23,6 +28,7 @@
 	<export function="getItemWeight" type="shared" />
 	<export function="isWorldItem" type="shared" />
 	<export function="getItemSubValue" type="shared" />
+	
 	<export function="getWeaponID" type="shared" />
 	<export function="getWeaponName" type="shared" />
 	<export function="getWeaponDescription" type="shared" />
@@ -30,10 +36,12 @@
 	<export function="getWeaponWeight" type="shared" />
 	<export function="getAmmoWeight" type="shared" />
 	
-	<export function="loadItems" type="server" />
-	<export function="getPlayerItems" type="server" />
-	<export function="giveItem" type="server" />
-	<export function="takeItem" type="server" />
-	<export function="hasItem" type="server" />
-	<export function="getPlayerItemValue" type="server" />
+	<export function="loadItems" />
+	<export function="getPlayerItems" />
+	<export function="giveItem" />
+	<export function="takeItem" />
+	<export function="hasItem" />
+	<export function="getPlayerItemValue" />
+	
+	<export function="loadWeapons" />
 </meta>

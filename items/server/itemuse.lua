@@ -25,6 +25,14 @@ addEventHandler( "items:act", root,
 		elseif ( itemID == 10 ) then
 			--triggerEvent( ":_displayPhone_:", client, value )
 			exports.chat:outputLocalActionMe( client, "takes out a cellphone." )
+		elseif ( itemID == 11 ) then
+			local weaponID = getWeaponID( value )
+			
+			if ( weaponID ) then
+				exports.chat:outputLocalActionMe( client, "equips a " .. getWeaponName( value ) .. "." )
+				
+				setPedWeaponSlot( client, getSlotFromWeapon( weaponID ) )
+			end
 		elseif ( itemID == 13 ) then
 			outputChatBox( "You can use this radio by typing /r <message>", client, 230, 180, 95, false )
 		elseif ( itemID == 14 ) then
