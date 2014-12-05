@@ -15,7 +15,7 @@ addEventHandler( "items:drop", root,
 		local rx, ry, rz = getElementRotation( client )
 		local item = getItems( )[ itemID ]
 		
-		if ( not element ) or ( element and getElementType( element ) ~= "player" ) or ( not exports.common:isPlayerPlaying( element ) ) then
+		if ( not isElement( element ) ) or ( isElement( element ) and getElementType( element ) ~= "player" ) or ( not exports.common:isPlayerPlaying( element ) ) then
 			local x, y, z = x + item.offsetX, y + item.offsetY, z + item.offsetZ
 			local rx, ry, rz = rx + item.offsetRX, ry + item.offsetRY, rz + item.offsetRZ
 			local interior = getElementInterior( client )
@@ -30,19 +30,23 @@ addEventHandler( "items:drop", root,
 			
 			local lastid = exports.database:insert_id( "INSERT INTO `worlditems` (`item_id`, `value`, `pos_x`, `pos_y`, `pos_z`, `rot_x`, `rot_y`, `rot_z`, `interior`, `dimension`, `ringtone_id`, `messagetone_id`, `user_id`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", itemID, value, x, y, z, rx, ry, rz, interior, dimension, ringtoneID, messagetoneID, exports.common:getCharacterID( client ) )
 			
-			worldItems[ lastid ] = { item_id = itemID, value = value, user_id = exports.common:getCharacterID( client ), pos_x = x, pos_y = y, pos_z = z, rot_x = rx, rot_y = ry, rot_z = rz, object = object, ringtone_id = 0, messagetone_id = 0 }
-			
-			exports.security:modifyElementData( object, "worlditem:id", lastid, true )
-			exports.security:modifyElementData( object, "worlditem:item_id", itemID, true )
-			exports.security:modifyElementData( object, "worlditem:value", value, true )
-			exports.security:modifyElementData( object, "worlditem:ringtone_id", ringtoneID, true )
-			exports.security:modifyElementData( object, "worlditem:messagetone_id", messagetoneID, true )
-			
-			exports.chat:outputLocalActionMe( client, "dropped down a " .. item.name .. "." )
-			takeItem( client, itemID, value, dbID )
-			
-			if ( itemID == 10 ) then
-				--triggerClientEvent(client, ":_exitPhoneWindows_:", client, value)
+			if ( lastid ) then
+				worldItems[ lastid ] = { item_id = itemID, value = value, user_id = exports.common:getCharacterID( client ), pos_x = x, pos_y = y, pos_z = z, rot_x = rx, rot_y = ry, rot_z = rz, object = object, ringtone_id = 0, messagetone_id = 0 }
+				
+				exports.security:modifyElementData( object, "worlditem:id", lastid, true )
+				exports.security:modifyElementData( object, "worlditem:item_id", itemID, true )
+				exports.security:modifyElementData( object, "worlditem:value", value, true )
+				exports.security:modifyElementData( object, "worlditem:ringtone_id", ringtoneID, true )
+				exports.security:modifyElementData( object, "worlditem:messagetone_id", messagetoneID, true )
+				
+				exports.chat:outputLocalActionMe( client, "dropped down a " .. item.name .. "." )
+				takeItem( client, itemID, value, dbID )
+				
+				if ( itemID == 10 ) then
+					--triggerClientEvent(client, ":_exitPhoneWindows_:", client, value)
+				end
+			else
+				destroyElement( object )
 			end
 		else
 			exports.chat:outputLocalActionMe( client, "gave " .. exports.common:getRealPlayerName( element ) .. " a " .. item.name .. "." )
@@ -75,7 +79,7 @@ addEventHandler( "items:pickup", root,
 		end
 		
 		giveItem( client, worldItems[ tableID ].item_id, worldItems[ tableID ].value )
-		table.remove( worlditems, tableID )
+		table.remove( worldItems, tableID )
 	end
 )
 
@@ -91,13 +95,17 @@ addEventHandler( "items:updateposition", root,
 			return
 		end
 		
-		local item = getItems( )[ worldItems[ tableID ].item_id ]
-		
-		exports.chat:outputLocalActionMe( client, "moved a " .. item.name .. "." )
-		
-		exports.database:execute( "UPDATE `worlditems` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ? WHERE `id` = ?", x, y, z, tableID )
-		
-		setElementPosition( object, x, y, z )
+		if ( worldItems[ tableID ] ) then
+			local item = getItem( worldItems[ tableID ].item_id )
+			
+			if ( item ) then
+				exports.chat:outputLocalActionMe( client, "moved a " .. item.name .. "." )
+				
+				exports.database:execute( "UPDATE `worlditems` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ? WHERE `id` = ?", x, y, z, tableID )
+				
+				setElementPosition( object, x, y, z )
+			end
+		end
 	end
 )
 
@@ -113,7 +121,7 @@ addEventHandler( "onResourceStart", resourceRoot,
 			end
 			
 			for _, row in pairs( query ) do
-				local item = getItems( )[ row.item_id ]
+				local item = getItem( row.item_id )
 				
 				if ( item ) then
 					local x, y, z = row.pos_x + item.offsetX, row.pos_y + item.offsetY, row.pos_z + item.offsetZ

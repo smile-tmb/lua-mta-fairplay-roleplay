@@ -133,9 +133,37 @@ function getItemWeight( itemID )
 end
 
 function isWorldItem( element )
-	if ( not element ) or ( getElementType( element ) ~= "object" ) or ( not getElementData( element, "worlditem.id" ) ) then
+	if ( not isElement( element ) ) or ( getElementType( element ) ~= "object" ) or ( not getElementData( element, "worlditem:id" ) ) then
 		return false
 	end
 	
 	return { id = tonumber( getElementData( element, "worlditem:id" ) ), item_id = tonumber( getElementData( element, "worlditem:item_id" ) ), value = getElementData( element, "worlditem:value" ) }
+end
+
+function getItemSubValue( value )
+	return split( value, ";" )
+end
+
+function getWeaponModel( weaponID )
+	return weaponmodels[ weaponID ] or itemlist[ 11 ].model
+end
+
+function getWeaponID( value )
+	return getItemSubValue( value )[ 1 ]
+end
+
+function getWeaponName( value )
+	return getItemSubValue( value )[ 2 ]
+end
+
+function getWeaponDescription( value )
+	return getItemSubValue( value )[ 3 ]
+end
+
+function getWeaponWeight( weaponID )
+	return weaponweights[ weaponID ] or itemlist[ 11 ].weight
+end
+
+function getAmmoWeight( weaponID )
+	return ammoweights[ weaponID ] or itemlist[ 12 ].weight
 end

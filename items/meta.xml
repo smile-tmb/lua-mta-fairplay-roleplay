@@ -22,6 +22,13 @@
 	<export function="getItemType" type="shared" />
 	<export function="getItemWeight" type="shared" />
 	<export function="isWorldItem" type="shared" />
+	<export function="getItemSubValue" type="shared" />
+	<export function="getWeaponID" type="shared" />
+	<export function="getWeaponName" type="shared" />
+	<export function="getWeaponDescription" type="shared" />
+	<export function="getWeaponModel" type="shared" />
+	<export function="getWeaponWeight" type="shared" />
+	<export function="getAmmoWeight" type="shared" />
 	
 	<export function="loadItems" type="server" />
 	<export function="getPlayerItems" type="server" />
