@@ -3,3 +3,9 @@ addCommandHandler( { "cursor", "togcursor", "togglecursor" },
 		showCursor( not isCursorShowing( ) )
 	end
 )
+
+addEventHandler( "onClientResourceStart", resourceRoot,
+	function( )
+		bindKey( "m", "down", "togcursor" )
+	end
+)
