@@ -119,8 +119,43 @@ addEventHandler( "characters:play", root,
 	end
 )
 
+function saveCharacter( player )
+	if ( exports.common:isPlayerPlaying( player ) ) then
+		local x, y, z = getElementPosition( player )
+		local rotation = getPedRotation( player )
+		local interior = getElementInterior( player )
+		local dimension = getElementDimension( player )
+		local skinModel = getElementModel( player )
+		local characterID = exports.common:getCharacterID( player )
+		
+		return exports.database:execute( "UPDATE `characters` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rotation` = ?, `interior` = ?, `dimension` = ?, `skin_id` = ?, `last_played` = NOW() WHERE `id` = ?", x, y, z, rotation, interior, dimension, skinModel, characterID )
+	end
+end
+
+addCommandHandler( "saveme",
+	function( player )
+		if ( saveCharacter( player ) ) then
+			outputChatBox( "Your character has been successfully saved.", player, 95, 230, 95, false )
+		end
+	end
+)
+
+addEventHandler( "onResourceStop", resourceRoot,
+	function( )
+		for _, player in ipairs( getElementsByType( "player" ) ) do
+			saveCharacter( player )
+		end
+	end
+)
+
+addEventHandler( "onPlayerQuit", root,
+	function( )
+		saveCharacter( source )
+	end
+)
+
 function characterSelection( player )
-	exports.database:execute( "UPDATE `characters` SET `last_played` = NOW( ) WHERE `id` = ?", getElementData( player, "character:id" ) )
+	saveCharacter( player )
 	
 	removeElementData( player, "player:playing" )
 	

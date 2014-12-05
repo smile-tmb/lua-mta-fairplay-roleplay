@@ -11,6 +11,7 @@
 	<export function="new" />
 	<export function="login" />
 	<export function="logout" />
+	<export function="saveCharacter" />
 	<export function="characterSelection" />
 	<export function="getNameBounds" />
 	<export function="getBirthDateBounds" />
