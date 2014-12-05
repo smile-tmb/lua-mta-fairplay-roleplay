@@ -37,7 +37,7 @@ function showLoginMenu( forceClose )
 	accounts_login_view.label[ 2 ] = guiCreateLabel( 17, 87, 238, 14, "Username", false, accounts_login_view.window )
 	guiSetFont( accounts_login_view.label[ 2 ], "default-bold-small" )
 	
-	accounts_login_view.label[ 3 ] = guiCreateLabel( 18, 150, 238, 14, "Password", false, accounts_login_view.window )
+	accounts_login_view.label[ 3 ] = guiCreateLabel( 18, 150, 238, 14, "Password (min. " .. minimumPasswordLength .. ")", false, accounts_login_view.window )
 	guiSetFont( accounts_login_view.label[ 3 ], "default-bold-small" )
 	
 	accounts_login_view.edit.username = guiCreateEdit( 17, 111, 239, 29, "", false, accounts_login_view.window )
