@@ -67,7 +67,7 @@ database.verification = {
 		{ name = "numberplate", type = "varchar", length = 10, default = "UNd3F1N3D" },
 		{ name = "variant_1", type = "tinyint", length = 3, default = 255, is_unsigned = true },
 		{ name = "variant_2", type = "tinyint", length = 3, default = 255, is_unsigned = true },
-		{ name = "account_id", type = "int", length = 11, default = 0, is_unsigned = true },
+		{ name = "owner_id", type = "int", length = 11, default = 0 },
 		{ name = "health", type = "smallint", length = 4, default = 1000, is_unsigned = true },
 		{ name = "color", type = "varchar", length = 255, default = "[ [ 0, 0, 0 ], [ 0, 0, 0 ], [ 0, 0, 0], [ 0, 0, 0 ] ]" },
 		{ name = "headlight_color", type = "varchar", length = 255, default = "[ [ 0, 0, 0 ] ]" },
