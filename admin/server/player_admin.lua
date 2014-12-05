@@ -46,14 +46,19 @@ addCommandHandler( { "makeadmin", "setlevel", "setadminlevel" },
 				return
 			end
 			
-			local levelName = exports.common:getLevelName( level )
+			local levelName = exports.common:getLevelName( tonumber( level ) )
 			
 			if ( levelName ~= "" ) then
-				exports.security:modifyElementData( player, "account:level", level, true )
+				exports.security:modifyElementData( targetPlayer, "account:level", level, true )
 				
-				exports.database:query( "UPDATE `accounts` SET `level` = ? WHERE `id` = ?", level, getElementData( player, "database:id" ) )
+				exports.database:query( "UPDATE `accounts` SET `level` = ? WHERE `id` = ?", level, getElementData( targetPlayer, "database:id" ) )
 				
-				triggerClientEvent( root, "admin:updateHUD", root )
+				if ( level > 0 ) then
+					triggerClientEvent( targetPlayer, "admin:showHUD", targetPlayer )
+					triggerClientEvent( root, "admin:updateHUD", root )
+				else
+					triggerClientEvent( targetPlayer, "admin:hideHUD", targetPlayer )
+				end
 				
 				outputChatBox( "Updated " .. exports.common:formatString( getPlayerName( targetPlayer ) ) .. " level to " .. level .. " (" .. levelName .. ").", player, 95, 230, 95, false )
 			else
@@ -82,9 +87,7 @@ addCommandHandler( { "toggleduty", "adminduty", "toggleadminduty", "togduty", "a
 addCommandHandler( { "announce", "announcement", "message" },
 	function( player, cmd, ... )
 		if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
-			local tick = getTickCount( )
-			
-			exports.messages:createMessage( root, table.concat( { ... }, " " ), nil, tick )
+			exports.messages:createMessage( root, table.concat( { ... }, " " ), nil, getTickCount( ) )
 		end
 	end
 )
