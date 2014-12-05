@@ -16,6 +16,7 @@
 	<export function="isPlayerPlaying" type="shared" />
 	<export function="getPlayerFromPartialName" type="shared" />
 	<export function="howToWrite" type="shared" />
+	<export function="formatString" type="shared" />
 	<export function="getCharacterID" type="shared" />
 	<export function="getRealPlayerName" type="shared" />
 	<export function="getAccountName" type="shared" />
