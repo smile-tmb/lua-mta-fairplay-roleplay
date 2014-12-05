@@ -60,7 +60,7 @@ function disconnect( queueRestart )
 		return true
 	end
 	
-	--outputDebugString( "DATABASE: Database connection is not alive and could not be destroyed.", 2 )
+	outputDebugString( "DATABASE: Database connection is not alive and could not be destroyed.", 2 )
 	
 	return false
 end
