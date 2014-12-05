@@ -97,6 +97,13 @@ function Superman:restorePlayer(player)
   self.previousVelocity[player] = nil
 end
 
+addEvent( "superman:stop", true )
+addEventHandler( "superman:stop", root,
+	function( )
+		Superman:restorePlayer( localPlayer )
+	end
+)
+
 function Superman:createSmokeGenerator(player)
   local generator = createObject(2780, getElementPosition(player))
   setElementCollisionsEnabled(generator, false)
