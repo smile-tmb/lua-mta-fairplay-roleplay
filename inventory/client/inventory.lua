@@ -1,33 +1,33 @@
-﻿-- General Stuff
-local screenWidth, screenHeight = guiGetScreenSize( )
-local isVisible = false
-local postGUI = true
+﻿local screenWidth, screenHeight = guiGetScreenSize( )
+local isInventoryVisible = false
 local illegalDrop = { [ 9 ] = true }
-local cases = { "backpack", "keys", "weapons" }
-local items = {
-	backpack = { },
-	keys = { },
-	weapons = { }
-}
+
+local categories = { "backpack", "keys", "weapons" }
+local items = { }
+
+do
+	for _, categoryName in ipairs( categories ) do
+		items[ categoryName ] = { }
+	end
+end
 
 -- Inventory Settings
-local GLOBAL_max = 6
-local GLOBAL_cooldown = false
-local GLOBAL_debug = false
+local maximumIndex = 6
+local inventoryCooldownTimer = false
 
-local CATEGORY_hovering
-local CATEGORY_open
+local hoveringCategoryID
+local inventoryOpenCategoryID
 
-local BG_currentIndex = 0
-local BG_currentRow = 1
+local localItemBackgroundCurrentIndex = 0
+local localItemBackgroundCurrentRow = 1
 
-local ROW_width = 282.0
-local ROW_offset = 100.0
+local inventoryRowWidth = 282
+local inventoryRowOffset = 100
 
-local ITEM_scale = 90
-local ITEM_margin = 3
-local ITEM_currentIndex = 0
-local ITEM_currentRow = 1
+local localItemScale = 90
+local localItemMargin = 3
+local currentLocalItemIndex = 0
+local currentLocalItemRow = 1
 
 local HOVER_currentIndex = 0
 local HOVER_currentRow = 1
@@ -35,23 +35,22 @@ local HOVER_currentRow = 1
 local CLICK_currentIndex = 0
 local CLICK_currentRow = 1
 
-local dist
-local col, x, y, z, element
+local distance
+local collision, x, y, z, element
 local _cursorX, _cursorY = 0, 0
 local maxDistance = 6
-local DRAG_item
-local DRAG_currentIndex = 0
-local DRAG_currentRow = 1
-local DELETING = false
-local draggingWorldItem = false
+local draggingItemSlot
+local draggingIndex = 0
+local draggingRow = 1
+local isDeletingItem = false
+local isDraggingWorldItem = false
 
 local DRAGEND_currentIndex = 0
 local DRAGEND_currentRow = 1
-local LOCKINVENTORY = false
+local isInventoryLocked = false
 
--- Script
 local function doesContainData( case )
-	if ( not items[ cases[ case ] ] ) or ( #items[ cases[ case ] ] == 0 ) then
+	if ( not items[ categories[ case ] ] ) or ( #items[ categories[ case ] ] == 0 ) then
 		return false
 	else
 		return true
@@ -60,13 +59,13 @@ end
 
 local function isHoveringWorldItem( )
 	local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
-	local cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
+	cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
 	local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
 	local _, x, y, z, element = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ )
 	
 	if ( element ) and ( exports.items:isWorldItem( element ) ) then
 		return element
-	elseif ( _x ) and ( _y ) and ( _z ) then
+	elseif ( x ) and ( y ) and ( z ) then
 		local maxDistance = 0.34
 		
 		for _, object in ipairs( getElementsByType( "object" ) ) do
@@ -93,185 +92,263 @@ end
 addEventHandler( "onClientRender", root,
 	function( )
 		if ( isCursorShowing( ) ) then
-			local element = isHoveringWorldItem( )
+			local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
+			cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
 			
-			if ( element ) and ( getElementType( element ) == "object" ) then
-				local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
-				local cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
-				local itemData = exports.items:isWorldItem( element )
+			if ( isDraggingWorldItem ) then
+				local itemID = tonumber( getElementData( isDraggingWorldItem, "worlditem:item_id" ) )
+				local value = getElementData( isDraggingWorldItem, "worlditem:value" )
+				local fileName = itemID
+				local item = exports.items:getItem( itemID )
 				
-				if ( itemData ) then
-					local item = exports.items:getItems( )[ itemData.item_id ]
-					local name = item.name
-					local value = item.value
-					local length = 200
+				if ( itemID == 11 ) then
+					local weaponData = split( value, ";" )
 					
-					if ( item.type == 2 ) or ( item.type == 3 ) then
-						name = name .. " (" .. itemData.value .. ")"
-					elseif ( itemData.item_id == 10 ) then
-						name = name .. " (#" .. itemData.value .. ")"
-					else
-						if ( itemData.value ) and ( itemData.value ~= "" ) then
-							value = item.description
-						end
+					if ( #weaponData > 0 ) then
+						fileName = fileName .. "_" .. weaponData[ 1 ]
 					end
-					
-					local nameLength = math.max( 200, dxGetTextWidth( name ) * 1.5 )
-					local valueLength = math.max( 200, dxGetTextWidth( value ) * 1.5 )
-					
-					if ( string.len( name ) > string.len( value ) ) then
-						length = nameLength
-					else
-						length = valueLength
-					end
-					
-					dxDrawRectangle( cursorX, cursorY, length, 57, tocolor( 0, 0, 0, 0.5 * 255 ), postGUI )
-					dxDrawText( name .. "\n" .. value, cursorX + 17, cursorY + 15, length, 50, tocolor( 245, 245, 245, 255 ), 1.0, "clear", "left", "top", false, false, postGUI, false, true )
-				end
-			end
-		end
-		
-		if ( not isVisible ) then
-			return
-		end
-		
-		-- Background
-		dxDrawRectangle((screenWidth-ROW_width)/2, (CATEGORY_open ~= nil and screenHeight-ROW_offset+4 or screenHeight-ROW_offset), ROW_width, screenHeight, tocolor(0, 0, 0, 0.65*255), postGUI)
-		dxDrawRectangle((screenWidth-ROW_width)/2, screenHeight-2, ROW_width, screenHeight, tocolor(245, 245, 245, 0.9*255), postGUI)
-		
-		-- Backpack
-		dxDrawRectangle((screenWidth-ROW_width+7)/2, screenHeight-(ROW_offset-4), ITEM_scale, ITEM_scale, tocolor(0, 0, 0, (CATEGORY_hovering == 1 and 0.6*255 or 0.5*255)), postGUI)
-		dxDrawImage((screenWidth-ROW_width+9)/2+8, screenHeight-(ROW_offset-9)-2, ITEM_scale-20, ITEM_scale-10, "images/backpack.png", 0, 0, 0, tocolor(255, 255, 255, (CATEGORY_hovering == 1 and 0.95*255 or 0.8*255)), postGUI)
-		
-		-- Keys
-		dxDrawRectangle((screenWidth-ROW_width+ITEM_scale*2+12)/2, screenHeight-(ROW_offset-4), ITEM_scale, ITEM_scale, tocolor(0, 0, 0, (CATEGORY_hovering == 2 and 0.6*255 or 0.5*255)), postGUI)
-		dxDrawImage((screenWidth-ROW_width+ITEM_scale*2+26)/2+2, screenHeight-(ROW_offset-12), ITEM_scale-20, ITEM_scale-15, "images/keys.png", 0, 0, 0, tocolor(255, 255, 255, (CATEGORY_hovering == 2 and 0.95*255 or 0.8*255)), postGUI)
-		
-		-- Weapons
-		dxDrawRectangle((screenWidth-ROW_width+ITEM_scale*4+17)/2, screenHeight-(ROW_offset-4), ITEM_scale, ITEM_scale, tocolor(0, 0, 0, (CATEGORY_hovering == 3 and 0.6*255 or 0.5*255)), postGUI)
-		dxDrawImage((screenWidth-ROW_width+ITEM_scale*4+25)/2+2, screenHeight-(ROW_offset-14)+5, ITEM_scale-13, ITEM_scale-35, "images/weapons.png", 0, 0, 0, tocolor(255, 255, 255, (CATEGORY_hovering == 3 and 0.95*255 or 0.8*255)), postGUI)
-		
-		local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
-		local cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
-		
-		if ( CATEGORY_open ) then
-			-- Background
-			for i,v in pairs(items[cases[CATEGORY_open]]) do
-				if (BG_currentIndex == GLOBAL_max) then
-					BG_currentIndex = 0
-					BG_currentRow = BG_currentRow+1
 				end
 				
-				if (i == #items[cases[CATEGORY_open]]) then
-					BG_currentIndex = 0
-					BG_currentRow = 1
+				local playerX, playerY, playerZ = getElementPosition( localPlayer )
+				local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
+				collision, x, y, z, element = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ )
+				distance = maxDistance
+				
+				if ( x ) and ( y ) and ( z ) then
+					distance = getDistanceBetweenPoints3D( x, y, z, playerX, playerY, playerZ )
 				end
 				
-				BG_currentIndex = BG_currentIndex+1
+				local color = tocolor( 0, 0, 0, 0.6 * 255 )
 				
-				if (BG_currentIndex == 1) then
-					dxDrawRectangle((screenWidth-ROW_width*2)/2, ((screenHeight-(ROW_offset*2))-((ITEM_scale+ITEM_margin)*(BG_currentRow-1)))+((ITEM_margin*3)-1), (ROW_width*2)-ITEM_margin, ITEM_scale+(ITEM_margin), tocolor(0, 0, 0, 0.65*255), postGUI)
-				end
-			end
-			
-			-- Grid bottom fix
-			dxDrawRectangle((screenWidth-ROW_width*2)/2, screenHeight-(ROW_offset-1), (ROW_width*2)-ITEM_margin, ITEM_margin, tocolor(0, 0, 0, 0.65*255), postGUI)
-			
-			-- Item Grid
-			for i,v in pairs(items[cases[CATEGORY_open]]) do
-				local hovering = false
-				
-				if (ITEM_currentIndex == GLOBAL_max) then
-					ITEM_currentIndex = 0
-					ITEM_currentRow = ITEM_currentRow+1
+				if ( not collision ) or ( distance >= maxDistance ) then
+					color = tocolor( 155, 25, 25, 0.7 * 255 )
+				elseif ( isElement( element ) ) and ( getElementType( element ) == "player" ) then
+					color = tocolor( 25, 155, 25, 0.7 * 255 )
+				elseif ( isDeletingItem ) then
+					color = tocolor( 105, 20, 20, 0.75 * 255 )
 				end
 				
-				if (i == #items[cases[CATEGORY_open]]) then
-					ITEM_currentIndex = 0
-					ITEM_currentRow = 1
-				end
+				dxDrawRectangle( cursorX, cursorY, localItemScale, localItemScale, color, true )
+				dxDrawImage( cursorX + ( localItemScale / 8 ) - 1, cursorY + ( localItemScale / 8 ) - 4, localItemScale - 18, localItemScale - 18, "images/" .. fileName .. ".png", 0, 0, 0, tocolor( 255, 255, 255, 0.95 * 255 ), true )
+			else
+				local element = isHoveringWorldItem( )
 				
-				ITEM_currentIndex = ITEM_currentIndex+1
-				
-				if (cursorX >= ((((screenWidth-(ROW_width)-(ITEM_scale+ITEM_margin))/2)+((ITEM_scale+ITEM_margin)*(ITEM_currentIndex-2)))+(ITEM_margin/2))) and (cursorX <= (((((screenWidth-(ROW_width)-(ITEM_scale+ITEM_margin))/2)+((ITEM_scale+ITEM_margin)*(ITEM_currentIndex-2)))+(ITEM_margin/2))+ITEM_scale)) and (cursorY >= ((screenHeight-((ITEM_scale+(ITEM_margin+(ITEM_margin/2)))*2))-((ITEM_scale+ITEM_margin)*(ITEM_currentRow-1)))) and (cursorY <= (((screenHeight-((ITEM_scale+(ITEM_margin+(ITEM_margin/2)))*2))-((ITEM_scale+ITEM_margin)*(ITEM_currentRow-1)))+ITEM_scale)) and (not DRAG_item) then
-					hovering = true
-				end
-				
-				if (DRAG_item ~= i) then
-					dxDrawRectangle((((screenWidth-(ROW_width)-(ITEM_scale+ITEM_margin))/2)+((ITEM_scale+ITEM_margin)*(ITEM_currentIndex-2)))+(ITEM_margin/2), (screenHeight-((ITEM_scale+(ITEM_margin+(ITEM_margin/2)))*2))-((ITEM_scale+ITEM_margin)*(ITEM_currentRow-1)), ITEM_scale, ITEM_scale, tocolor(0, 0, 0, (hovering and 0.6*255 or 0.5*255)), postGUI)
-					dxDrawImage((((screenWidth-(ROW_width)-(ITEM_scale+ITEM_margin))/2)+((ITEM_scale+ITEM_margin)*(ITEM_currentIndex-2)))+(ITEM_scale/8), ((screenHeight-((ITEM_scale+(ITEM_margin+(ITEM_margin/2)))*2))-((ITEM_scale+ITEM_margin)*(ITEM_currentRow-1)))+(((ITEM_scale/8)/2)+3), ITEM_scale-18, ITEM_scale-18, "images/" .. items[cases[CATEGORY_open]][i].item_id .. ".png", 0, 0, 0, tocolor(255, 255, 255, (hovering and 0.95*255 or 0.8*255)), postGUI)
-				else
-					local px, py, pz = getElementPosition(localPlayer)
-					local camX, camY, camZ = getWorldFromScreenPosition(cursorX, cursorY, 0.1)
-					col, x, y, z, element = processLineOfSight(camX, camY, camZ, worldX, worldY, worldZ)
-					dist = maxDistance
+				if ( isElement( element ) ) and ( getElementType( element ) == "object" ) then
+					local itemData = exports.items:isWorldItem( element )
 					
-					if (x) and (y) and (z) then
-						dist = getDistanceBetweenPoints3D(x, y, z, px, py, pz)
-					end
-					
-					local color = tocolor(0, 0, 0, 0.6*255)
-					
-					if (not col) or (dist >= maxDistance) then
-						color = tocolor(155, 25, 25, 0.7*255)
-					elseif (element) and (getElementType(element) == "player") then
-						color = tocolor(25, 155, 25, 0.7*255)
-					elseif (DELETING) then
-						color = tocolor(105, 20, 20, 0.75*255)
-					end
-					
-					dxDrawRectangle(cursorX, cursorY, ITEM_scale, ITEM_scale, color, postGUI)
-					dxDrawImage(cursorX+(ITEM_scale/8)-1, cursorY+(ITEM_scale/8)-4, ITEM_scale-18, ITEM_scale-18, "images/" .. items[cases[CATEGORY_open]][i].item_id .. ".png", 0, 0, 0, tocolor(255, 255, 255, 0.95*255), postGUI)
-				end
-			end
-			
-			-- Hovering
-			if (not DRAG_item) then
-				for i,v in pairs(items[cases[CATEGORY_open]]) do
-					if (HOVER_currentIndex == GLOBAL_max) then
-						HOVER_currentIndex = 0
-						HOVER_currentRow = HOVER_currentRow+1
-					end
-					
-					if (i == #items[cases[CATEGORY_open]]) then
-						HOVER_currentIndex = 0
-						HOVER_currentRow = 1
-					end
-					
-					HOVER_currentIndex = HOVER_currentIndex+1
-					
-					if (cursorX >= ((((screenWidth-(ROW_width)-(ITEM_scale+ITEM_margin))/2)+((ITEM_scale+ITEM_margin)*(HOVER_currentIndex-2)))+(ITEM_margin/2))) and (cursorX <= (((((screenWidth-(ROW_width)-(ITEM_scale+ITEM_margin))/2)+((ITEM_scale+ITEM_margin)*(HOVER_currentIndex-2)))+(ITEM_margin/2))+ITEM_scale)) and (cursorY >= ((screenHeight-((ITEM_scale+(ITEM_margin+(ITEM_margin/2)))*2))-((ITEM_scale+ITEM_margin)*(HOVER_currentRow-1)))) and (cursorY <= (((screenHeight-((ITEM_scale+(ITEM_margin+(ITEM_margin/2)))*2))-((ITEM_scale+ITEM_margin)*(HOVER_currentRow-1)))+ITEM_scale)) then
-						local name
-						local item = exports.items:getItems()[v.item_id]
-						local value = ""
+					if ( itemData ) then
+						local item = exports.items:getItem( itemData.item_id )
+						local name = item.name
+						local value = item.description
 						local length = 200
 						
-						if (CATEGORY_open == 2) then
-							name = item.name .. " (" .. v.value .. ")"
+						if ( inventoryOpenCategoryID == 2 ) then
+							name = item.name .. " (" .. itemData.value .. ")"
 							value = item.value
 						else
 							name = item.name
 						end
 						
-						if (not value or value == "") then
+						if ( not value ) or ( value == "" ) then
 							value = item.description
 						end
 						
-						if (v.item_id == 10) then
-							name = item.name .. " (#" .. v.value .. ")"
+						if ( itemData.item_id == 10 ) then
+							name = item.name .. " (#" .. itemData.value .. ")"
+						elseif ( itemData.item_id == 11 ) then
+							local parts = split( itemData.value, ";" )
+							
+							if ( #parts >= 2 ) and ( #parts <= 3 ) then
+								name = parts[ 2 ]
+								
+								if ( #parts == 3 ) then
+									value = parts[ 3 ]
+								end
+							else
+								name = item.name
+							end
 						end
 						
-						local nameLength = math.max(200, dxGetTextWidth(name)*1.5)
-						local valueLength = math.max(200, dxGetTextWidth(value)*1.5)
+						local nameLength = math.max( 200, dxGetTextWidth( name ) * 1.5 )
+						local valueLength = math.max( 200, dxGetTextWidth( value ) * 1.5 )
 						
-						if (string.len(name) > string.len(value)) then
+						if ( string.len( name ) > string.len( value ) ) then
 							length = nameLength
 						else
 							length = valueLength
 						end
 						
-						dxDrawRectangle(cursorX, cursorY, length, 57, tocolor(0, 0, 0, 0.5*255), postGUI)
-						dxDrawText(name .. "\n" .. value, cursorX+17, cursorY+15, length, 50, tocolor(245, 245, 245, 255), 1.0, "clear", "left", "top", false, false, postGUI, false, true)
+						dxDrawRectangle( cursorX, cursorY, length, 57, tocolor( 0, 0, 0, 0.5 * 255 ), true )
+						dxDrawText( name .. ( value == "" and "" or "\n" .. value ), cursorX + 17, cursorY + 15, length, 50, tocolor( 245, 245, 245, 255 ), 1.0, "clear", "left", "top", false, false, true, false, true )
+					end
+				end
+			end
+		end
+		
+		if ( not isInventoryVisible ) then
+			return
+		end
+		
+		-- Background
+		dxDrawRectangle( ( screenWidth - inventoryRowWidth ) / 2, ( inventoryOpenCategoryID and screenHeight - inventoryRowOffset + 4 or screenHeight - inventoryRowOffset ), inventoryRowWidth, screenHeight, tocolor( 0, 0, 0, 0.65 * 255 ), true )
+		dxDrawRectangle( ( screenWidth - inventoryRowWidth ) / 2, screenHeight - 2, inventoryRowWidth, screenHeight, tocolor( 245, 245, 245, 0.9 * 255 ), true )
+		
+		for categoryID = 0, #categories - 1 do
+			dxDrawRectangle( ( screenWidth - inventoryRowWidth + ( localItemScale * 2 * categoryID ) ) / 2 + ( localItemMargin * ( categoryID + 1 ) ), screenHeight - ( inventoryRowOffset - 4 ), localItemScale, localItemScale, tocolor( 0, 0, 0, ( hoveringCategoryID == categoryID + 1 and 0.6 * 255 or 0.5 * 255 ) ), true )
+			dxDrawImage( ( screenWidth - inventoryRowWidth + ( localItemScale * 2 * categoryID ) ) / 2 + ( localItemMargin * ( categoryID + 1 ) ), screenHeight - ( inventoryRowOffset - 4 ), localItemScale, localItemScale, "images/" .. categories[ categoryID + 1 ] .. ".png", 0, 0, 0, tocolor( 255, 255, 255, ( hoveringCategoryID == categoryID + 1 and 0.95 * 255 or 0.8 * 255 ) ), true )
+		end
+		
+		local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
+		cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
+		
+		if ( inventoryOpenCategoryID ) then
+			-- Background
+			for localItemIndex, localItem in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
+				if ( localItemBackgroundCurrentIndex == maximumIndex ) then
+					localItemBackgroundCurrentIndex = 0
+					localItemBackgroundCurrentRow = localItemBackgroundCurrentRow + 1
+				end
+				
+				if ( localItemIndex == #items[ categories[ inventoryOpenCategoryID ] ] ) then
+					localItemBackgroundCurrentIndex = 0
+					localItemBackgroundCurrentRow = 1
+				end
+				
+				localItemBackgroundCurrentIndex = localItemBackgroundCurrentIndex + 1
+				
+				if ( localItemBackgroundCurrentIndex == 1 ) then
+					dxDrawRectangle( ( screenWidth-inventoryRowWidth * 2 ) / 2, ( ( screenHeight - ( inventoryRowOffset * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( localItemBackgroundCurrentRow - 1 ) ) ) + ( ( localItemMargin * 3 ) - 1 ), ( inventoryRowWidth * 2 ) - localItemMargin, localItemScale + localItemMargin, tocolor( 0, 0, 0, 0.65 * 255 ), true )
+				end
+			end
+			
+			-- Grid bottom fix
+			dxDrawRectangle( ( screenWidth - inventoryRowWidth * 2 ) / 2, screenHeight - ( inventoryRowOffset - 1 ), ( inventoryRowWidth * 2 ) - localItemMargin, localItemMargin, tocolor( 0, 0, 0, 0.65 * 255 ), true )
+			
+			-- Item Grid
+			for localItemIndex, localItem in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
+				local hovering = false
+				
+				if ( currentLocalItemIndex == maximumIndex ) then
+					currentLocalItemIndex = 0
+					currentLocalItemRow = currentLocalItemRow + 1
+				end
+				
+				if ( localItemIndex == #items[ categories[ inventoryOpenCategoryID ] ] ) then
+					currentLocalItemIndex = 0
+					currentLocalItemRow = 1
+				end
+				
+				currentLocalItemIndex = currentLocalItemIndex + 1
+				
+				if	( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
+					( cursorX <= ( ( ( ( ( screenWidth - ( inventoryRowWidth ) - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
+					( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ) ) and
+					( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ) + localItemScale ) ) and
+					( not draggingItemSlot ) then
+					hovering = true
+				end
+				
+				local fileName = localItem.item_id
+				local item = exports.items:getItem( localItem.item_id )
+				
+				if ( localItem.item_id == 11 ) then
+					local weaponData = split( localItem.value, ";" )
+					
+					if ( #weaponData > 0 ) then
+						fileName = fileName .. "_" .. weaponData[ 1 ]
+					end
+				end
+				
+				if ( draggingItemSlot ~= localItemIndex ) and ( not isDraggingWorldItem ) then
+					dxDrawRectangle( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemMargin / 2 ), ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) )  *2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ), localItemScale, localItemScale, tocolor( 0, 0, 0, ( hovering and 0.6 * 255 or 0.5 * 255 ) ), true)
+					dxDrawImage( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemScale / 8 ), ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ) + ( ( ( localItemScale / 8 ) / 2 ) + 3 ), localItemScale - 18, localItemScale - 18, "images/" .. fileName .. ".png", 0, 0, 0, tocolor( 255, 255, 255, ( hovering and 0.95 * 255 or 0.8 * 255 ) ), true )
+				else
+					local playerX, playerY, playerZ = getElementPosition( localPlayer )
+					local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
+					collision, x, y, z, element = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ )
+					distance = maxDistance
+					
+					if ( x ) and ( y ) and ( z ) then
+						distance = getDistanceBetweenPoints3D( x, y, z, playerX, playerY, playerZ )
+					end
+					
+					local color = tocolor( 0, 0, 0, 0.6 * 255 )
+					
+					if ( not collision ) or ( distance >= maxDistance ) then
+						color = tocolor( 155, 25, 25, 0.7 * 255 )
+					elseif ( isElement( element ) ) and ( getElementType( element ) == "player" ) then
+						color = tocolor( 25, 155, 25, 0.7 * 255 )
+					elseif ( isDeletingItem ) then
+						color = tocolor( 105, 20, 20, 0.75 * 255 )
+					end
+					
+					dxDrawRectangle( cursorX, cursorY, localItemScale, localItemScale, color, true )
+					dxDrawImage( cursorX + ( localItemScale / 8 ) - 1, cursorY + ( localItemScale / 8 ) - 4, localItemScale - 18, localItemScale - 18, "images/" .. fileName .. ".png", 0, 0, 0, tocolor( 255, 255, 255, 0.95 * 255 ), true )
+				end
+			end
+			
+			-- Hovering
+			if ( not draggingItemSlot ) then
+				for i, localItem in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
+					if ( HOVER_currentIndex == maximumIndex ) then
+						HOVER_currentIndex = 0
+						HOVER_currentRow = HOVER_currentRow + 1
+					end
+					
+					if ( i == #items[ categories[ inventoryOpenCategoryID ] ] ) then
+						HOVER_currentIndex = 0
+						HOVER_currentRow = 1
+					end
+					
+					HOVER_currentIndex = HOVER_currentIndex + 1
+					
+					if	( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( HOVER_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
+						( cursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( HOVER_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
+						( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( HOVER_currentRow - 1 ) ) ) ) and
+						( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( HOVER_currentRow - 1 ) ) ) + localItemScale ) ) then
+						local item = exports.items:getItem( localItem.item_id )
+						local name = item.name
+						local value = item.description
+						local length = 200
+						
+						if ( inventoryOpenCategoryID == 2 ) then
+							name = item.name .. " (" .. localItem.value .. ")"
+							value = item.value
+						else
+							name = item.name
+						end
+						
+						if ( not value ) or ( value == "" ) then
+							value = item.description
+						end
+						
+						if ( localItem.item_id == 10 ) then
+							name = item.name .. " (#" .. localItem.value .. ")"
+						elseif ( localItem.item_id == 11 ) then
+							local parts = split( localItem.value, ";" )
+							
+							if ( #parts >= 2 ) and ( #parts <= 3 ) then
+								name = parts[ 2 ]
+								
+								if ( #parts == 3 ) then
+									value = parts[ 3 ]
+								end
+							else
+								name = item.name
+							end
+						end
+						
+						local nameLength = math.max( 200, dxGetTextWidth( name ) * 1.5 )
+						local valueLength = math.max( 200, dxGetTextWidth( value ) * 1.5 )
+						
+						if ( string.len( name ) > string.len( value ) ) then
+							length = nameLength
+						else
+							length = valueLength
+						end
+						
+						dxDrawRectangle( cursorX, cursorY, length, 57, tocolor( 0, 0, 0, 0.5 * 255 ), true )
+						dxDrawText( name .. ( value == "" and "" or "\n" .. value ), cursorX + 17, cursorY + 15, length, 50, tocolor( 245, 245, 245, 255 ), 1.0, "clear", "left", "top", false, false, true, false, true )
 					end
 				end
 			end
@@ -280,74 +357,61 @@ addEventHandler( "onClientRender", root,
 )
 
 addEventHandler( "onClientCursorMove", root,
-	function( cursorX, cursorY, cursorX, cursorY, worldX, worldY, worldZ )
-		if ( not draggingWorldItem ) or ( not isElement( draggingWorldItem ) ) then
-			-- Inventory
-			if (cursorX >= (screenWidth-ROW_width+7)/2) and (cursorX <= ((screenWidth-ROW_width+7)/2)+ITEM_scale) and (cursorY >= (screenHeight-(ROW_offset-4))) and (cursorY <= (screenHeight-(ROW_offset-4))+ITEM_scale) then
-				-- Backpack
-				if ( CATEGORY_hovering == 1 ) then
-					return
+	function( _, _, cursorX, cursorY, worldX, worldY, worldZ )
+		if ( not isElement( isDraggingWorldItem ) ) then
+			local isHovering = false
+			
+			for categoryID = 0, #categories - 1 do
+				if	( cursorX >= ( screenWidth - inventoryRowWidth + ( localItemScale * 2 * categoryID ) ) / 2 + ( localItemMargin * ( categoryID + 1 ) ) ) and
+					( cursorX <= ( ( screenWidth - inventoryRowWidth + ( localItemScale * 2 * categoryID ) ) / 2 + ( localItemMargin * ( categoryID + 1 ) ) ) + localItemScale ) and
+					( cursorY >= ( screenHeight - ( inventoryRowOffset - 4 ) ) ) and
+					( cursorY <= ( screenHeight - ( inventoryRowOffset - 4 ) ) + localItemScale ) then
+					hoveringCategoryID = categoryID + 1
+					isHovering = true
 				end
-				CATEGORY_hovering = 1
-			elseif (cursorX >= (screenWidth-ROW_width+ITEM_scale*2+12)/2) and (cursorX <= ((screenWidth-ROW_width+ITEM_scale*2+12)/2)+ITEM_scale) and (cursorY >= (screenHeight-(ROW_offset-4))) and (cursorY <= (screenHeight-(ROW_offset-4))+ITEM_scale) then
-				-- Keys
-				if ( CATEGORY_hovering == 2 ) then
-					return
-					end
-				CATEGORY_hovering = 2
-			elseif (cursorX >= (screenWidth-ROW_width+ITEM_scale*4+17)/2) and (cursorX <= ((screenWidth-ROW_width+ITEM_scale*4+16)/2)+ITEM_scale) and (cursorY >= (screenHeight-(ROW_offset-4))) and (cursorY <= (screenHeight-(ROW_offset-4))+ITEM_scale) then
-				-- Weapons
-				if ( CATEGORY_hovering == 3 ) then
-					return
-				end
-				CATEGORY_hovering = 3
-			else
-				if ( CATEGORY_hovering == nil ) then
-					return
-				end
-				CATEGORY_hovering = nil
 			end
-		else
-			if ( not draggingWorldItem ) or ( not isElement( draggingWorldItem ) ) then
+			
+			if ( not isHovering ) then
+				hoveringCategoryID = nil
+			end
+		--[[else
+			local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
+			local collision, x, y, z, element = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ, true, true, false, true, true, true, false, true, localPlayer, false, true )
+			
+			if ( not collision ) then
 				return
 			end
 			
-			local px, py, pz = getElementPosition( localPlayer )
-			local camX, camY, camZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
-			local col, x, y, z, element = processLineOfSight( camX, camY, camZ, worldX, worldY, worldZ )
-			
-			if ( not col ) then
-				return
-			end
-			
-			local dist2 = maxDistance
-			setElementPosition( draggingWorldItem, x, y, z )
+			setElementPosition( isDraggingWorldItem, x, y, getGroundPosition( x, y, z ) )
+			setElementRotation( isDraggingWorldItem, 0, 0, getPedRotation( localPlayer ) )]]
 		end
 	end
 )
 
 addEventHandler( "onClientKey", root,
 	function( button, pressOrRelease )
-		if ( not DRAG_item ) and ( DELETING ) then
-			DELETING = false
+		if ( not draggingItemSlot ) and ( isDeletingItem ) then
+			isDeletingItem = false
 		end
 		
 		if ( button == "delete" ) then
-			if ( DRAG_item ) then
-				if ( pressOrRelease == true ) and ( not DELETING ) then
-					DELETING = true
+			if ( draggingItemSlot ) then
+				if ( pressOrRelease ) and ( not isDeletingItem ) then
+					isDeletingItem = true
 				else
-					if ( not DELETING ) then
+					if ( not isDeletingItem ) then
 						return
 					end
 					
-					DELETING = false
-					triggerServerEvent( "items:delete", localPlayer, items[ cases[ CATEGORY_open ] ][ DRAG_item ].db_id, items[ cases[ CATEGORY_open ] ][ DRAG_item ].item_id, items[ cases[ CATEGORY_open ] ][ DRAG_item ].value )
-					DRAG_item = false
+					localItem = items[ categories[ inventoryOpenCategoryID ] ][ draggingItemSlot ]
+					
+					isDeletingItem = false
+					triggerServerEvent( "items:delete", localPlayer, localItem.db_id, localItem.item_id, localItem.value )
+					draggingItemSlot = false
 				end
 			end
-		elseif ( ( button == "backspace" ) or ( button == "escape" ) ) and ( DELETING ) then
-			DELETING = false
+		elseif ( ( button == "backspace" ) or ( button == "escape" ) ) and ( isDeletingItem ) then
+			isDeletingItem = false
 		end
 	end
 )
@@ -358,69 +422,76 @@ addEventHandler( "onClientClick", root,
 			return
 		end
 		
-		if ( not DRAG_item ) and ( DELETING ) then
-			DELETING = false
+		if ( not draggingItemSlot ) and ( isDeletingItem ) then
+			isDeletingItem = false
 		end
 		
 		if ( state == "down" ) then
-			if ( isVisible ) then
-				_cursorX, _cursorY = cursorX, cursorY
+			if ( isInventoryVisible ) then
+				clickCursorX, clickCursorY = cursorX, cursorY
 				
 				setTimer( function( )
-					if ( getKeyState( "mouse1" ) == true ) then
+					if ( getKeyState( "mouse1" ) ) then
 						if ( items ) then
-							if ( not CATEGORY_open ) then
+							if ( not inventoryOpenCategoryID ) then
 								return
 							end
 							
-							for i, v in pairs( items[ cases[ CATEGORY_open ] ] ) do
-								if ( DRAG_currentIndex == GLOBAL_max ) then
-									DRAG_currentIndex = 0
-									DRAG_currentRow = DRAG_currentRow + 1
+							for localItemIndex, localItem in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
+								if ( draggingIndex == maximumIndex ) then
+									draggingIndex = 0
+									draggingRow = draggingRow + 1
 								end
 								
-								if ( i == #items[ cases[ CATEGORY_open ] ] ) then
-									DRAG_currentIndex = 0
-									DRAG_currentRow = 1
+								if ( localItemIndex == #items[ categories[ inventoryOpenCategoryID ] ] ) then
+									draggingIndex = 0
+									draggingRow = 1
 								end
 								
-								DRAG_currentIndex = DRAG_currentIndex + 1
+								draggingIndex = draggingIndex + 1
 								
-								if	( _cursorX >= ( ( ( ( screenWidth - ROW_width - ( ITEM_scale + ITEM_margin ) ) / 2 ) + ( ( ITEM_scale + ITEM_margin ) * ( DRAG_currentIndex - 2 ) ) ) + ( ITEM_margin / 2 ) ) ) and
-									( _cursorX <= ( ( ( ( ( screenWidth - ROW_width - ( ITEM_scale + ITEM_margin ) ) / 2 ) + ( ( ITEM_scale + ITEM_margin ) * ( DRAG_currentIndex - 2 ) ) ) + ( ITEM_margin / 2 ) ) + ITEM_scale ) ) and
-									( _cursorY >= ( ( screenHeight - ( ( ITEM_scale + ( ITEM_margin + ( ITEM_margin / 2 ) ) ) * 2 ) ) - ( ( ITEM_scale + ITEM_margin ) * ( DRAG_currentRow - 1 ) ) ) ) and
-									( _cursorY <= ( ( ( screenHeight - ( ( ITEM_scale + ( ITEM_margin + ( ITEM_margin / 2 ) ) ) * 2 ) ) - ( ( ITEM_scale + ITEM_margin ) * ( DRAG_currentRow - 1 ) ) ) + ITEM_scale ) ) then
-									if ( illegalDrop[ items[ cases[ CATEGORY_open ] ][ i ].item_id ] ) and ( not exports.common:isPlayerServerTrialAdmin( localPlayer ) ) then
-										outputChatBox( "You are unable to drop this item.", 245, 20, 20, false )
+								if	( clickCursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( draggingIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
+									( clickCursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( draggingIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
+									( clickCursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( draggingRow - 1 ) ) ) ) and
+									( clickCursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( draggingRow - 1 ) ) ) + localItemScale ) ) then
+									if ( illegalDrop[ localItem.item_id ] ) and ( not exports.common:isPlayerServerTrialAdmin( localPlayer ) ) then
+										outputChatBox( "You are not able to drop this item.", 245, 20, 20, false )
 									else
-										DRAG_item = i
+										draggingItemSlot = localItemIndex
 									end
 								end
 							end
 						end
 					end
-				end, 200, 1)
+				end, 200, 1 )
 			else
-				if ( not draggingWorldItem ) then
+				if ( not isDraggingWorldItem ) then
 					local element = isHoveringWorldItem( )
-					if ( element ) and ( getElementType( element ) == "object" ) then
+					
+					if ( isElement( element ) ) and ( getElementType( element ) == "object" ) then
 						if ( not isPedInVehicle( localPlayer ) ) then
 							local itemData = exports.items:isWorldItem( element )
+							
 							if ( itemData ) then
 								setTimer( function( )
-									if ( not draggingWorldItem ) and ( getKeyState( "mouse1" ) == true ) then
+									if ( not isDraggingWorldItem ) and ( getKeyState( "mouse1" ) ) then
 										local element = isHoveringWorldItem( )
+										
 										if ( element ) then
 											local itemData = exports.items:isWorldItem( element )
+											
 											if ( itemData ) then
 												local x, y, z = getElementPosition( element )
-												local _, _, rot = getElementRotation( element )
+												local _, _, rotation = getElementRotation( element )
+												
 												setElementData( element, "temp:origin_x", x, false )
 												setElementData( element, "temp:origin_y", y, false )
 												setElementData( element, "temp:origin_z", z, false )
-												setElementData( element, "temp:origin_rotation", rot, false )
-												draggingWorldItem = element
-												setElementAlpha( draggingWorldItem, 200 )
+												setElementData( element, "temp:origin_rotation", rotation, false )
+												
+												isDraggingWorldItem = element
+												
+												setElementAlpha( isDraggingWorldItem, 200 )
 											end
 										end
 									end
@@ -433,30 +504,30 @@ addEventHandler( "onClientClick", root,
 		end
 		
 		if ( state == "up" ) then
-			if ( draggingWorldItem ) then
-				local x, y, z = getElementPosition( draggingWorldItem )
+			if ( isDraggingWorldItem ) then
+				worldZ = getGroundPosition( worldX, worldY, worldZ )
 				
-				if ( getDistanceBetweenPoints3D( x, y, z, getElementPosition( localPlayer ) ) < 14 ) then
-					local itemData = exports.items:isWorldItem( draggingWorldItem )
-					triggerServerEvent( "items:updateposition", localPlayer, itemData[ 1 ], draggingWorldItem, x, y, z )
+				if ( getDistanceBetweenPoints3D( worldX, worldY, worldZ, getElementPosition( localPlayer ) ) < 14 ) then
+					local itemData = exports.items:isWorldItem( isDraggingWorldItem )
+					triggerServerEvent( "items:updateposition", localPlayer, itemData.id, isDraggingWorldItem, worldX, worldY, worldZ )
 				else
 					outputChatBox( "Sorry, but that's too far.", 245, 20, 20, false )
-					setElementPosition( draggingWorldItem, tonumber( getElementData( draggingWorldItem, "temp:origin_x" ) ), tonumber( getElementData( draggingWorldItem, "temp:origin_y" ) ), tonumber( getElementData( draggingWorldItem, "temp:origin_z" ) ) )
-					setElementRotation( draggingWorldItem, 0, 0, tonumber( getElementData( draggingWorldItem, "temp:origin_rotation" ) ) )
+					setElementPosition( isDraggingWorldItem, tonumber( getElementData( isDraggingWorldItem, "temp:origin_x" ) ), tonumber( getElementData( isDraggingWorldItem, "temp:origin_y" ) ), tonumber( getElementData( isDraggingWorldItem, "temp:origin_z" ) ) )
+					setElementRotation( isDraggingWorldItem, 0, 0, tonumber( getElementData( isDraggingWorldItem, "temp:origin_rotation" ) ) )
 				end
 				
-				setElementAlpha( draggingWorldItem, 255 )
-				draggingWorldItem = false
+				setElementAlpha( isDraggingWorldItem, 255 )
+				isDraggingWorldItem = false
 			else
 				local element = isHoveringWorldItem( )
 				
-				if ( element ) and ( getElementType( element ) == "object" ) then
+				if ( isElement( element ) ) and ( getElementType( element ) == "object" ) then
 					local itemData = exports.items:isWorldItem( element )
 					
 					if ( itemData ) then
 						if ( not isPedInVehicle( localPlayer ) ) then
 							if ( tonumber( getElementData( localPlayer, "character:weight" ) ) + exports.items:getItemWeight( itemData.item_id ) <= tonumber( getElementData( localPlayer, "character:max_weight" ) ) ) then
-								local item = exports.items:getItems( )[ itemData.item_id ]
+								local item = exports.items:getItem( itemData.item_id )
 								local name = item.name
 								local value = item.value
 								
@@ -472,93 +543,67 @@ addEventHandler( "onClientClick", root,
 					end
 				end
 				
-				if ( DRAG_item ) then
-					local item = items[ cases[ CATEGORY_open ] ][ DRAG_item ]
+				if ( draggingItemSlot ) then
+					local localItem = items[ categories[ inventoryOpenCategoryID ] ][ draggingItemSlot ]
 					
-					if ( not col ) or ( dist >= maxDistance ) then
+					if ( not collision ) or ( distance >= maxDistance ) then
 						outputChatBox( "That's outer space, monkey." )
 					elseif ( element ) and ( element ~= localPlayer ) then
-						triggerServerEvent( "items:drop", localPlayer, element, item.db_id, item.item_id, item.value, item.ringtone_id, item.messagetone_id, worldX, worldY, worldZ )
+						triggerServerEvent( "items:drop", localPlayer, element, localItem.db_id, localItem.item_id, localItem.value, localItem.ringtone_id, localItem.messagetone_id, worldX, worldY, worldZ )
 					elseif ( element ) and ( element == localPlayer ) then
 						outputChatBox( "Giving yourself a present? Aw, how cute!" )
 					else
-						triggerServerEvent( "items:drop", localPlayer, false, item.db_id, item.item_id, item.value, item.ringtone_id, item.messagetone_id, worldX, worldY, worldZ )
+						triggerServerEvent( "items:drop", localPlayer, false, localItem.db_id, localItem.item_id, localItem.value, localItem.ringtone_id, localItem.messagetone_id, worldX, worldY, worldZ )
 					end
 					
-					DRAG_item = nil
+					draggingItemSlot = nil
 				else
-					if	( cursorX >= ( screenWidth - ROW_width + 7 ) / 2 ) and
-						( cursorX <= ( ( screenWidth - ROW_width + 7 ) / 2 ) + ITEM_scale ) and
-						( cursorY >= ( screenHeight - ( ROW_offset - 4 ) ) ) and
-						( cursorY <= ( screenHeight - ( ROW_offset - 4 ) ) + ITEM_scale ) then
-						if ( not doesContainData( 1 ) ) then
-							return
+					for categoryID = 0, #categories - 1 do
+						if	( cursorX >= ( screenWidth - inventoryRowWidth + 7 + ( localItemScale * 2 * categoryID ) ) / 2 ) and
+							( cursorX <= ( ( screenWidth - inventoryRowWidth + 7 + ( localItemScale * 2 * categoryID ) ) / 2 ) + localItemScale ) and
+							( cursorY >= ( screenHeight - ( inventoryRowOffset - 4 ) ) ) and
+							( cursorY <= ( screenHeight - ( inventoryRowOffset - 4 ) ) + localItemScale ) then
+							if ( not doesContainData( categoryID + 1 ) ) then
+								return
+							end
+							
+							if ( inventoryOpenCategoryID == categoryID + 1 ) then
+								inventoryOpenCategoryID = nil
+								return
+							end
+							
+							inventoryOpenCategoryID = categoryID + 1
 						end
-						
-						if ( CATEGORY_open == 1 ) then
-							CATEGORY_open = nil
-							return
-						end
-						
-						CATEGORY_open = 1
-					elseif	( cursorX >= ( screenWidth - ROW_width + ITEM_scale * 2 + 12 ) / 2 ) and
-							( cursorX <= ( ( screenWidth - ROW_width + ITEM_scale * 2 + 12 ) / 2 ) + ITEM_scale ) and
-							( cursorY >= ( screenHeight - ( ROW_offset - 4 ) ) ) and
-							( cursorY <= ( screenHeight - ( ROW_offset - 4 ) ) + ITEM_scale ) then
-						if ( not doesContainData( 2 ) ) then
-							return
-						end
-						
-						if ( CATEGORY_open == 2 ) then
-							CATEGORY_open = nil
-							return
-						end
-						
-						CATEGORY_open = 2
-					elseif	( cursorX >= ( screenWidth - ROW_width + ITEM_scale * 4 + 17 ) / 2 ) and
-							( cursorX <= ( ( screenWidth - ROW_width + ITEM_scale * 4 + 17 ) / 2 ) + ITEM_scale ) and
-							( cursorY >= ( screenHeight - ( ROW_offset - 4 ) ) ) and
-							( cursorY <= ( screenHeight - ( ROW_offset - 4 ) ) + ITEM_scale ) then
-						if ( not doesContainData( 3 ) ) then
-							return
-						end
-						
-						if ( CATEGORY_open == 3 ) then
-							CATEGORY_open = nil
-							return
-						end
-						
-						CATEGORY_open = 3
 					end
 					
 					if ( items ) then
-						if ( not CATEGORY_open ) then
+						if ( not inventoryOpenCategoryID ) then
 							return
 						end
 						
-						for i, v in pairs( items[ cases[ CATEGORY_open ] ] ) do
-							if ( CLICK_currentIndex == GLOBAL_max ) then
+						for i, v in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
+							if ( CLICK_currentIndex == maximumIndex ) then
 								CLICK_currentIndex = 0
 								CLICK_currentRow = CLICK_currentRow + 1
 							end
 							
-							if ( i == #items[ cases[ CATEGORY_open ] ] ) then
+							if ( i == #items[ categories[ inventoryOpenCategoryID ] ] ) then
 								CLICK_currentIndex = 0
 								CLICK_currentRow = 1
 							end
 							
 							CLICK_currentIndex = CLICK_currentIndex + 1
 							
-							if  ( cursorX >= ( ( ( ( screenWidth - ROW_width - ( ITEM_scale + ITEM_margin ) ) / 2 ) + ( ( ITEM_scale + ITEM_margin ) * ( CLICK_currentIndex - 2 ) ) ) + ( ITEM_margin / 2 ) ) ) and
-								( cursorX <= ( ( ( ( ( screenWidth - ROW_width- ( ITEM_scale + ITEM_margin ) ) / 2 ) + ( ( ITEM_scale + ITEM_margin ) * ( CLICK_currentIndex - 2 ) ) ) + ( ITEM_margin / 2 ) ) + ITEM_scale ) ) and
-								( cursorY >= ( ( screenHeight - ( ( ITEM_scale + ( ITEM_margin + ( ITEM_margin / 2 ) ) ) * 2 ) ) - ( ( ITEM_scale + ITEM_margin ) * ( CLICK_currentRow - 1 ) ) ) ) and
-								( cursorY <= ( ( ( screenHeight - ( ( ITEM_scale + ( ITEM_margin + ( ITEM_margin / 2 ) ) ) * 2 ) ) - ( ( ITEM_scale + ITEM_margin ) * ( CLICK_currentRow - 1 ) ) ) + ITEM_scale ) ) then
-								local item = items[ cases[ CATEGORY_open ] ][ i ]
+							if  ( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( CLICK_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
+								( cursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( CLICK_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
+								( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( CLICK_currentRow - 1 ) ) ) ) and
+								( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( CLICK_currentRow - 1 ) ) ) + localItemScale ) ) then
+								local localItem = items[ categories[ inventoryOpenCategoryID ] ][ i ]
 								
-								triggerServerEvent( "items:act", localPlayer, item.db_id, item.item_id, item.value )
+								triggerServerEvent( "items:act", localPlayer, localItem.db_id, localItem.item_id, localItem.value )
 								
-								if ( items[ cases[ CATEGORY_open ] ][ i ][ 2 ] == 10 ) then
-									LOCKINVENTORY = true
+								if ( localItem.item_id == 10 ) then
+									isInventoryLocked = true
 								end
 							end
 						end
@@ -571,26 +616,24 @@ addEventHandler( "onClientClick", root,
 
 addEvent( "inventory:synchronize", true )
 addEventHandler( "inventory:synchronize", root,
-	function( items_ )
-		items = {
-			backpack = { },
-			keys = { },
-			weapons = { }
-		}
+	function( serverItems )
+		for index, _ in pairs( items ) do
+			items[ index ] = { }
+		end
 		
-		for i, v in pairs( items_ ) do
-			if ( items_[ i ].item_id ) then
-				local type = cases[ exports.items:getItemType( items_[ i ].item_id ) ]
+		for i, v in pairs( serverItems ) do
+			if ( v.item_id ) then
+				local type = categories[ exports.items:getItemType( v.item_id ) ]
 				
 				if ( type ) then
-					table.insert( items[ type ], { name = items_[ i ].name, item_id = items_[ i ].item_id, value = items_[ i ].value, ringtone_id = items_[ i ].ringtone_id, messagetone_id = items_[ i ].messagetone_id } )
+					table.insert( items[ type ], { name = v.name, item_id = v.item_id, value = v.value, ringtone_id = v.ringtone_id, messagetone_id = v.messagetone_id } )
 				end
 			end
 		end
 		
-		if ( CATEGORY_open ) then
-			if ( not doesContainData( CATEGORY_open ) ) then
-				CATEGORY_open = nil
+		if ( inventoryOpenCategoryID ) then
+			if ( not doesContainData( inventoryOpenCategoryID ) ) then
+				inventoryOpenCategoryID = nil
 			end
 		end
 	end
@@ -598,56 +641,57 @@ addEventHandler( "inventory:synchronize", root,
 
 addCommandHandler( "fixinventory",
 	function( )
-		if ( not GLOBAL_cooldown ) then
-			GLOBAL_cooldown = true
-			
-			setTimer( function( )
-				if ( isElement( localPlayer ) ) then
-					GLOBAL_cooldown = not GLOBAL_cooldown
-				end
+		if ( not inventoryCooldownTimer ) then
+			inventoryCooldownTimer = setTimer( function( )
+				inventoryCooldownTimer = nil
 			end, 5000, 1 )
 			
-			outputChatBox( "Fix deployed!", 20, 245, 20, false )
+			outputChatBox( "Attempting to fix your inventory now...", 20, 245, 20, false )
 			triggerServerEvent( "items:get", localPlayer )
 		else
-			outputChatBox("Please wait a moment before fixing the inventory again!", 245, 20, 20, false)
+			outputChatBox( "Please wait a moment before fixing the inventory again!", 245, 20, 20, false )
 		end
 	end
 )
 
-local function toggleInventory()
+local function toggleInventory( )
 	if ( exports.common:isPlayerPlaying( localPlayer ) ) then
-		if ( LOCKINVENTORY ) then
-			outputChatBox( "Exit your phone in order to toggle the inventory.", 245, 20, 20, false )
+		if ( isInventoryLocked ) then
+			outputChatBox( "Inventory cannot be accessed at this time.", 245, 20, 20, false )
 		else
-			isVisible = not isVisible
-			toggleAllControls( not isVisible, true, false )
-			showCursor( isVisible, isVisible )
-			CATEGORY_hovering = nil
-			CATEGORY_open = nil
-			DELETING = nil
-			draggingWorldItem = false
+			isInventoryVisible = not isInventoryVisible
+			
+			toggleAllControls( not isInventoryVisible, true, false )
+			showCursor( isInventoryVisible, isInventoryVisible )
+			
+			hoveringCategoryID = nil
+			inventoryOpenCategoryID = nil
+			isDeletingItem = nil
+			isDraggingWorldItem = false
 		end
 	end
 end
+addCommandHandler( { "inventory", "inv", "toggleinventory", "toginventory" }, toggleInventory )
 
 addEvent( "inventory:unlock", true )
 addEventHandler( "inventory:unlock", root,
 	function( )
-		LOCKINVENTORY = false
+		isInventoryLocked = false
 	end
 )
 
 addEvent( "inventory:close", true )
 addEventHandler( "inventory:close", root,
 	function( )
-		isVisible = false
+		isInventoryVisible = false
+		
 		toggleAllControls( true, true, false )
 		showCursor( false, false )
-		CATEGORY_hovering = nil
-		CATEGORY_open = nil
-		DELETING = nil
-		draggingWorldItem = false
+		
+		hoveringCategoryID = nil
+		inventoryOpenCategoryID = nil
+		isDeletingItem = nil
+		isDraggingWorldItem = false
 	end
 )
 
@@ -658,5 +702,11 @@ addEventHandler( "onClientResourceStart", resourceRoot,
 		if ( exports.common:isPlayerPlaying( localPlayer ) ) then
 			triggerServerEvent( "items:get", localPlayer )
 		end
+	end
+)
+
+addEventHandler( "onClientResourceStop", resourceRoot,
+	function( )
+		toggleAllControls( true, true, false )
 	end
 )
