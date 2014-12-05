@@ -6,39 +6,43 @@ function createMessage( message, messageType, messageGlobalID, hideButton, disab
 	destroyMessage( messageType )
 	destroyMessage( nil, nil, messageGlobalID )
 
-	local messageID = messageGlobalID or exports.common:nextIndex( messages )
 	local messageRealm = messageGlobalID and "global" or "client"
-	local messageHolder
+	local messageID = messageGlobalID or exports.common:nextIndex( messages[ messageRealm ] )
 	
 	messages[ messageRealm ][ messageID ] = { messageType = messageType or "other", disableInput = disableInput }
-
-	messageHolder = messages[ messageRealm ][ messageID ]
 	
 	local messageHeight = messageHeight - ( hideButton and 25 or 0 )
 	
-	messageHolder.window = guiCreateWindow( ( screenWidth - messageWidth ) / 2, ( screenHeight - messageHeight ) / 2, messageWidth, messageHeight, "Message", false )
-	guiWindowSetSizable( messageHolder.window, false )
-	guiSetProperty( messageHolder.window, "AlwaysOnTop", "True" )
-	guiSetAlpha( messageHolder.window, 0.925 )
+	messages[ messageRealm ][ messageID ].window = guiCreateWindow( ( screenWidth - messageWidth ) / 2, ( screenHeight - messageHeight ) / 2, messageWidth, messageHeight, "Message", false )
+	guiWindowSetSizable( messages[ messageRealm ][ messageID ].window, false )
+	guiSetProperty( messages[ messageRealm ][ messageID ].window, "AlwaysOnTop", "True" )
+	guiSetAlpha( messages[ messageRealm ][ messageID ].window, 0.925 )
 	
-	setElementData( messageHolder.window, "messages:id", messageID, false )
-	setElementData( messageHolder.window, "messages:type", messageHolder.messageType, false )
-	setElementData( messageHolder.window, "messages:realm", messageRealm, false )
-	setElementData( messageHolder.window, "messages:disableInput", disableInput, false )
+	setElementData( messages[ messageRealm ][ messageID ].window, "messages:id", messageID, false )
+	setElementData( messages[ messageRealm ][ messageID ].window, "messages:type", messages[ messageRealm ][ messageID ].messageType, false )
+	setElementData( messages[ messageRealm ][ messageID ].window, "messages:realm", messageRealm, false )
+	setElementData( messages[ messageRealm ][ messageID ].window, "messages:disableInput", disableInput, false )
 	
-	messageHolder.message = guiCreateLabel( 17, 35, 283, 60, message, false, messageHolder.window )
-	guiLabelSetHorizontalAlign( messageHolder.message, "center", true )
-	guiLabelSetVerticalAlign( messageHolder.message, "center" )
+	if ( messageRealm == "global" ) then
+		setElementData( messages[ messageRealm ][ messageID ].window, "messages:globalID", messageGlobalID, false )
+	end
+	
+	messages[ messageRealm ][ messageID ].message = guiCreateLabel( 17, 35, 283, 60, message, false, messages[ messageRealm ][ messageID ].window )
+	guiLabelSetHorizontalAlign( messages[ messageRealm ][ messageID ].message, "center", true )
+	guiLabelSetVerticalAlign( messages[ messageRealm ][ messageID ].message, "center" )
 
 	showCursor( true )
 	guiSetInputEnabled( disableInput or false )
 	
 	if ( not hideButton ) then
-		messageHolder.button = guiCreateButton( 16, 109, 284, 25, "Continue", false, messageHolder.window )	
+		messages[ messageRealm ][ messageID ].button = guiCreateButton( 16, 109, 284, 25, "Continue", false, messages[ messageRealm ][ messageID ].window )	
 		
-		addEventHandler( "onClientGUIClick", messageHolder.button,
+		addEventHandler( "onClientGUIClick", messages[ messageRealm ][ messageID ].button,
 			function( )
-				destroyMessage( messageHolder.messageType )
+				local type = getElementData( getElementParent( source ), "messages:type" )
+				local globalID = getElementData( getElementParent( source ), "messages:globalID" )
+				
+				destroyMessage( type, globalID or nil )
 			end, false
 		)
 	end
@@ -47,35 +51,31 @@ addEvent( "messages:create", true )
 addEventHandler( "messages:create", root, createMessage )
 
 function destroyMessage( messageType, messageGlobalID )
-	if ( messageType ) then
-		for messageIndex, messageID in ipairs( exports.common:findByValue( messages.client, messageType, true ) ) do
-			local message = messages.client[ messageID ]
-			
-			if ( isElement( message.window ) ) then
-				destroyElement( message.window )
-			end
-			
-			triggerEvent( "messages:onContinue", localPlayer, messageID, message.messageType, "client", message.disableInput )
-			
-			messages.client[ messageIndex ] = nil
-		end
-	else
-		if ( messageGlobalID ) then
-			local message = messages.global[ messageGlobalID ]
-
-			if ( message ) then
-				if ( isElement( message.window ) ) then
-					destroyElement( message.window )
+	if ( not messageGlobalID ) then
+		for index, data in pairs( messages.client ) do
+			if ( data.messageType == messageType ) then
+				if ( isElement( messages.client[ index ].window ) ) then
+					destroyElement( messages.client[ index ].window )
 				end
 				
-				triggerEvent( "messages:onContinue", localPlayer, messageID, message.messageType, "global", message.disableInput )
+				triggerEvent( "messages:onContinue", localPlayer, index, data.messageType, "client", data.disableInput )
 				
-				messages.global[ messageGlobalID ] = nil
+				messages.client[ index ] = nil
 			end
+		end
+	else
+		if ( messages.global[ messageGlobalID ] ) then
+			if ( isElement( messages.global[ messageGlobalID ].window ) ) then
+				destroyElement( messages.global[ messageGlobalID ].window )
+			end
+			
+			triggerEvent( "messages:onContinue", localPlayer, messageID, messages.global[ messageGlobalID ].messageType, "global", messages.global[ messageGlobalID ].disableInput )
+			
+			messages.global[ messageGlobalID ] = nil
 		end
 	end
 	
-	if ( #messages.client == 0 ) and ( #messages.global == 0 ) then
+	if ( exports.common:count( messages.client ) == 0 ) and ( exports.common:count( messages.global ) == 0 ) then
 		showCursor( false )
 		guiSetInputEnabled( false )
 	end
