@@ -167,6 +167,14 @@ addEventHandler( "onClientRender", root,
 							else
 								name = item.name
 							end
+						elseif ( itemData.item_id == 12 ) then
+							local parts = split( itemData.value, ";" )
+							
+							if ( #parts >= 2 ) then
+								name = name .. " (@" .. getWeaponNameFromID( parts[ 1 ] ) .. ") (" .. parts[ 2 ] .. " bullets)"
+							else
+								name = item.name
+							end
 						end
 						
 						local nameLength = math.max( 200, dxGetTextWidth( name ) * 1.5 )
@@ -261,7 +269,7 @@ addEventHandler( "onClientRender", root,
 				
 				if ( draggingItemSlot ~= localItemIndex ) and ( not isDraggingWorldItem ) then
 					dxDrawRectangle( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemMargin / 2 ), ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) )  *2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ), localItemScale, localItemScale, tocolor( 0, 0, 0, ( hovering and 0.6 * 255 or 0.5 * 255 ) ), true)
-					dxDrawImage( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemScale / 8 ), ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ) + ( ( ( localItemScale / 8 ) / 2 ) + 3 ), localItemScale - 18, localItemScale - 18, "images/" .. fileName .. ".png", 0, 0, 0, tocolor( 255, 255, 255, ( hovering and 0.95 * 255 or 0.8 * 255 ) ), true )
+					dxDrawImage( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ), ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ), localItemScale, localItemScale, "images/" .. fileName .. ".png", 0, 0, 0, tocolor( 255, 255, 255, ( hovering and 0.95 * 255 or 0.8 * 255 ) ), true )
 				else
 					local playerX, playerY, playerZ = getElementPosition( localPlayer )
 					local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
@@ -333,6 +341,14 @@ addEventHandler( "onClientRender", root,
 								if ( #parts == 3 ) then
 									value = parts[ 3 ]
 								end
+							else
+								name = item.name
+							end
+						elseif ( localItem.item_id == 12 ) then
+							local parts = split( localItem.value, ";" )
+							
+							if ( #parts >= 2 ) then
+								name = name .. " (@" .. getWeaponNameFromID( parts[ 1 ] ) .. ") (" .. parts[ 2 ] .. " bullets)"
 							else
 								name = item.name
 							end
@@ -546,14 +562,16 @@ addEventHandler( "onClientClick", root,
 				if ( draggingItemSlot ) then
 					local localItem = items[ categories[ inventoryOpenCategoryID ] ][ draggingItemSlot ]
 					
-					if ( not collision ) or ( distance >= maxDistance ) then
-						outputChatBox( "That's outer space, monkey." )
-					elseif ( element ) and ( element ~= localPlayer ) then
-						triggerServerEvent( "items:drop", localPlayer, element, localItem.db_id, localItem.item_id, localItem.value, localItem.ringtone_id, localItem.messagetone_id, worldX, worldY, worldZ )
-					elseif ( element ) and ( element == localPlayer ) then
-						outputChatBox( "Giving yourself a present? Aw, how cute!" )
-					else
-						triggerServerEvent( "items:drop", localPlayer, false, localItem.db_id, localItem.item_id, localItem.value, localItem.ringtone_id, localItem.messagetone_id, worldX, worldY, worldZ )
+					if ( localItem ) then
+						if ( not collision ) or ( distance >= maxDistance ) then
+							outputChatBox( "That's outer space, monkey." )
+						elseif ( element ) and ( element ~= localPlayer ) then
+							triggerServerEvent( "items:drop", localPlayer, element, localItem.db_id, localItem.item_id, localItem.value, localItem.ringtone_id, localItem.messagetone_id, worldX, worldY, worldZ )
+						elseif ( element ) and ( element == localPlayer ) then
+							outputChatBox( "Giving yourself a present? Aw, how cute!" )
+						else
+							triggerServerEvent( "items:drop", localPlayer, false, localItem.db_id, localItem.item_id, localItem.value, localItem.ringtone_id, localItem.messagetone_id, worldX, worldY, worldZ )
+						end
 					end
 					
 					draggingItemSlot = nil
@@ -659,6 +677,13 @@ local function toggleInventory( )
 		if ( isInventoryLocked ) then
 			outputChatBox( "Inventory cannot be accessed at this time.", 245, 20, 20, false )
 		else
+			if ( not isInventoryVisible ) then
+				if ( getElementData( localPlayer, "temp:need_synchronization" ) ) then
+					triggerServerEvent( "items:synchronize", localPlayer )
+					setElementData( localPlayer, "temp:need_synchronization", false, false )
+				end
+			end
+			
 			isInventoryVisible = not isInventoryVisible
 			
 			toggleAllControls( not isInventoryVisible, true, false )
