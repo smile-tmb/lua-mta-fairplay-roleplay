@@ -57,7 +57,7 @@ addEventHandler( "characters:create", root,
 				characterName = characterName:gsub( "%s", "_" )
 				
 				if ( not getCharacterByName( characterName ) ) then
-					local characterID = exports.database:insert_id( "INSERT INTO `characters` (`account`, `skin_id`, `name`, `pos_x`, `pos_y`, `pos_z`, `rotation`, `interior`, `dimension`, `date_of_birth`, `gender`, `skin_color`, `origin`, `look`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", tonumber( getElementData( client, "database:id" ) ), characterSkinModel, characterName, defaultSpawnX, defaultSpawnY, defaultSpawnZ, defaultSpawnRotation, defaultSpawnInterior, defaultSpawnDimension, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, "NOW()" )
+					local characterID = exports.database:insert_id( "INSERT INTO `characters` (`account`, `skin_id`, `name`, `pos_x`, `pos_y`, `pos_z`, `rotation`, `interior`, `dimension`, `date_of_birth`, `gender`, `skin_color`, `origin`, `look`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", exports.common:getAccountID( client ), characterSkinModel, characterName, defaultSpawnX, defaultSpawnY, defaultSpawnZ, defaultSpawnRotation, defaultSpawnInterior, defaultSpawnDimension, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, "NOW()" )
 					
 					if ( characterID ) then
 						exports.messages:destroyMessage( client, "selection" )
@@ -198,13 +198,13 @@ function spawnCharacter( player, character, fade )
 				exports.security:modifyElementData( player, "character:look", character.look, true )
 				exports.security:modifyElementData( player, "character:date_of_birth", character.date_of_birth, true )
 				
-				exports.items:loadItems( player )
-				
 				exports.database:query( "UPDATE `characters` SET `last_played` = NOW( ) WHERE `id` = ?", character.id )
 				
 				spawnPlayer( player, character.pos_x, character.pos_y, character.pos_z, character.rotation, character.skin_id, character.interior, character.dimension, getTeamFromName( "Civilian" ) or nil )
-				
 				setPedRotation( player, character.rotation )
+				setPlayerName( player, character.name )
+				
+				exports.items:loadItems( player )
 				
 				triggerClientEvent( player, "characters:onSpawn", player )
 				
