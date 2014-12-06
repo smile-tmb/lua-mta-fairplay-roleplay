@@ -124,7 +124,7 @@ addCommandHandler( { "toggleduty", "adminduty", "toggleadminduty", "togduty", "a
 addCommandHandler( { "announce", "announcement", "message" },
 	function( player, cmd, ... )
 		if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
-			exports.messages:createMessage( root, table.concat( { ... }, " " ), nil, getTickCount( ) )
+			exports.messages:createMessage( root, table.concat( { ... }, " " ), getTickCount( ) )
 		end
 	end
 )
