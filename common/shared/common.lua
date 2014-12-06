@@ -154,3 +154,7 @@ end
 function getAccountName( player )
 	return getElementData( player, "account:username" )
 end
+
+function getPlayerID( player )
+	return getElementData( player, "player:id" ) and tonumber( getElementData( player, "player:id" ) ) or false
+end
