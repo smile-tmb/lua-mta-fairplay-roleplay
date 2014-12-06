@@ -2,7 +2,7 @@ function getFactions( )
 	local factions = { }
 	
 	for _, team in ipairs( getElementsByType( "team" ) ) do
-		if ( getElementData( team, "faction:id" ) ) then
+		if ( exports.factions:getFactionID( team ) ) then
 			table.insert( factions, team )
 		end
 	end
@@ -12,7 +12,7 @@ end
 
 function getFactionByID( id )
 	for _, faction in ipairs( getFactions( ) ) do
-		if ( tonumber( getElementData( faction, "faction:id" ) ) == id ) then
+		if ( exports.factions:getFactionID( faction ) == id ) then
 			return faction
 		end
 	end
@@ -22,7 +22,7 @@ end
 
 function getFactionByName( name )
 	for _, faction in ipairs( getFactions( ) ) do
-		if ( tonumber( getElementData( faction, "faction:name" ) ) == name ) then
+		if ( exports.factions:getFactionName( faction ) == name ) then
 			return faction
 		end
 	end
