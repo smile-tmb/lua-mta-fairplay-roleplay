@@ -127,8 +127,6 @@ addEventHandler( "accounts:ready", root,
 		
 		local accountID = tonumber( getElementData( client, "database:id" ) )
 		
-		triggerClientEvent( client, "admin:updateHUD", client )
-		
 		if ( not accountID ) then
 			triggerClientEvent( client, "accounts:showLogin", client )
 			
