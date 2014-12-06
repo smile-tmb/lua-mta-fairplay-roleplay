@@ -158,3 +158,32 @@ end
 function getPlayerID( player )
 	return getElementData( player, "player:id" ) and tonumber( getElementData( player, "player:id" ) ) or false
 end
+
+function getPlayerByID( id )
+	for _, player in ipairs( getElementsByType( "player" ) ) do
+		if ( getPlayerID( player ) == id ) then
+			return player
+		end
+	end
+	
+	return false
+end
+
+function nextToPosition( x, y, z, rotation, radius )
+	rotation = rotation or 0
+	radius = radius or 5
+	
+	if ( isElement( x ) ) then
+		if ( y ) then
+			radius = y
+		end
+		
+		_, _, rotation = getElementRotation( x )
+		x, y, z = getElementPosition( x )
+	end
+	
+	x = x + ( ( math.cos( math.rad( rotation ) ) ) * radius )
+	y = y + ( ( math.sin( math.rad( rotation ) ) ) * radius )
+	
+	return x, y, z
+end
