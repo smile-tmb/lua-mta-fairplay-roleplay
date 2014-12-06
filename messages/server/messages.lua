@@ -16,6 +16,8 @@ function createGlobalMessage( message, messageType, hideButton, disableInput )
 	for _, player in ipairs( getElementsByType( "player" ) ) do
 		createMessage( player, message, messageType, messageGlobalID, hideButton, disableInput )
 	end
+	
+	return messageGlobalID
 end
 
 function destroyGlobalMessage( messageGlobalID )
@@ -37,6 +39,18 @@ addEventHandler( "messages:ready", root,
 		
 		for index, message in pairs( messages ) do
 			createMessage( client, message.message, message.messageType, index, message.hideButton, message.disableInput )
+		end
+	end
+)
+
+addEventHandler( "onResourceStop", root,
+	function( resource )
+		if ( getResourceName( resource ) == "vehicles" ) then
+			for _, message in pairs( messages ) do
+				if ( message.messageType == "vehicles-loading" ) then
+					destroyGlobalMessage( message.messageGlobalID )
+				end
+			end
 		end
 	end
 )
