@@ -1,0 +1,5 @@
+<meta>
+	<info name="scoreboard@fpg" author="socialz@github" type="script" />
+	
+	<script src="client/scoreboard.lua" type="client" cache="false" />
+</meta>
