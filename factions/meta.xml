@@ -1,0 +1,9 @@
+<meta>
+	<info name="factions@fairplay" author="socialz@fairplay" type="script" />
+	
+	<script src="server/factions.lua" />
+	
+	<export function="getFactions" />
+	<export function="getFactionByID" />
+	<export function="getFactionByName" />
+</meta>
