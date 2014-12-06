@@ -38,6 +38,8 @@ function logout( player )
 	
 	exports.database:execute( "UPDATE `accounts` SET `last_action` = NOW( ) WHERE `id` = ?", getElementData( player, "database:id" ) )
 	
+	setPlayerName( player, getElementData( player, "player:name" ) )
+	
 	removeElementData( player, "database:id" )
 	removeElementData( player, "account:username" )
 	removeElementData( player, "account:level" )
@@ -143,6 +145,10 @@ addEventHandler( "accounts:ready", root,
 				
 				fadeCamera( client, true )
 			end
+		end
+		
+		if ( not getElementData( client, "player:id" ) ) then
+			givePlayerID( client )
 		end
 		
 		setPlayerHudComponentVisible( client, "all", false )
