@@ -3,4 +3,14 @@
 	
 	<script src="client/vehicles.lua" type="client" cache="false" />
 	<script src="server/vehicles.lua" />
+	
+	<export function="get" />
+	<export function="getVehicle" />
+	<export function="new" />
+	<export function="spawn" />
+	<export function="despawn" />
+	<export function="reload" />
+	<export function="save" />
+	<export function="saveAllVehicles" />
+	<export function="spawnAllVehicles" />
 </meta>
