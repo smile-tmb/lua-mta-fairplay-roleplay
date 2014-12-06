@@ -63,20 +63,20 @@ function scoreboardHUD( )
 	local screenHeight = screenHeight
 	
 	-- background
-	local scoreboardWidth, scoreboardHeight = screenWidth / 3, screenHeight / 2 + 4 -- + 4 is custom
+	local scoreboardWidth, scoreboardHeight = screenWidth / 3, screenHeight / 2 - 6 -- - 6 is custom
 	local scoreboardX, scoreboardY = ( screenWidth - scoreboardWidth ) / 2, ( screenHeight - scoreboardHeight ) / 2
 	
 	dxDrawRectangle( scoreboardX, scoreboardY, scoreboardWidth, scoreboardHeight, tocolor( 0, 0, 0, 0.825 * 255 ), true )
 	
 	-- players
-	local playerBoxHeight = 32
+	local playerBoxHeight = 27
 	local playerBoxMarginX, playerBoxMarginY = 4, 4
 	local playerBoxWidth, playerBoxHeight = scoreboardWidth - ( playerBoxMarginX * 2 ), playerBoxHeight - playerBoxMarginY
 	local playerBoxX, playerBoxY = scoreboardX + playerBoxMarginX, scoreboardY + playerBoxMarginY
 	
 	--// TEMPORARY BEGIN //
 	local playerIDText = "ID"
-	local playerNameText = "Character"
+	local playerNameText = "Character name"
 	local playerBoxColor = colors.default
 	
 	-- player box
@@ -85,14 +85,14 @@ function scoreboardHUD( )
 	dxDrawRectangle( playerBoxX, playerBoxY, playerBoxWidth, playerBoxHeight, playerBoxColor, true )
 	
 	-- player id
-	local playerTextMarginX, playerTextMarginY = 4, 7
+	local playerTextMarginX, playerTextMarginY = 4, 4
 	local playerTextX, playerTextY = playerBoxX + playerTextMarginX, playerBoxY + playerTextMarginY
 	local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ), playerTextY + playerBoxHeight - playerTextMarginY
 	
 	dxDrawText( playerIDText, playerTextX, playerTextY, playerTextWidth, playerTextHeight, tocolor( 255, 255, 255, 0.775 * 255 ), 1.0, "default-bold", "left", "top", true, false, true, false, false, 0, 0, 0 )
 	
 	-- player name
-	local playerTextMarginX, playerTextMarginY = 4, 7
+	local playerTextMarginX, playerTextMarginY = 4, 4
 	local playerTextX, playerTextY = playerBoxX + playerTextMarginX + 100, playerBoxY + playerTextMarginY
 	local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ) - 100, playerTextY + playerBoxHeight - playerTextMarginY
 	
@@ -140,14 +140,14 @@ function scoreboardHUD( )
 			dxDrawRectangle( playerBoxX, playerBoxY, playerBoxWidth, playerBoxHeight, playerBoxColor, true )
 			
 			-- player id
-			local playerTextMarginX, playerTextMarginY = 4, 7
+			local playerTextMarginX, playerTextMarginY = 4, 4
 			local playerTextX, playerTextY = playerBoxX + playerTextMarginX, playerBoxY + playerTextMarginY
 			local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ), playerTextY + playerBoxHeight - playerTextMarginY
 			
 			dxDrawText( playerIDText, playerTextX, playerTextY, playerTextWidth, playerTextHeight, tocolor( 255, 255, 255, 0.775 * 255 ), 1.0, "clear", "left", "top", true, false, true, false, false, 0, 0, 0 )
 			
 			-- player name
-			local playerTextMarginX, playerTextMarginY = 4, 7
+			local playerTextMarginX, playerTextMarginY = 4, 4
 			local playerTextX, playerTextY = playerBoxX + playerTextMarginX + 100, playerBoxY + playerTextMarginY
 			local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ) - 100, playerTextY + playerBoxHeight - playerTextMarginY
 			
