@@ -11,6 +11,7 @@
 	<script src="server/utility.lua" />
 	<script src="server/player_admin.lua" />
 	<script src="server/server.lua" />
+	<script src="server/vehicle_admin.lua" />
 	
 	<export function="isServerInMaintenance" type="shared" />
 	<export function="isServerOverloaded" type="shared" />
