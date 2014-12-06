@@ -120,6 +120,10 @@ addEventHandler( "characters:play", root,
 )
 
 function saveCharacter( player )
+	if ( not isElement( player ) ) then
+		return
+	end
+	
 	if ( exports.common:isPlayerPlaying( player ) ) then
 		local x, y, z = getElementPosition( player )
 		local rotation = getPedRotation( player )
@@ -155,6 +159,10 @@ addEventHandler( "onPlayerQuit", root,
 )
 
 function characterSelection( player )
+	if ( not isElement( player ) ) then
+		return
+	end
+	
 	saveCharacter( player )
 	
 	removeElementData( player, "player:playing" )
@@ -183,6 +191,10 @@ function characterSelection( player )
 end
 
 function spawnCharacter( player, character, fade )
+	if ( not isElement( player ) ) then
+		return
+	end
+	
 	local character = type( character ) == "number" and getCharacter( character ) or ( type( character ) == "table" and character or nil )
 	
 	if ( character ) then
@@ -200,7 +212,12 @@ function spawnCharacter( player, character, fade )
 				
 				exports.database:query( "UPDATE `characters` SET `last_played` = NOW( ) WHERE `id` = ?", character.id )
 				
-				spawnPlayer( player, character.pos_x, character.pos_y, character.pos_z, character.rotation, character.skin_id, character.interior, character.dimension, getTeamFromName( "Civilian" ) or nil )
+				spawnPlayer( player, character.pos_x, character.pos_y, character.pos_z, character.rotation, character.skin_id, character.interior, character.dimension )
+				
+				if ( getTeamFromName( "Civilian" ) ) then
+					setPlayerTeam( player, getTeamFromName( "Civilian" ) )
+				end
+				
 				setPedRotation( player, character.rotation )
 				setPlayerName( player, character.name )
 				
