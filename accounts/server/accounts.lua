@@ -97,6 +97,17 @@ addEventHandler( "accounts:login", root,
 	end
 )
 
+addEvent( "accounts:logout", true )
+addEventHandler( "accounts:logout", root,
+	function( )
+		if ( source ~= client ) then
+			return
+		end
+		
+		logout( client )
+	end
+)
+
 addEvent( "accounts:register", true )
 addEventHandler( "accounts:register", root,
 	function( username, password )
@@ -145,6 +156,10 @@ addEventHandler( "accounts:ready", root,
 				
 				fadeCamera( client, true )
 			end
+		end
+		
+		if ( not getElementData( client, "player:playing" ) ) then
+			triggerClientEvent( client, "accounts:showView", client )
 		end
 		
 		if ( not getElementData( client, "player:id" ) ) then

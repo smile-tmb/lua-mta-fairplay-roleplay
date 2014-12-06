@@ -92,6 +92,17 @@ addEventHandler( "characters:create", root,
 	end
 )
 
+addEvent( "characters:selection", true )
+addEventHandler( "characters:selection", root,
+	function( )
+		if ( source ~= client ) then
+			return
+		end
+		
+		characterSelection( client )
+	end
+)
+
 addEvent( "characters:play", true )
 addEventHandler( "characters:play", root,
 	function( characterName )
@@ -110,7 +121,7 @@ addEventHandler( "characters:play", root,
 			local character = exports.database:query_single( "SELECT * FROM `characters` WHERE `name` = ? AND `account` = ?", characterName, accountID )
 			
 			if ( character ) then
-				triggerClientEvent( client, "characters:closeGUI", client )
+				triggerClientEvent( client, "characters:closeGUI", client, true )
 				spawnCharacter( client, character, true )
 			else
 				exports.messages:createMessage( client, "Unable to retrieve information for this character. Please try again.", "selection" )
@@ -178,14 +189,15 @@ function characterSelection( player )
 	removeElementData( player, "character:max_weight" )
 	
 	triggerClientEvent( player, "superman:stop", player )
+	triggerClientEvent( player, "scoreboard:hideHUD", player )
 	
 	spawnPlayer( player, 0, 0, 0 )
 	setElementDimension( player, 6000 )
 	
 	setCameraMatrix( player, 0, 0, 100, 100, 100, 100 )
 	
-	triggerClientEvent( player, "accounts:showCharacterSelection", player )
 	triggerClientEvent( player, "messages:destroy", player, "selection" )
+	triggerClientEvent( player, "accounts:showCharacterSelection", player )
 	
 	updateCharacters( player )
 end
@@ -212,13 +224,21 @@ function spawnCharacter( player, character, fade )
 				
 				exports.database:query( "UPDATE `characters` SET `last_played` = NOW( ) WHERE `id` = ?", character.id )
 				
-				spawnPlayer( player, character.pos_x, character.pos_y, character.pos_z, character.rotation, character.skin_id, character.interior, character.dimension )
+				triggerClientEvent( player, "accounts:hideView", player )
+				triggerClientEvent( player, "scoreboard:showHUD", player )
+				triggerClientEvent( player, "scoreboard:updateHUD", player )
+				
+				spawnPlayer( player, character.pos_x, character.pos_y, character.pos_z )
 				
 				if ( getTeamFromName( "Civilian" ) ) then
 					setPlayerTeam( player, getTeamFromName( "Civilian" ) )
 				end
 				
 				setPedRotation( player, character.rotation )
+				setElementModel( player, character.skin_id )
+				setElementInterior( player, character.interior )
+				setElementDimension( player, character.dimension )
+				
 				setPlayerName( player, character.name )
 				
 				exports.items:loadItems( player )

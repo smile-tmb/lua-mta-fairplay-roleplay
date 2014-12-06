@@ -25,6 +25,9 @@ function showCharacterSelection( forceClose )
 	showCursor( true )
 	guiSetInputEnabled( true )
 	
+	triggerEvent( "accounts:showView", localPlayer )
+	addEventHandler( "onClientRender", root, showBackground )
+	
 	character_selection.window = guiCreateWindow( ( screenWidth - 536 ) / 2, ( screenHeight - 346 ) / 2, 536, 376, "Character Selection", false )
 	guiWindowSetSizable( character_selection.window, false )
 	
@@ -321,9 +324,14 @@ addEventHandler( "accounts:showCharacterSelection", root,
 
 addEvent( "characters:closeGUI", true )
 addEventHandler( "characters:closeGUI", root,
-	function( )
+	function( hideBackgroundOnSpawn )
 		exports.messages:destroyMessage( "selection" )
+		triggerEvent( "accounts:close_menu", localPlayer )
 		showCharacterSelection( true )
+		
+		if ( not hideBackgroundOnSpawn ) then
+			removeEventHandler( "onClientRender", root, showBackground )
+		end
 	end
 )
 
@@ -331,6 +339,7 @@ addEvent( "characters:onSpawn", true )
 addEventHandler( "characters:onSpawn", root,
 	function( )
 		setPedCameraRotation( localPlayer, getPedRotation( localPlayer ) - 180 )
+		removeEventHandler( "onClientRender", root, showBackground )
 	end
 )
 
