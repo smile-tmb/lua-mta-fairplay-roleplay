@@ -26,6 +26,8 @@ function updateScoreboardHUD( )
 		end]]
 	end
 end
+addEvent( "scoreboard:updateHUD", true )
+addEventHandler( "scoreboard:updateHUD", root, updateScoreboardHUD )
 
 function showScoreboardHUD( )
 	updateScoreboardHUD( )
@@ -47,13 +49,6 @@ function hideScoreboardHUD( )
 end
 addEvent( "scoreboard:hideHUD", true )
 addEventHandler( "scoreboard:hideHUD", root, hideScoreboardHUD )
-
-addEvent( "scoreboard:updateHUD", true )
-addEventHandler( "scoreboard:updateHUD", root,
-	function( )
-		updateScoreboardHUD( )
-	end
-)
 
 function scoreboardHUD( )
 	if ( not showHUD ) or ( not hudShowing ) or ( not getKeyState( "tab" ) ) then
@@ -115,7 +110,7 @@ function scoreboardHUD( )
 			playerNameText = exports.common:getRealPlayerName( player )
 			
 			if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
-				playerNameText = "@ " .. playerNameText
+				playerNameText = "+ " .. playerNameText
 			end
 		elseif ( player.custom_id ) or ( player.custom_name ) then
 			if ( player.custom_color ) then
