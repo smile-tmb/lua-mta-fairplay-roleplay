@@ -47,7 +47,7 @@ addEventHandler( "admin:updateHUD", root,
 )
 
 function adminHUD( )
-	if ( not showHUD ) then
+	if ( not showHUD ) or ( not hudShowing ) then
 		return
 	end
 	
