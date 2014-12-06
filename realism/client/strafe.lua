@@ -1,10 +1,9 @@
 addEventHandler( "onClientPreRender", root,
 	function( )
-		
 		local leftPressed = getKeyState( "q" )
 		local rightPressed = getKeyState( "e" )
 		
-		if ( ( leftPressed ) or ( rightPressed ) ) and ( not isMTAWindowActive( ) ) then
+		if ( ( leftPressed ) or ( rightPressed ) ) and ( not isMTAWindowActive( ) ) and ( not exports.messages:isMessageOpen( ) ) then
 			setControlState( "forwards", true )
 			--setControlState( "sprint", true )
 			
