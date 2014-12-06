@@ -1,7 +1,6 @@
 <meta>
 	<info name="vehicles@fairplay" author="socialz@fairplay" type="script" />
 	
-	<script src="client/vehicles.lua" type="client" cache="false" />
 	<script src="server/vehicles.lua" />
 	
 	<export function="get" />
