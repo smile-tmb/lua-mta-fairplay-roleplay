@@ -1,6 +1,7 @@
 <meta>
 	<info name="realism@fairplay" author="socialz@fairplay" type="script" />
 	
+	<script src="client/realism.lua" type="client" cache="false" />
 	<script src="client/strafe.lua" type="client" cache="false" />
 	<script src="server/realism.lua" />
 </meta>
