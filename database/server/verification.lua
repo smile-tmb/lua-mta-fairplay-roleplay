@@ -151,7 +151,7 @@ addEventHandler( "onResourcePreStart", root,
 				if ( _return ) and ( _code > 0 ) then
 					outputDebugString( "DATABASE: Verification check completed for \"" .. database .. "\": database created." )
 				else
-					outputDebugString( "DATABASE: Verification check completed for \"" .. database .. "\": database wasn't created, because it already exists, most probably." )
+					--outputDebugString( "DATABASE: Verification check completed for \"" .. database .. "\": database wasn't created, because it already exists, most probably." )
 				end
 			end
 		end
