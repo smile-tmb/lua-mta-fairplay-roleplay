@@ -4,6 +4,7 @@
 	<script src="client/messages.lua" type="client" cache="false" />
 	<script src="server/messages.lua" />
 	
+	<export function="isMessageOpen" type="client" />
 	<export function="createMessage" type="shared" />
 	<export function="destroyMessage" type="shared" />
 	<export function="createGlobalMessage" />

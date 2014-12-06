@@ -75,13 +75,21 @@ function destroyMessage( messageType, messageGlobalID )
 		end
 	end
 	
-	if ( exports.common:count( messages.client ) == 0 ) and ( exports.common:count( messages.global ) == 0 ) then
+	if ( not isMessageOpen( ) ) then
 		showCursor( false )
 		guiSetInputEnabled( false )
 	end
 end
 addEvent( "messages:destroy", true )
 addEventHandler( "messages:destroy", root, destroyMessage )
+
+function isMessageOpen( )
+	if ( exports.common:count( messages.client ) > 0 ) or ( exports.common:count( messages.global ) > 0 ) then
+		return true
+	end
+	
+	return false
+end
 
 addEvent( "messages:onContinue", true )
 addEventHandler( "messages:onContinue", root,
@@ -107,7 +115,7 @@ addEventHandler( "onClientResourceStop", root,
 	end
 )
 
-addEventHandler( "onClientResourceStart", root,
+addEventHandler( "onClientResourceStart", resourceRoot,
 	function( )
 		triggerServerEvent( "messages:ready", localPlayer )
 	end
