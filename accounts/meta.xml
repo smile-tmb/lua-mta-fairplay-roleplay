@@ -6,11 +6,13 @@
 	<script src="client/accounts.lua" type="client" cache="false" />
 	<script src="client/characters.lua" type="client" cache="false" />
 	<script src="client/menu.lua" type="client" cache="false" />
+	<script src="client/tutorial.lua" type="client" cache="false" />
 	<script src="client/view.lua" type="client" cache="false" />
 	
 	<script src="server/accounts.lua" />
 	<script src="server/characters.lua" />
 	<script src="server/id.lua" />
+	<script src="server/tutorial.lua" />
 	
 	<export function="get" />
 	<export function="new" />
