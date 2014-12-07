@@ -60,6 +60,8 @@ addEventHandler( "characters:create", root,
 					local characterID = exports.database:insert_id( "INSERT INTO `characters` (`account`, `skin_id`, `name`, `pos_x`, `pos_y`, `pos_z`, `rotation`, `interior`, `dimension`, `date_of_birth`, `gender`, `skin_color`, `origin`, `look`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", exports.common:getAccountID( client ), characterSkinModel, characterName, defaultSpawnX, defaultSpawnY, defaultSpawnZ, defaultSpawnRotation, defaultSpawnInterior, defaultSpawnDimension, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, "NOW()" )
 					
 					if ( characterID ) then
+						exports.database:execute( "INSERT INTO `languages` (`character_id`, `language_1`) VALUES (?, ?)", characterID, characterLanguage )
+						
 						exports.messages:destroyMessage( client, "selection" )
 						
 						triggerClientEvent( client, "characters:closeGUI", client )
@@ -188,6 +190,11 @@ function characterSelection( player )
 	removeElementData( player, "character:weight" )
 	removeElementData( player, "character:max_weight" )
 	
+	for slot = 1, exports.chat:getMaxLanguages( ) do
+		removeElementData( player, "character:language_" .. slot )
+		removeElementData( player, "character:language_" .. slot .. "_skill" )
+	end
+	
 	triggerClientEvent( player, "superman:stop", player )
 	triggerClientEvent( player, "scoreboard:hideHUD", player )
 	
@@ -221,6 +228,15 @@ function spawnCharacter( player, character, fade )
 				exports.security:modifyElementData( player, "character:origin", character.origin, true )
 				exports.security:modifyElementData( player, "character:look", character.look, true )
 				exports.security:modifyElementData( player, "character:date_of_birth", character.date_of_birth, true )
+				
+				local languages = exports.database:query_single( "SELECT * FROM `languages` WHERE `character_id` = ?", character.id )
+				
+				if ( languages ) then
+					for slot = 1, exports.chat:getMaxLanguages( ) do
+						exports.security:modifyElementData( player, "character:language_" .. slot, languages[ "language_" .. slot ] or 0, true )
+						exports.security:modifyElementData( player, "character:language_" .. slot .. "_skill", languages[ "skill_" .. slot ] or 0, true )
+					end
+				end
 				
 				exports.database:query( "UPDATE `characters` SET `last_played` = NOW( ) WHERE `id` = ?", character.id )
 				

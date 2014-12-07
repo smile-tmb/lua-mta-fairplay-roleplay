@@ -1,7 +1,24 @@
 <meta>
 	<info name="chat@fairplay" author="socialz@fairplay" type="script" />
 	
+	<script src="shared/languages.lua" type="shared" cache="false" />
 	<script src="server/chat.lua" />
 	
+	<export function="outputChatBox" />
+	<export function="outputLocalChat" />
 	<export function="outputLocalActionMe" />
+	
+	<export function="getLanguages" type="shared" />
+	<export function="getMaxLanguages" type="shared" />
+	<export function="getLanguage" type="shared" />
+	<export function="getLanguageFlag" type="shared" />
+	<export function="getLanguageName" type="shared" />
+	<export function="hasLanguage" type="shared" />
+	<export function="getFreeSlot" type="shared" />
+	<export function="giveLanguage" type="shared" />
+	<export function="takeLanguage" type="shared" />
+	<export function="increaseLanguageSkill" type="shared" />
+	<export function="getPlayerLanguage" type="shared" />
+	<export function="getPlayerLanguages" type="shared" />
+	<export function="getPlayerLanguageSkill" type="shared" />
 </meta>
