@@ -1,4 +1,4 @@
-database.configuration.automated_resources = { accounts = { "accounts", "characters" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, chat = { "languages" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -46,6 +46,16 @@ database.verification = {
 		{ name = "ringtone_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
+	},
+	languages = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "character_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "language_1", type = "smallint", length = 3, default = 1, is_unsigned = true },
+		{ name = "language_2", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "language_3", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "skill_1", type = "smallint", length = 3, default = 100, is_unsigned = true },
+		{ name = "skill_2", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "skill_3", type = "smallint", length = 3, default = 0, is_unsigned = true }
 	},
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
