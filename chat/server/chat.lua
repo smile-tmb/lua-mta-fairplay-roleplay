@@ -6,6 +6,16 @@
 	return string
 end
 
+local _outputChatBox = outputChatBox
+function outputChatBox( text, visibleTo, r, g, b, colorCoded )
+	if ( string.len( text ) > 128 ) then
+		_outputChatBox( string.sub( text, 1, 127 ), visibleTo, r, g, b, colorCoded )
+		outputChatBox( " " .. string.sub( text, 128 ), visibleTo, r, g, b, colorCoded )
+	else
+		_outputChatBox( text, visibleTo, r, g, b, colorCoded )
+	end
+end
+
 function outputLocalActionMe( player, action )
 	if ( exports.common:isPlayerPlaying( player ) ) then
 		local x, y, z = getElementPosition( player )
