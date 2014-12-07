@@ -151,6 +151,10 @@ function getRealPlayerName( player )
 	return getPlayerName( player ):gsub( "_", " " )
 end
 
+function getAccountID( player )
+	return getElementData( player, "database:id" ) and tonumber( getElementData( player, "database:id" ) ) or false
+end
+
 function getAccountName( player )
 	return getElementData( player, "account:username" )
 end

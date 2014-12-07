@@ -23,6 +23,7 @@
 	<export function="formatString" type="shared" />
 	<export function="getCharacterID" type="shared" />
 	<export function="getRealPlayerName" type="shared" />
+	<export function="getAccountID" type="shared" />
 	<export function="getAccountName" type="shared" />
 	<export function="getPlayerID" type="shared" />
 	<export function="getPlayerByID" type="shared" />
