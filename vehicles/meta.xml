@@ -1,6 +1,7 @@
 <meta>
 	<info name="vehicles@fairplay" author="socialz@fairplay" type="script" />
 	
+	<script src="shared/vehicles.lua" type="shared" cache="false" />
 	<script src="server/vehicles.lua" />
 	
 	<export function="get" />
@@ -12,4 +13,8 @@
 	<export function="save" />
 	<export function="saveAllVehicles" />
 	<export function="spawnAllVehicles" />
+	
+	<export function="getBikeModels" type="shared" />
+	<export function="getWindowlessModels" type="shared" />
+	<export function="getRooflessModels" type="shared" />
 </meta>
