@@ -24,21 +24,22 @@ function load_resource( resource_name )
 		local resource_path = ":" .. resource_name .. "/"
 		local xml_file = xmlLoadFile( resource_path .. resource_config_file )
 		local script_files_to_combine = { }
+		local xml_copy
 		
 		if ( xml_file ) then
-			xmlCopyFile( xml_file, resource_path .. "meta-" .. getRealTime( ).timestamp .. ".xml" )
+			xml_copy = xmlCopyFile( xml_file, resource_path .. "meta-" .. getRealTime( ).timestamp .. ".xml" )
 			
 			local xml_script_children = xmlNodeGetChildren( xml_file )
 			local xml_found_combined_file, xml_found_shared_content = false, false
 			
 			for _,xml_node in ipairs( xml_script_children ) do
-				if ( xmlNodeGetName( xml_node ) == "_script" ) and ( ( xmlNodeGetAttribute( xml_node, "type" ) == "client" ) or ( xmlNodeGetAttribute( xml_node, "type" ) == "shared" ) ) then
+				if ( xmlNodeGetName( xml_node ) == "_script" ) and ( ( xmlNodeGetAttribute( xml_node, "type" ) == "client" ) --[[or ( xmlNodeGetAttribute( xml_node, "type" ) == "shared" )]] ) then
 					if ( xmlNodeGetAttribute( xml_node, "type" ) == "shared" ) then
 						xml_found_shared_content = true
 					end
 					
 					table.insert( script_files_to_combine, xmlNodeGetAttribute( xml_node, "src" ) )
-					outputDebugString( xmlNodeGetAttribute( xml_node, "src" ) )
+					--outputDebugString( xmlNodeGetAttribute( xml_node, "src" ) )
 				end
 				
 				if ( xmlNodeGetName( xml_node ) == "script" ) and ( xmlNodeGetAttribute( xml_node, "src" ) == "script" ) then
@@ -51,12 +52,8 @@ function load_resource( resource_name )
 				
 				xmlNodeSetAttribute( xml_node, "src", "script" )
 				xmlNodeSetAttribute( xml_node, "type", xml_found_shared_content and "shared" or "client" )
-				xmlNodeSetAttribute( xml_node, "cached", "false" )
-				
-				xmlSaveFile( xml_file )
+				xmlNodeSetAttribute( xml_node, "cache", "false" )
 			end
-			
-			xmlUnloadFile( xml_file )
 		else
 			outputDebugString( "Could not find or read configuration file.", 3 )
 		end
@@ -71,7 +68,7 @@ function load_resource( resource_name )
 					if ( fileGetSize( client_file ) > 1 ) then
 						table.insert( script_files, client_file )
 					else
-						fileClose( resource_path .. client_file_path )
+						fileClose( client_file )
 					end
 				else
 					outputDebugString( "Could not read file via path \"" .. resource_path .. client_file_path .. "\".", 2 )
@@ -84,6 +81,12 @@ function load_resource( resource_name )
 		waiting_for_compiler = false
 		
 		if ( #script_files > 0 ) then
+			xmlSaveFile( xml_copy )
+			xmlUnloadFile( xml_copy )
+			
+			xmlSaveFile( xml_file )
+			xmlUnloadFile( xml_file )
+			
 			local combined_script_file = fileExists( resource_path .. combined_script_file_name ) and fileOpen( resource_path .. combined_script_file_name ) or false
 			
 			if ( not combined_script_file ) then
@@ -91,6 +94,7 @@ function load_resource( resource_name )
 				
 				if ( not combined_script_file ) then
 					outputDebugString( "Could not create combined client file.", 3 )
+					
 					return
 				end
 			end
@@ -103,7 +107,7 @@ function load_resource( resource_name )
 						local contents = fileRead( client_file, fileGetSize( client_file ) )
 						
 						if ( contents ) then
-							combined_script_file_content = combined_script_file_content .. " " .. contents
+							combined_script_file_content = combined_script_file_content .. "\r\n" .. contents
 							
 							fileClose( client_file )
 						end
@@ -111,6 +115,7 @@ function load_resource( resource_name )
 				end
 				
 				combined_script_file_content = pregReplace( combined_script_file_content, "\t", " " )
+				combined_script_file_content = pregReplace( combined_script_file_content, "\r\n\r\n", "\r\n" )
 				
 				while ( combined_script_file_content ) and ( combined_script_file_content:find( "  " ) ) do
 					combined_script_file_content = combined_script_file_content:gsub( "  ", " " )
@@ -126,15 +131,17 @@ function load_resource( resource_name )
 					current_script_file_content = current_script_file_content .. fileRead( combined_script_file, 500 )
 				end
 				
+				combined_script_file_content = tostring( combined_script_file_content )
+				
 				if ( compile_script ) then
 					waiting_for_compiler = true
 					
 					fetchRemote( compiler_address, function( data )
-						outputDebugString( combined_script_file_content )
+						--outputDebugString( combined_script_file_content )
 						
 						combined_script_file_content = data
 						
-						outputDebugString( combined_script_file_content )
+						--outputDebugString( combined_script_file_content )
 						
 						local current_checksum = md5( current_script_file_content )
 						local new_checksum = md5( combined_script_file_content )
@@ -179,6 +186,8 @@ function load_resource( resource_name )
 				outputDebugString( "Could not load the combined client file.", 3 )
 			end
 		else
+			xmlUnloadFile( xml_copy )
+			xmlUnloadFile( xml_file )
 			outputDebugString( "No client files to compile." )
 		end
 		
