@@ -36,7 +36,7 @@ end
 function logout( player )
 	characterSelection( player )
 	
-	exports.database:execute( "UPDATE `accounts` SET `last_action` = NOW( ) WHERE `id` = ?", getElementData( player, "database:id" ) )
+	exports.database:execute( "UPDATE `accounts` SET `last_action` = NOW( ) WHERE `id` = ?", exports.common:getAccountID( player ) )
 	
 	setPlayerName( player, getElementData( player, "player:name" ) )
 	
@@ -138,7 +138,7 @@ addEventHandler( "accounts:ready", root,
 			return
 		end
 		
-		local accountID = tonumber( getElementData( client, "database:id" ) )
+		local accountID = exports.common:getAccountID( client )
 		
 		if ( not accountID ) then
 			triggerClientEvent( client, "accounts:showLogin", client )

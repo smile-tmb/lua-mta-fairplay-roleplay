@@ -112,7 +112,7 @@ addEventHandler( "characters:play", root,
 		
 		exports.messages:destroyMessage( client, "selection" )
 		
-		local accountID = tonumber( getElementData( client, "database:id" ) )
+		local accountID = exports.common:getAccountID( client )
 		
 		if ( not accountID ) then
 			triggerClientEvent( client, "accounts:showLogin", client )
@@ -247,6 +247,10 @@ function spawnCharacter( player, character, fade )
 				
 				setCameraTarget( player, player )
 				
+				if ( get( exports.common:getAccountID( player ) ).tutorial == 0 ) then
+					triggerClientEvent( player, "accounts:showTutorial", player )
+				end
+				
 				fadeCamera( player, true, 2.0 )
 			end
 		end
@@ -261,7 +265,7 @@ function spawnCharacter( player, character, fade )
 end
 
 function updateCharacters( player )
-	local accountID = tonumber( getElementData( player, "database:id" ) )
+	local accountID = exports.common:getAccountID( player )
 	
 	if ( accountID ) then
 		local characters = exports.database:query( "SELECT * FROM `characters` WHERE `account` = ?", accountID )
