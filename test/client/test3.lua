@@ -1,1 +1,0 @@
-	outputChatBox( "TEST3" )
