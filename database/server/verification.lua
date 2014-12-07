@@ -9,9 +9,11 @@ database.verification = {
 		{ name = "username", type = "varchar", length = 25, default = "" },
 		{ name = "password", type = "varchar", length = 1000, default = "" },
 		{ name = "level", type = "tinyint", length = 3, default = 0 },
+		{ name = "tutorial", type = "tinyint", length = 1, default = 0 },
+		{ name = "tutorial_date", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "is_deleted", type = "tinyint", length = 1, default = 0 },
-		{ name = "last_login", type = "datetime", default = "0000-00-00 00:00:00" },
-		{ name = "last_action", type = "datetime", default = "0000-00-00 00:00:00" },
+		{ name = "last_login", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "last_action", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "last_ip", type = "varchar", length = 128, default = "0.0.0.0" },
 		{ name = "last_serial", type = "varchar", length = 32, default = "13371337133713371337133713371337" }
 	},
@@ -22,7 +24,7 @@ database.verification = {
 		{ name = "name", type = "varchar", length = 255, default = "" },
 		{ name = "gender", type = "varchar", length = 255, default = "" },
 		{ name = "skin_color", type = "varchar", length = 255, default = "" },
-		{ name = "date_of_birth", type = "datetime", default = "0000-00-00 00:00:00" },
+		{ name = "date_of_birth", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "origin", type = "varchar", length = 255, default = "" },
 		{ name = "look", type = "varchar", length = 255, default = "" },
 		{ name = "pos_x", type = "float", default = 0 },
@@ -33,8 +35,8 @@ database.verification = {
 		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
 		{ name = "health", type = "smallint", length = 3, default = 100, is_unsigned = true },
 		{ name = "armor", type = "smallint", length = 3, default = 0, is_unsigned = true },
-		{ name = "last_played", type = "datetime", default = "0000-00-00 00:00:00" },
-		{ name = "created_time", type = "datetime", default = "CURRENT_TIMESTAMP" }
+		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
 	},
 	inventory = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -43,7 +45,7 @@ database.verification = {
 		{ name = "value", type = "varchar", length = 1000, default = "" },
 		{ name = "ringtone_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "created_time", type = "datetime", default = "CURRENT_TIMESTAMP" }
+		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
 	},
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -79,7 +81,7 @@ database.verification = {
 		{ name = "is_deleted", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_broken", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_bulletproof", type = "tinyint", length = 1, default = 0, is_unsigned = true },
-		{ name = "created_time", type = "datetime", default = "CURRENT_TIMESTAMP" },
+		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" },
 		{ name = "created_by", type = "int", length = 11, default = 0, is_unsigned = true }
 	},
 	worlditems = {
@@ -98,7 +100,7 @@ database.verification = {
 		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "user_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "protection", type = "int", length = 10, default = 0 },
-		{ name = "created_time", type = "datetime", default = "CURRENT_TIMESTAMP" }
+		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
 	}
 }
 
