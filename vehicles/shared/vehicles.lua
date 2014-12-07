@@ -13,3 +13,7 @@ end
 function getRooflessModels( )
 	return roofless
 end
+
+function isVehicleWindowsDown( vehicle )
+	return getElementData( vehicle, "vehicle:windows" ) or false
+end

@@ -17,4 +17,5 @@
 	<export function="getBikeModels" type="shared" />
 	<export function="getWindowlessModels" type="shared" />
 	<export function="getRooflessModels" type="shared" />
+	<export function="isVehicleWindowsDown" type="shared" />
 </meta>
