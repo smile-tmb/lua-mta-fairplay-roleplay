@@ -1,11 +1,17 @@
 local isCameraMoving = false
+
 local smoothStopTimer
 local smoothMovers = { }
+
+local cameraStartTick = 0
 local cameraRoll, cameraFoV = 0, 70
+local cameraNewRoll, cameraNewFoV = cameraRoll, cameraFoV
 
 local function render( )
 	local posX, posY, posZ = getElementPosition( smoothMovers.source )
 	local aimX, aimY, aimZ = getElementPosition( smoothMovers.target )
+	
+	cameraRoll, cameraFoV = interpolateBetween( cameraRoll, cameraFoV, 0, cameraNewRoll, cameraNewFoV, 0, ( getTickCount( ) - cameraStartTick ) / cameraSpeed, "InOutQuad" )
 	
 	setCameraMatrix( posX, posY, posZ, aimX, aimY, aimZ, cameraRoll, cameraFoV )
 end
@@ -37,8 +43,12 @@ function smoothMoveCamera( x1, y1, z1, x1t, y1t, z1t, x2, y2, z2, x2t, y2t, z2t,
 		return false
 	end
 	
-	cameraRoll = roll or 0
-	cameraFoV = fov or 70
+	time = time < 50 and 50 or time
+	
+	cameraStartTick = getTickCount( )
+	cameraSpeed = time
+	cameraNewRoll = roll or 0
+	cameraNewFoV = fov or 70
 	
 	smoothMovers.source = createObject( 1337, x1, y1, z1 )
 	smoothMovers.target = createObject( 1337, x1t, y1t, z1t )
