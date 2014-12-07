@@ -191,3 +191,11 @@ function nextToPosition( x, y, z, rotation, radius )
 	
 	return x, y, z
 end
+
+function cleanString( string )
+	while ( string:find( "  " ) ) do
+		string:gsub( "  ", " " )
+	end
+	
+	return string
+end
