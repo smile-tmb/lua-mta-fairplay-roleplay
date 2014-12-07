@@ -95,6 +95,12 @@ function showCharacterSelection( forceClose )
 	
 	guiSetSize( character_selection.combobox.skin_color, width, 3 * 20 + 20, false )
 	
+	character_selection.label[ 7 ] = guiCreateLabel( 10, 250, 127, 15, "Language: Vietnamese", false, character_selection.tab.create )
+	guiSetFont( character_selection.label[ 7 ], "default-bold-small" )
+	
+	character_selection.button.language_previous = guiCreateButton( 10, 275, 26, 23, "<", false, character_selection.tab.create )
+	character_selection.button.language_next = guiCreateButton( 47, 275, 26, 23, ">", false, character_selection.tab.create )
+	
 	character_selection.skin = guiCreateStaticImage( 137, 157, 83, 83, "images/models/" .. selectedSkin .. ".png", false, character_selection.tab.create )
 	
 	character_selection.button.skin_previous = guiCreateButton( 147, 250, 26, 23, "<", false, character_selection.tab.create )
