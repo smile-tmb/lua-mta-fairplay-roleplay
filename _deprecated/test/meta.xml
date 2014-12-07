@@ -1,5 +1,5 @@
 <meta>
-    <_script src="client/test.lua" type="client"></_script>
-    <_script src="client/test2.lua" type="client"></_script>
-    <_script src="client/test3.lua" type="client"></_script>
+	<_script src="client/test.lua" type="client"></_script>
+	<_script src="client/test2.lua" type="client"></_script>
+	<_script src="client/test3.lua" type="client"></_script>
 </meta>

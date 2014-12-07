@@ -1,5 +1,6 @@
 <meta>
 	<info name="superman@fpg" author="socialz@github" type="script" />
+	<min_mta_version client="1.3.4-0.00000" />
 	
 	<script src="client/superman.lua" type="client" cache="false" />
 	<script src="server/superman.lua" />

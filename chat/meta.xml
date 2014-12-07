@@ -1,5 +1,6 @@
 <meta>
 	<info name="chat@fairplay" author="socialz@fairplay" type="script" />
+	<min_mta_version client="1.3.4-0.00000" />
 	
 	<script src="shared/languages.lua" type="shared" cache="false" />
 	<script src="server/chat.lua" />

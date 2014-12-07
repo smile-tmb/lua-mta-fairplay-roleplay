@@ -1,5 +1,6 @@
 <meta>
 	<info name="accounts@fairplay" author="socialz@fairplay" type="script" />
+	<min_mta_version client="1.3.4-0.00000" />
 	
 	<script src="shared/characters.lua" type="shared" cache="false" />
 	

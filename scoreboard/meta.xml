@@ -1,5 +1,6 @@
 <meta>
 	<info name="scoreboard@fpg" author="socialz@github" type="script" />
+	<min_mta_version client="1.3.4-0.00000" />
 	
 	<script src="client/scoreboard.lua" type="client" cache="false" />
 </meta>
