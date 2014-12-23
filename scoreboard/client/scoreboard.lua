@@ -28,6 +28,8 @@ function updateScoreboardHUD( )
 end
 addEvent( "scoreboard:updateHUD", true )
 addEventHandler( "scoreboard:updateHUD", root, updateScoreboardHUD )
+addEventHandler( "onClientPlayerJoin", root, updateScoreboardHUD )
+addEventHandler( "onClientPlayerQuit", root, updateScoreboardHUD )
 
 function showScoreboardHUD( )
 	updateScoreboardHUD( )
@@ -97,59 +99,61 @@ function scoreboardHUD( )
 	local index = 1
 	
 	for _, player in ipairs( players ) do
-		local playerIDText = "?"
-		local playerNameText = "Unknown Player"
-		local playerBoxColor = colors.default
-		
 		if ( isElement( player ) ) then
-			playerBoxColor = exports.common:isPlayerPlaying( player ) and "online" or "offline"
-			playerBoxColor = player == localPlayer and "myself" or playerBoxColor
-			playerBoxColor = colors[ playerBoxColor ]
+			local playerIDText = "?"
+			local playerNameText = "Unknown Player"
+			local playerBoxColor = colors.default
 			
-			playerIDText = tostring( exports.common:getPlayerID( player ) )
-			playerNameText = exports.common:getRealPlayerName( player )
-			
-			if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
-				playerNameText = "+ " .. playerNameText
+			if ( isElement( player ) ) then
+				playerBoxColor = exports.common:isPlayerPlaying( player ) and "online" or "offline"
+				playerBoxColor = player == localPlayer and "myself" or playerBoxColor
+				playerBoxColor = colors[ playerBoxColor ]
+				
+				playerIDText = tostring( exports.common:getPlayerID( player ) )
+				playerNameText = exports.common:getRealPlayerName( player )
+				
+				if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
+					playerNameText = "+ " .. playerNameText
+				end
+			elseif ( player.custom_id ) or ( player.custom_name ) then
+				if ( player.custom_color ) then
+					playerBoxColor = player.custom_color
+				end
+				
+				if ( player.custom_id ) then
+					playerIDText = tostring( player.custom_id )
+				else
+					playerIDText = index
+				end
+				
+				if ( player.custom_name ) then
+					playerNameText = tostring( player.custom_name )
+				end
 			end
-		elseif ( player.custom_id ) or ( player.custom_name ) then
-			if ( player.custom_color ) then
-				playerBoxColor = player.custom_color
+			
+			-- player box
+			local playerBoxY = playerBoxY + ( ( playerBoxHeight + ( playerBoxMarginY / 2 ) ) * index )
+			
+			if ( playerBoxY + playerBoxHeight < scoreboardY + scoreboardHeight ) then
+				dxDrawRectangle( playerBoxX, playerBoxY, playerBoxWidth, playerBoxHeight, playerBoxColor, true )
+				
+				-- player id
+				local playerTextMarginX, playerTextMarginY = 4, 4
+				local playerTextX, playerTextY = playerBoxX + playerTextMarginX, playerBoxY + playerTextMarginY
+				local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ), playerTextY + playerBoxHeight - playerTextMarginY
+				
+				dxDrawText( playerIDText, playerTextX, playerTextY, playerTextWidth, playerTextHeight, tocolor( 255, 255, 255, 0.775 * 255 ), 1.0, "clear", "left", "top", true, false, true, false, false, 0, 0, 0 )
+				
+				-- player name
+				local playerTextMarginX, playerTextMarginY = 4, 4
+				local playerTextX, playerTextY = playerBoxX + playerTextMarginX + 100, playerBoxY + playerTextMarginY
+				local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ) - 100, playerTextY + playerBoxHeight - playerTextMarginY
+				
+				dxDrawText( playerNameText, playerTextX, playerTextY, playerTextWidth, playerTextHeight, tocolor( 255, 255, 255, 0.775 * 255 ), 1.0, "clear", "left", "top", true, false, true, false, false, 0, 0, 0 )
+				
+				-- additionals
+				index = index + 1
 			end
-			
-			if ( player.custom_id ) then
-				playerIDText = tostring( player.custom_id )
-			else
-				playerIDText = index
-			end
-			
-			if ( player.custom_name ) then
-				playerNameText = tostring( player.custom_name )
-			end
-		end
-		
-		-- player box
-		local playerBoxY = playerBoxY + ( ( playerBoxHeight + ( playerBoxMarginY / 2 ) ) * index )
-		
-		if ( playerBoxY + playerBoxHeight < scoreboardY + scoreboardHeight ) then
-			dxDrawRectangle( playerBoxX, playerBoxY, playerBoxWidth, playerBoxHeight, playerBoxColor, true )
-			
-			-- player id
-			local playerTextMarginX, playerTextMarginY = 4, 4
-			local playerTextX, playerTextY = playerBoxX + playerTextMarginX, playerBoxY + playerTextMarginY
-			local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ), playerTextY + playerBoxHeight - playerTextMarginY
-			
-			dxDrawText( playerIDText, playerTextX, playerTextY, playerTextWidth, playerTextHeight, tocolor( 255, 255, 255, 0.775 * 255 ), 1.0, "clear", "left", "top", true, false, true, false, false, 0, 0, 0 )
-			
-			-- player name
-			local playerTextMarginX, playerTextMarginY = 4, 4
-			local playerTextX, playerTextY = playerBoxX + playerTextMarginX + 100, playerBoxY + playerTextMarginY
-			local playerTextWidth, playerTextHeight = playerTextX + playerBoxWidth - ( playerTextMarginX * 2 ) - 100, playerTextY + playerBoxHeight - playerTextMarginY
-			
-			dxDrawText( playerNameText, playerTextX, playerTextY, playerTextWidth, playerTextHeight, tocolor( 255, 255, 255, 0.775 * 255 ), 1.0, "clear", "left", "top", true, false, true, false, false, 0, 0, 0 )
-			
-			-- additionals
-			index = index + 1
 		end
 	end
 end
