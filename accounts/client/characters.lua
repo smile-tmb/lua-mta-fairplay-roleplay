@@ -299,7 +299,7 @@ addEventHandler( "accounts:addCharacters", root,
 			for _, character in ipairs( characters ) do
 				local row = guiGridListAddRow( character_selection.characters )
 				guiGridListSetItemText( character_selection.characters, row, 1, character.name:gsub( "_", " " ), false, false )
-				guiGridListSetItemText( character_selection.characters, row, 2, character.last_played, false, false )
+				guiGridListSetItemText( character_selection.characters, row, 2, exports.common:formatDate( character.last_played, true ), false, false )
 			end
 		end
 	end

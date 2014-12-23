@@ -263,11 +263,16 @@ function spawnCharacter( player, character, fade )
 				
 				setCameraTarget( player, player )
 				
-				if ( get( exports.common:getAccountID( player ) ).tutorial == 0 ) then
+				local pendingTutorial = get( exports.common:getAccountID( player ) ).tutorial == 0
+				
+				if ( pendingTutorial ) then
 					triggerClientEvent( player, "accounts:showTutorial", player )
 				end
 				
 				fadeCamera( player, true, 2.0 )
+				
+				outputChatBox( "Welcome" .. ( not pendingTutorial and " back" or "" ) .. ", " .. character.name:gsub( "_", " " ) .. "!", player, 230, 180, 95, false )
+				outputChatBox( "You were last seen on this character on " .. exports.common:formatDate( character.last_played, true ) .. ".", player, 230, 180, 95, false )
 			end
 		end
 		
