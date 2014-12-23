@@ -32,6 +32,8 @@ addCommandHandler( { "getpos", "pos", "getposition", "getxyz", "getloc", "loc", 
 addCommandHandler( { "makeadmin", "setlevel", "setadminlevel" },
 	function( player, cmd, targetPlayer, level )
 		if ( exports.common:isPlayerServerSeniorAdmin( player ) ) then
+			local level = tonumber( level )
+			
 			if ( not targetPlayer ) or ( not level ) then
 				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [level]", player, 230, 180, 95, false )
 				
