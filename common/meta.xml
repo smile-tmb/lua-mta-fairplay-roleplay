@@ -30,6 +30,7 @@
 	<export function="getPlayerByID" type="shared" />
 	<export function="nextToPosition" type="shared" />
 	<export function="cleanString" type="shared" />
+	<export function="formatDate" type="shared" />
 	
 	<export function="getLevels" type="shared" />
 	<export function="getLevelPriority" type="shared" />

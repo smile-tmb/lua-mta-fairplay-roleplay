@@ -199,3 +199,19 @@ function cleanString( string )
 	
 	return string
 end
+
+function formatDate( string, preparedString )
+	local dateAndTime = split( string, " " )
+	local date = split( dateAndTime[ 1 ], "-" )
+	local time = split( dateAndTime[ 2 ], ":" )
+
+	local thExtension = { "st", "nd", "rd" }
+	local day = date[ 3 ]:len( ) >= 2 and date[ 3 ]:sub( 2, 2 ) or date[ 3 ]
+		  day = tonumber( day )
+		  day = date[ 3 ] .. ( thExtension[ day ] or "th" )
+
+	local months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
+	local month = months[ tonumber( date[ 2 ] ) ]
+	
+	return preparedString and day .. " of " .. month .. " " .. date[ 1 ] .. " " .. dateAndTime[ 2 ] or { day = day, month = month, year = date[ 1 ], hour = time[ 1 ], minute = time[ 2 ], second = time[ 3 ] }
+end
