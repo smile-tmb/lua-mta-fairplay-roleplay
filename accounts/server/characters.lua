@@ -14,8 +14,6 @@ function verifyCharacterName( name )
 	name = name:gsub( "%c%d\!\?\=\)\(\\\/\"\#\&\%\[\]\{\}\*\^\~\:\;\>\<", "" ):gsub( "_", " " )
 	local nameParts = split( name, " " )
 	
-	outputChatBox( #nameParts )
-	
 	if ( #nameParts >= 2 ) then
 		for i, v in ipairs( nameParts ) do
 			if ( v:len( ) > 1 ) then
