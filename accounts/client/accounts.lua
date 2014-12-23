@@ -157,6 +157,12 @@ end
 
 addEventHandler( "onClientResourceStart", resourceRoot,
 	function( )
+		if ( not getElementData( localPlayer, "player:playing" ) ) then
+			for i = 1, getChatboxLayout( ).chat_lines do
+				outputChatBox( "" )
+			end
+		end
+		
 		triggerServerEvent( "accounts:ready", localPlayer )
 	end
 )
