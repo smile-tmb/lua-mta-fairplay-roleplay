@@ -59,7 +59,7 @@ end
 
 local function isHoveringWorldItem( )
 	local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
-	cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
+		  cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
 	local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
 	local _, x, y, z, element = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ )
 	
@@ -93,7 +93,7 @@ addEventHandler( "onClientRender", root,
 	function( )
 		if ( isCursorShowing( ) ) then
 			local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
-			cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
+				  cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
 			
 			if ( isDraggingWorldItem ) then
 				local itemID = tonumber( getElementData( isDraggingWorldItem, "worlditem:item_id" ) )
