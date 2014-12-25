@@ -63,14 +63,14 @@ local ticketBrowser = {
     button = { }
 }
 
-function openTicketBrowser( forceClose )
+function openTicketBrowser( forceEnd )
 	if ( isElement( ticketBrowser.window ) ) then
 		destroyElement( ticketBrowser.window )
 		showCursor( false )
-		
-		if ( forceClose ) then
-			return
-		end
+	end
+	
+	if ( forceEnd ) then
+		return
 	end
 	
 	showCursor( true )
