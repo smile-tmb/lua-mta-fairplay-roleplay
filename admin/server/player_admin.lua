@@ -75,6 +75,89 @@ addCommandHandler( "revive",
 	end
 )
 
+addCommandHandler( "ck",
+	function( player, cmd, characterName, ... )
+		if ( exports.common:isPlayerServerSeniorAdmin( player ) ) then
+			local causeOfDeath = table.concat( { ... }, " " )
+			
+			if ( not characterName ) or ( not causeOfDeath ) or ( causeOfDeath:len( ) < 5 ) then
+				outputChatBox( "SYNTAX: /" .. cmd .. " [full character name] [cause of death]", player, 230, 180, 95, false )
+				
+				return
+			end
+			
+			local characterName = characterName:gsub( " ", "_" )
+			local character = exports.accounts:getCharacterByName( characterName )
+			
+			if ( character ) then
+				if ( exports.realism:characterKill( character.id, causeOfDeath ) ) then
+					outputChatBox( "Character killed " .. character.name:gsub( "_", " " ) .. ".", player, 95, 230, 95, false )
+				else
+					outputChatBox( "Something went wrong when trying to kill that character. Is that character dead already?", player, 230, 95, 95, false )
+				end
+			else
+				outputChatBox( "Could not find a character with that name.", player, 230, 95, 95, false )
+			end
+		end
+	end
+)
+
+addCommandHandler( "unck",
+	function( player, cmd, characterName )
+		if ( exports.common:isPlayerServerSeniorAdmin( player ) ) then
+			if ( not characterName ) then
+				outputChatBox( "SYNTAX: /" .. cmd .. " [full character name]", player, 230, 180, 95, false )
+				
+				return
+			end
+			
+			local characterName = characterName:gsub( " ", "_" )
+			local character = exports.accounts:getCharacterByName( characterName )
+			
+			if ( character ) then
+				if ( exports.realism:characterResurrect( character.id ) ) then
+					outputChatBox( "Resurrected " .. character.name:gsub( "_", " " ) .. ".", player, 95, 230, 95, false )
+				else
+					outputChatBox( "Something went wrong when trying to resurrect that character. Is that character alive already?", player, 230, 95, 95, false )
+				end
+			else
+				outputChatBox( "Could not find a character with that name.", player, 230, 95, 95, false )
+			end
+		end
+	end
+)
+
+addCommandHandler( "bury",
+	function( player, cmd, characterName )
+		if ( exports.common:isPlayerServerSeniorAdmin( player ) ) then
+			if ( not characterName ) then
+				outputChatBox( "SYNTAX: /" .. cmd .. " [full character name]", player, 230, 180, 95, false )
+				
+				return
+			end
+			
+			local characterName = characterName:gsub( " ", "_" )
+			local character = exports.accounts:getCharacterByName( characterName )
+			
+			if ( character ) then
+				if ( character.is_dead == 1 ) then
+					if ( exports.database:execute( "UPDATE `characters` SET `is_dead` = '2' WHERE `id` = ? AND `is_dead` = '1'", character.id ) ) then
+						outputChatBox( "Buried " .. character.name:gsub( "_", " " ) .. ".", player, 95, 230, 95, false )
+					else
+						outputChatBox( "Something went wrong when trying to bury that character, try again.", player, 230, 95, 95, false )
+					end
+				elseif ( character.is_dead == 2 ) then
+					outputChatBox( "That character is already buried.", player, 230, 95, 95, false )
+				else
+					outputChatBox( "That character is not character killed.", player, 230, 95, 95, false )
+				end
+			else
+				outputChatBox( "Could not find a character with that name.", player, 230, 95, 95, false )
+			end
+		end
+	end
+)
+
 addCommandHandler( { "makeadmin", "setlevel", "setadminlevel" },
 	function( player, cmd, targetPlayer, level )
 		if ( exports.common:isPlayerServerSeniorAdmin( player ) ) then
