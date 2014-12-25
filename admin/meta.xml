@@ -14,6 +14,7 @@
 	<script src="server/player_admin.lua" />
 	<script src="server/server.lua" />
 	<script src="server/vehicle_admin.lua" />
+	<script src="server/teleport_admin.lua" />
 	<script src="server/tickets.lua" />
 	
 	<export function="isServerInMaintenance" type="shared" />
@@ -23,6 +24,8 @@
 	
 	<export function="createTicket" />
 	<export function="destroyTicket" />
+	<export function="assignTicket" />
+	<export function="teleportPlayer" />
 	
 	<file src="sounds/admin_beep.mp3" />
 </meta>

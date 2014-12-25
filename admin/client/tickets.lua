@@ -30,6 +30,8 @@ addEventHandler( "admin:update_tickets", root,
 		
 		if ( not found ) then
 			openTicket( nil, true )
+		else
+			openTicket( activeTicket )
 		end
 		
 		updateTicketBrowser( )
@@ -63,10 +65,14 @@ local ticketBrowser = {
     button = { }
 }
 
-function openTicketBrowser( forceEnd )
+function openTicketBrowser( forceEnd, stayClosed )
 	if ( isElement( ticketBrowser.window ) ) then
 		destroyElement( ticketBrowser.window )
 		showCursor( false )
+		
+		if ( stayClosed ) then
+			return
+		end
 	end
 	
 	if ( forceEnd ) then
@@ -214,17 +220,54 @@ function openTicket( id, forceEnd )
 	end
 	
 	ticket.button.goto_source = guiCreateButton( 471, 176, 238, 26, "Go to submitter", false, ticket.window )
+	
+	if ( thisTicket.sourcePlayer == localPlayer ) then
+		guiSetEnabled( ticket.button.goto_source, false )
+	end
+	
 	ticket.button.goto_target = guiCreateButton( 471, 212, 238, 26, "Go to reported player", false, ticket.window )
+	
+	if ( thisTicket.targetPlayer == localPlayer ) then
+		guiSetEnabled( ticket.button.goto_target, false )
+	end
+	
 	ticket.button.assign = guiCreateButton( 471, 248, 238, 26, "Assign ticket to yourself", false, ticket.window )
 	ticket.button.close_spam = guiCreateButton( 471, 284, 238, 26, "Close ticket as spam", false, ticket.window )
 	ticket.button.close = guiCreateButton( 471, 318, 238, 26, "Close ticket", false, ticket.window )
 	
+	if ( thisTicket.assignedTo ) then
+		guiSetEnabled( ticket.button.assign, false )
+		
+		if ( thisTicket.assignedTo ~= localPlayer ) then
+			guiSetEnabled( ticket.button.close_spam, false )
+			guiSetEnabled( ticket.button.close, false )
+		end
+	end
+	
 	ticket.button.close_window = guiCreateButton(471, 354, 238, 26, "Close window", false, ticket.window )
 	guiSetFont( ticket.button.close_window, "default-bold-small" )
 	
+	addEventHandler( "onClientGUIClick", ticket.button.goto_source,
+		function( )
+			triggerServerEvent( "admin:goto_player", localPlayer, activeTicket, "source" )
+		end, false
+	)
+	
+	addEventHandler( "onClientGUIClick", ticket.button.goto_target,
+		function( )
+			triggerServerEvent( "admin:goto_player", localPlayer, activeTicket, "target" )
+		end, false
+	)
+	
+	addEventHandler( "onClientGUIClick", ticket.button.assign,
+		function( )
+			triggerServerEvent( "admin:ticket_assign", localPlayer, activeTicket )
+		end, false
+	)
+	
 	addEventHandler( "onClientGUIClick", ticket.button.close_spam,
 		function( )
-			triggerServerEvent( "admin:ticket_close", localPlayer, activeTicket, "Your ticket was closed as spam. Please refrain from creating spam tickets in the future or a punishment will be forced on your account." )
+			triggerServerEvent( "admin:ticket_close", localPlayer, activeTicket, "Your ticket was closed as spam. Please refrain from creating spam tickets in the future or a punishment will be forced on your account.", true )
 			openTicket( nil, true )
 			openTicketBrowser( )
 		end, false

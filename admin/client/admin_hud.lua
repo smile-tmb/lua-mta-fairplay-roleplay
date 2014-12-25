@@ -76,7 +76,7 @@ addEventHandler( "onClientClick", root,
 		if ( state == "down" ) and
 		   ( cursorX >= ticketBoxX ) and ( cursorX <= ticketBoxX + ticketBoxWidth ) and
 		   ( cursorY >= ticketBoxY ) and ( cursorY <= ticketBoxY + ticketBoxHeight ) then
-			openTicketBrowser( true )
+			openTicketBrowser( false, true )
 		end
 	end
 )
