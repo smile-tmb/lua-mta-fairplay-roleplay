@@ -31,6 +31,8 @@
 	<export function="nextToPosition" type="shared" />
 	<export function="cleanString" type="shared" />
 	<export function="formatDate" type="shared" />
+	<export function="getPlayerByAccountID" type="shared" />
+	<export function="getPlayerByCharacterID" type="shared" />
 	
 	<export function="getLevels" type="shared" />
 	<export function="getLevelPriority" type="shared" />

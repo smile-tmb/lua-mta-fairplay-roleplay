@@ -216,3 +216,23 @@ function formatDate( string, preparedString )
 	
 	return preparedString and day .. " of " .. month .. " " .. date[ 1 ] .. " " .. dateAndTime[ 2 ] or { day = day, month = month, year = date[ 1 ], hour = time[ 1 ], minute = time[ 2 ], second = time[ 3 ] }
 end
+
+function getPlayerByAccountID( accountID )
+	for _, player in ipairs( getElementsByType( "player" ) ) do
+		if ( getAccountID( player ) == accountID ) then
+			return player
+		end
+	end
+	
+	return false
+end
+
+function getPlayerByCharacterID( characterID )
+	for _, player in ipairs( getElementsByType( "player" ) ) do
+		if ( getCharacterID( player ) == characterID ) then
+			return player
+		end
+	end
+	
+	return false
+end
