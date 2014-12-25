@@ -7,6 +7,6 @@ addEventHandler( "accounts:onTutorialComplete", root,
 		
 		setCameraTarget( client, client )
 		
-		exports.database:execute( "UPDATE `accounts` SET `tutorial` = '1', `tutorial_date` = NOW() WHERE `id` = ?", exports.common:getCharacterID( client ) )
+		exports.database:execute( "UPDATE `accounts` SET `tutorial` = '1', `tutorial_date` = NOW() WHERE `id` = ?", exports.common:getAccountID( client ) )
 	end
 )
