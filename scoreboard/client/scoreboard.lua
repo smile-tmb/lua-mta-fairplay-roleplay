@@ -110,7 +110,7 @@ function scoreboardHUD( )
 				playerBoxColor = colors[ playerBoxColor ]
 				
 				playerIDText = tostring( exports.common:getPlayerID( player ) )
-				playerNameText = exports.common:getRealPlayerName( player )
+				playerNameText = exports.common:getPlayerName( player )
 				
 				if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
 					playerNameText = "+ " .. playerNameText

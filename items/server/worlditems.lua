@@ -49,7 +49,7 @@ addEventHandler( "items:drop", root,
 				destroyElement( object )
 			end
 		else
-			exports.chat:outputLocalActionMe( client, "gave " .. exports.common:getRealPlayerName( element ) .. " a " .. item.name .. "." )
+			exports.chat:outputLocalActionMe( client, "gave " .. exports.common:getPlayerName( element ) .. " a " .. item.name .. "." )
 			takeItem( client, itemID, value, dbID )
 			giveItem( element, itemID, value )
 		end

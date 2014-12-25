@@ -207,7 +207,7 @@ addCommandHandler( "giveitem",
 						if ( data[ targetPlayer ] ) then
 							if ( ( tonumber( getElementData( targetPlayer, "character:weight" ) ) + getItemWeight( itemID ) ) <= tonumber( getElementData( targetPlayer, "character:max_weight" ) ) ) then
 								if ( giveItem( targetPlayer, itemID, value ) ) then
-									outputChatBox( "Gave " .. exports.common:getRealPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
+									outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
 								else
 									outputChatBox( "Error occurred - 0x0220.", player, 230, 95, 95, false )
 								end
@@ -252,7 +252,7 @@ addCommandHandler( "takeitem",
 									setVehicleEngineState( vehicle, false )
 								end
 								
-								outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getRealPlayerName(targetPlayer) .. ".", player, 95, 230, 95, false )
+								outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getPlayerName(targetPlayer) .. ".", player, 95, 230, 95, false )
 							else
 								outputChatBox( "That player doesn't have an item.", player, 230, 95, 95, false )
 							end

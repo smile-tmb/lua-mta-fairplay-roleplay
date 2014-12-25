@@ -132,7 +132,7 @@ function outputLocalChat( player, message, originalDistance )
 			
 			if ( distance <= 60 ) then
 				if ( ( vehicle ) and ( ( isOnDuty ) or ( ( not isOnDuty ) and ( exports.vehicles:isVehicleWindowsDown( vehicle ) or isBike or isWindowless or isRoofless or getPedOccupiedVehicle( targetPlayer ) == vehicle ) ) ) or ( not vehicle ) ) then
-					outputChatBox( prefixes .. exports.common:getRealPlayerName( player ) .. " says: " .. message, targetPlayer, r, g, b, false )
+					outputChatBox( prefixes .. exports.common:getPlayerName( player ) .. " says: " .. message, targetPlayer, r, g, b, false )
 				end
 			else
 				if ( originalDistance ) then
@@ -140,7 +140,7 @@ function outputLocalChat( player, message, originalDistance )
 						local frequency = string.gsub( originalDistance, "r", "" )
 						
 						if ( exports.items:hasItem( targetPlayer, 13, frequency ) ) or ( getDistanceBetweenPoints3D( posX, posY, posZ, targetX, targetY, targetZ ) <= 20 ) then
-							outputChatBox( "[#" .. frequency .. "] " .. prefixes .. exports.common:getRealPlayerName( player ) .. " says: " .. message, targetPlayer, 95, 95, 220, false )
+							outputChatBox( "[#" .. frequency .. "] " .. prefixes .. exports.common:getPlayerName( player ) .. " says: " .. message, targetPlayer, 95, 95, 220, false )
 						end
 					end
 				end
@@ -161,7 +161,7 @@ function outputLocalActionMe( player, action )
 			local distance = getDistanceBetweenPoints3D( px, py, pz, x, y, z )
 			
 			if ( distance < 30 ) and ( getElementInterior( player ) == getElementInterior( targetPlayer ) ) and ( getElementDimension( player ) == getElementDimension( targetPlayer ) ) then
-				outputChatBox( " *" .. exports.common:getRealPlayerName( player ) .. " " .. action, targetPlayer, 237, 116, 136, false )
+				outputChatBox( " *" .. exports.common:getPlayerName( player ) .. " " .. action, targetPlayer, 237, 116, 136, false )
 			end
 		end
 	end

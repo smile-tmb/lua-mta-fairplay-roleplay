@@ -147,8 +147,9 @@ function getCharacterID( player )
 	return getElementData( player, "character:id" ) and tonumber( getElementData( player, "character:id" ) ) or false
 end
 
-function getRealPlayerName( player )
-	return getPlayerName( player ):gsub( "_", " " )
+local _getPlayerName = getPlayerName
+function getPlayerName( player )
+	return _getPlayerName( player ):gsub( "_", " " )
 end
 
 function getAccountID( player )
