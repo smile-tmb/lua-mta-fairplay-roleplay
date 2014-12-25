@@ -121,8 +121,12 @@ addEventHandler( "characters:play", root,
 			local character = exports.database:query_single( "SELECT * FROM `characters` WHERE `name` = ? AND `account` = ?", characterName, accountID )
 			
 			if ( character ) then
-				triggerClientEvent( client, "characters:closeGUI", client, true )
-				spawnCharacter( client, character, true )
+				if ( character.is_dead == 0 ) then
+					triggerClientEvent( client, "characters:closeGUI", client, true )
+					spawnCharacter( client, character, true )
+				else
+					outputChatBox( "That character is dead, you cannot play on it anymore.", client, 230, 95, 95, false )
+				end
 			else
 				exports.messages:createMessage( client, "Unable to retrieve information for this character. Please try again.", "selection" )
 			end
@@ -208,6 +212,8 @@ function characterSelection( player )
 	triggerClientEvent( player, "accounts:showCharacterSelection", player )
 	
 	updateCharacters( player )
+	
+	exports.messages:destroyMessage( player, "wait-for-admin" )
 end
 
 function spawnCharacter( player, character, fade )

@@ -10,7 +10,7 @@ local character_selection = {
 
 local selectedSkin = 1
 
-function showCharacterSelection( forceClose )
+function showCharacterSelection( forceEnd )
 	if ( isElement( character_selection.window ) ) then
 		destroyElement( character_selection.window )
 	end
@@ -18,7 +18,7 @@ function showCharacterSelection( forceClose )
 	showCursor( false )
 	guiSetInputEnabled( false )
 	
-	if ( forceClose ) then
+	if ( forceEnd ) then
 		return
 	end
 	
@@ -46,9 +46,15 @@ function showCharacterSelection( forceClose )
 		local row, column = guiGridListGetSelectedItem( character_selection.characters )
 		
 		if ( row ~= -1 ) and ( column ~= -1 ) then
-			local characterName = guiGridListGetItemText( character_selection.characters, row, column )
+			local red = guiGridListGetItemColor( character_selection.characters, row, column )
 			
-			triggerServerEvent( "characters:play", localPlayer, characterName )
+			if ( red == 255 ) then
+				local characterName = guiGridListGetItemText( character_selection.characters, row, column )
+				
+				triggerServerEvent( "characters:play", localPlayer, characterName )
+			else
+				outputChatBox( "That character is dead, you cannot play on it anymore.", 230, 95, 95, false )
+			end
 		end
 	end
 	
@@ -296,10 +302,18 @@ addEvent( "accounts:addCharacters", true )
 addEventHandler( "accounts:addCharacters", root,
 	function( characters )
 		if ( isElement( character_selection.window ) ) then
+			guiGridListClear( character_selection.characters )
+			
 			for _, character in ipairs( characters ) do
 				local row = guiGridListAddRow( character_selection.characters )
+				
 				guiGridListSetItemText( character_selection.characters, row, 1, character.name:gsub( "_", " " ), false, false )
 				guiGridListSetItemText( character_selection.characters, row, 2, exports.common:formatDate( character.last_played, true ), false, false )
+				
+				if ( character.is_dead == 1 ) then
+					guiGridListSetItemColor( character_selection.characters, row, 1, 230, 95, 95, 255 )
+					guiGridListSetItemColor( character_selection.characters, row, 2, 230, 95, 95, 255 )
+				end
 			end
 		end
 	end
