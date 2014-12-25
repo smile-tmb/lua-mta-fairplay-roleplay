@@ -25,6 +25,9 @@
 	<export function="createTicket" />
 	<export function="destroyTicket" />
 	<export function="assignTicket" />
+	<export function="updateTickets" />
+	<export function="getAmountOfTicketsByPlayer" />
+	
 	<export function="teleportPlayer" />
 	
 	<file src="sounds/admin_beep.mp3" />

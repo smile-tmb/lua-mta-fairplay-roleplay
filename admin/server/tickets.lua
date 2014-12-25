@@ -12,16 +12,6 @@ function createTicket( sourcePlayer, targetPlayer, message, type )
 	local minute = ( getRealTime( ).minute < 10 and "0" or "" ) .. getRealTime( ).minute
 	local second = ( getRealTime( ).second < 10 and "0" or "" ) .. getRealTime( ).second
 	local dateAndTime = day .. "/" .. month .. "/" .. year .. " " .. hour .. ":" .. minute .. ":" .. second
-	local ticket = {
-		sourcePlayer = sourcePlayer,
-		targetPlayer = targetPlayer or sourcePlayer,
-		message = message and message:gsub( "\r\n", " " ) or "",
-		type = type or 1000,
-		players = { },
-		location = getElementZoneName( sourcePlayer ) .. ", " .. getElementZoneName( sourcePlayer, true ),
-		time = dateAndTime
-	}
-	
 	local jsonSafePlayers = { }
 	
 	for _, player in ipairs( getElementsByType( "player" ) ) do
@@ -29,13 +19,7 @@ function createTicket( sourcePlayer, targetPlayer, message, type )
 		local distance = getDistanceBetweenPoints3D( x, y, z, getElementPosition( sourcePlayer ) )
 		
 		if ( distance < 75 ) then
-			local data = { name = exports.common:getPlayerName( player ), account = exports.common:getAccountName( player ), player = player, distance = distance }
-			
-			table.insert( tickets[ id ].players, data )
-			
-			data.player = nil
-			
-			table.insert( jsonSafePlayers, data )
+			table.insert( jsonSafePlayers, { name = exports.common:getPlayerName( player ), account = exports.common:getAccountName( player ), distance = distance } )
 		end
 	end
 	
@@ -59,11 +43,21 @@ function loadTicket( id )
 			type = ticket.type,
 			players = fromJSON( ticket.players ),
 			location = ticket.location,
-			time = ticket.time
+			time = ticket.time,
+			assignedTo = ticket.assigned_to,
+			assignedTime = ticket.assigned_time
 		}
 		
-		for _, player in ipairs( exports.common:getPriorityPlayers( ) ) do
-			triggerClientEvent( player, "admin:update_tickets", player, tickets, true )
+		if ( ticket.assigned_to == 0 ) then
+			for _, player in ipairs( exports.common:getPriorityPlayers( ) ) do
+				triggerClientEvent( player, "admin:update_tickets", player, tickets, true )
+			end
+		else
+			local player = exports.common:getPlayerByAccountID( ticket.assigned_to )
+			
+			if ( player ) then
+				triggerClientEvent( player, "admin:update_tickets", player, tickets, true )
+			end
 		end
 		
 		return true
@@ -90,23 +84,32 @@ end
 
 function assignTicket( id, player )
 	if ( tickets[ id ] ) then
-		tickets[ id ].assignedTo = player
-		tickets[ id ].assignedTime = getRealTime( ).timestamp
+		tickets[ id ].assignedTo = exports.common:getAccountID( player )
 		
 		for _, player in ipairs( exports.common:getPriorityPlayers( ) ) do
 			triggerClientEvent( player, "admin:update_tickets", player, tickets )
 		end
 		
-		return exports.database:execute( "UPDATE `ticket_logs` SET `assigned_time` = NOW() AND `assigned_to` = ? WHERE `id` = ?", tickets[ id ].assignedTime, exports.common:getAccountID( player ), id )
+		if ( exports.database:execute( "UPDATE `ticket_logs` SET `assigned_time` = NOW(), `assigned_to` = ? WHERE `id` = ?", exports.common:getAccountID( player ), id ) ) then
+			return loadTicket( id )
+		end
 	end
 	
 	return false
 end
 
+function updateTickets( player )
+	triggerClientEvent( player, "admin:update_tickets", player, tickets )
+end
+
+function getAmountOfTicketsByPlayer( player )
+	return exports.database:query_single( "SELECT COUNT(*) AS `count` FROM `ticket_logs` WHERE `assigned_to` = ?", exports.common:getAccountID( player ) ).count
+end
+
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		setTimer( function( )
-			for _, data in ipairs( exports.database:query( "SELECT * FROM `ticket_logs` WHERE `closed_state` = '0'" ) ) do
+			for _, data in ipairs( exports.database:query( "SELECT * FROM `ticket_logs` WHERE `closed_state` = '0' ORDER BY `id` ASC, `assigned_to` ASC, `type` ASC" ) ) do
 				loadTicket( data.id )
 			end
 		end, 500, 1 )
@@ -122,9 +125,9 @@ function playerChanged( player )
 				tickets[ id ].targetPlayer = getPlayerName( source )
 			end
 			
-			if ( data.sourcePlayer == source ) then
+			--[[if ( data.sourcePlayer == source ) then
 				destroyTicket( id )
-			end
+			end]]
 		end
 		
 		return true
@@ -144,10 +147,10 @@ addEventHandler( "admin:ticket_close", root,
 		end
 		
 		if ( tickets[ id ] ) then
-			if ( not tickets[ id ].assignedTo ) then
-				assignTicket( id, player )
+			if ( tickets[ id ].assignedTo == 0 ) then
+				assignTicket( id, client )
 			else
-				if ( tickets[ id ].assignedTo ~= client ) then
+				if ( tickets[ id ].assignedTo ~= exports.common:getAccountID( client ) ) then
 					outputChatBox( "This is not your ticket!", client, 230, 95, 95, false )
 				end
 			end
@@ -187,6 +190,36 @@ addEventHandler( "admin:ticket_assign", root,
 			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95, false )
 			
 			triggerClientEvent( client, "admin:update_tickets", client, tickets )
+		end
+	end
+)
+
+addEvent( "admin:new_ticket", true )
+addEventHandler( "admin:new_ticket", root,
+	function( targetName, message, type )
+		if ( source ~= client ) or ( not targetName ) or ( not message ) or ( not type ) then
+			return
+		end
+		
+		while ( message:find( "  " ) ) do
+			message = message:gsub( "  ", " " )
+		end
+		
+		if ( message:len( ) >= 15 ) and ( message:len( ) <= 1000 ) then
+			local target = exports.common:getPlayerFromPartialName( targetName, client )
+			
+			if ( not target ) then
+				target = client
+			end
+			
+			if ( createTicket( client, target, message, type ) ) then
+				triggerClientEvent( client, "admin:hide_ticket_ui", client )
+				exports.messages:createMessage( client, "You have successfully submitted your ticket. You will be contacted by an administrator soon.", "new-ticket-msg" )
+			else
+				outputChatBox( "Could not create a ticket, please try again.", client, 230, 95, 95, false )
+			end
+		else
+			outputChatBox( "Message length is not sufficient. Minimum length is 15 and maximum length is 1000 characters.", client, 230, 95, 95, false )
 		end
 	end
 )

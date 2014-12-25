@@ -53,6 +53,7 @@ function hideTicketUI( )
 	closeTicketWindow( true )
 	openTicket( nil, true )
 	openTicketBrowser( true )
+	createTicketWindow( true )
 end
 addEvent( "admin:hideHUD", true )
 addEventHandler( "admin:hideHUD", root, hideTicketUI )
@@ -129,8 +130,8 @@ function updateTicketBrowser( )
 			local row = guiGridListAddRow( ticketBrowser.gridlist )
 			
 			guiGridListSetItemText( ticketBrowser.gridlist, row, 1, id, false, true )
-			guiGridListSetItemText( ticketBrowser.gridlist, row, 2, isElement( ticket.sourcePlayer ) and exports.common:getPlayerName( ticket.sourcePlayer ) or ticket.sourcePlayer .. " (Offline)", false, false )
-			guiGridListSetItemText( ticketBrowser.gridlist, row, 3, isElement( ticket.targetPlayer ) and exports.common:getPlayerName( ticket.targetPlayer ) or ticket.targetPlayer .. " (Offline)", false, false )
+			guiGridListSetItemText( ticketBrowser.gridlist, row, 2, ( ticket.sourcePlayer and isElement( ticket.sourcePlayer ) ) and exports.common:getPlayerName( ticket.sourcePlayer ) or tostring( ticket.sourcePlayer ) .. " (Offline)", false, false )
+			guiGridListSetItemText( ticketBrowser.gridlist, row, 3, ( ticket.targetPlayer and isElement( ticket.targetPlayer ) ) and exports.common:getPlayerName( ticket.targetPlayer ) or tostring( ticket.targetPlayer ) .. " (Offline)", false, false )
 			guiGridListSetItemText( ticketBrowser.gridlist, row, 4, ticketTypes[ ticket.type ], false, false )
 		end
 	end
@@ -235,10 +236,10 @@ function openTicket( id, forceEnd )
 	ticket.button.close_spam = guiCreateButton( 471, 284, 238, 26, "Close ticket as spam", false, ticket.window )
 	ticket.button.close = guiCreateButton( 471, 318, 238, 26, "Close ticket", false, ticket.window )
 	
-	if ( thisTicket.assignedTo ) then
+	if ( thisTicket.assignedTo > 0 ) then
 		guiSetEnabled( ticket.button.assign, false )
 		
-		if ( thisTicket.assignedTo ~= localPlayer ) then
+		if ( thisTicket.assignedTo ~= exports.common:getAccountID( localPlayer ) ) then
 			guiSetEnabled( ticket.button.close_spam, false )
 			guiSetEnabled( ticket.button.close, false )
 		end
@@ -347,3 +348,141 @@ function closeTicketWindow( forceEnd )
 		end, false
 	)
 end
+
+local newTicket = {
+    label = { },
+    button = { }
+}
+
+function createTicketWindow( forceEnd, stayClosed )
+	if ( isElement( newTicket.window ) ) then
+		destroyElement( newTicket.window )
+		showCursor( false, false )
+		
+		if ( stayClosed ) then
+			return
+		end
+	end
+	
+	if ( forceEnd ) then
+		return
+	end
+	
+	showCursor( true, true )
+	
+	newTicket.window = guiCreateWindow( 633, 353, 303, 394, "Create ticket", false )
+	guiWindowSetSizable( newTicket.window, false )
+	guiSetAlpha( newTicket.window, 0.9 )
+
+	newTicket.label[ 1 ] = guiCreateLabel( 16, 32, 270, 15, "Ticket regarding", false, newTicket.window )
+	newTicket.type = guiCreateComboBox( 16, 57, 270, 23, "", false, newTicket.window )
+	
+	for _, type in pairs( ticketTypes ) do
+		guiComboBoxAddItem( newTicket.type, type )
+	end
+	
+	guiComboBoxSetSelected( newTicket.type, 0 )
+	guiSetSize( newTicket.type, guiGetSize( newTicket.type, false ), #ticketTypes * 20, false )
+	
+	newTicket.label[ 2 ] = guiCreateLabel( 16, 90, 270, 15, "Reported player (Self)", false, newTicket.window )
+	newTicket.target = guiCreateEdit( 16, 115, 270, 25, getPlayerName( localPlayer ), false, newTicket.window )
+	
+	addEventHandler( "onClientGUIChanged", newTicket.target,
+		function( )
+			local player = exports.common:getPlayerFromPartialName( guiGetText( source ) )
+			
+			if ( player ) and ( player ~= localPlayer ) then
+				guiSetText( newTicket.label[ 2 ], "Reported player (Found: " .. getPlayerName( player ) .. ")" )
+			else
+				guiSetText( newTicket.label[ 2 ], "Reported player (Self)" )
+			end
+		end
+	)
+	
+	addEventHandler( "onClientGUIBlur", newTicket.target,
+		function( )
+			local player = exports.common:getPlayerFromPartialName( guiGetText( source ) )
+			
+			if ( player ) then
+				guiSetText( source, getPlayerName( player ) )
+			end
+			
+			if ( player == localPlayer ) or ( not player ) then
+				guiSetText( newTicket.label[ 2 ], "Reported player (Self)" )
+			end
+		end
+	)
+	
+	newTicket.label[ 3 ] = guiCreateLabel( 16, 150, 270, 15, "Message", false, newTicket.window )
+	guiLabelSetColor( newTicket.label[ 3 ], 230, 95, 95 )
+	newTicket.message = guiCreateMemo( 16, 175, 270, 135, "", false, newTicket.window )
+	
+	addEventHandler( "onClientGUIChanged", newTicket.message,
+		function( )
+			local message = guiGetText( newTicket.message )
+			
+			if ( message:len( ) < 15 ) or ( message:len( ) > 1000 ) then
+				guiLabelSetColor( newTicket.label[ 3 ], 230, 95, 95 )
+			elseif ( message:len( ) > 900 ) and ( message:len( ) <= 1000 ) then
+				guiLabelSetColor( newTicket.label[ 3 ], 230, 180, 95 )
+			else
+				guiLabelSetColor( newTicket.label[ 3 ], 95, 230, 95 )
+			end
+		end
+	)
+	
+	newTicket.button.submit = guiCreateButton( 16, 320, 270, 25, "Create ticket", false, newTicket.window )
+	newTicket.button.close = guiCreateButton( 16, 355, 270, 25, "Close window", false, newTicket.window )
+	
+	addEventHandler( "onClientGUIClick", newTicket.button.submit,
+		function( )
+			local selectedType = guiComboBoxGetSelected( newTicket.type ) + 1
+			
+			if ( selectedType ) and ( selectedType > 0 ) then
+				local targetName = guiGetText( newTicket.target )
+				local message = guiGetText( newTicket.message )
+				
+				while ( targetName:find( "  " ) ) do
+					targetName = targetName:gsub( "  ", " " )
+				end
+				
+				targetName = targetName:gsub( " ", "_" )
+				targetName = targetName:sub( #targetName ) == "_" and targetName:sub( 1, #targetName - 1 ) or targetName
+				
+				guiSetText( newTicket.target, targetName )
+				
+				while ( message:find( "  " ) ) do
+					message = message:gsub( "  ", " " )
+				end
+				
+				message = message:sub( #message ) == " " and message:sub( 1, #message - 1 ) or message
+				
+				guiSetText( newTicket.message, message )
+				
+				if ( message:len( ) >= 15 ) and ( message:len( ) <= 1000 ) then
+					triggerServerEvent( "admin:new_ticket", localPlayer, targetName, message, selectedType )
+				else
+					outputChatBox( "Message length is not sufficient. Minimum length is 15 and maximum length is 1000 characters.", 230, 95, 95, false )
+				end
+			else
+				outputChatBox( "Please select the ticket type.", 230, 95, 95, false )
+			end
+		end, false
+	)
+	
+	addEventHandler( "onClientGUIClick", newTicket.button.close,
+		function( )
+			createTicketWindow( true )
+		end, false
+	)
+end
+
+addEventHandler( "onClientResourceStart", resourceRoot,
+	function( )
+		bindKey( "F2", "down",
+			function( )
+				createTicketWindow( false, true )
+			end
+		)
+	end
+)
