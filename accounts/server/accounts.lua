@@ -16,7 +16,7 @@ function login( player, username, password )
 	local account = exports.database:query_single( "SELECT * FROM `accounts` WHERE `username` = ? AND `password` = ?", username, exports.security:hashString( password ) )
 	
 	if ( account ) then
-		exports.database:execute( "UPDATE `accounts` SET `last_login` = NOW( ) WHERE `id` = ?", account.id )
+		exports.database:execute( "UPDATE `accounts` SET `last_login` = NOW( ), `last_ip` = ?, `last_serial` = ? WHERE `id` = ?", getPlayerIP( player ), getPlayerSerial( player ), account.id )
 		
 		exports.security:modifyElementData( player, "database:id", account.id, false )
 		exports.security:modifyElementData( player, "account:username", account.username, true )
