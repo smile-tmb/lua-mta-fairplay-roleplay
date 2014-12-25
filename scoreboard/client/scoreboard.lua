@@ -53,7 +53,7 @@ addEvent( "scoreboard:hideHUD", true )
 addEventHandler( "scoreboard:hideHUD", root, hideScoreboardHUD )
 
 function scoreboardHUD( )
-	if ( not showHUD ) or ( not hudShowing ) or ( not getKeyState( "tab" ) ) then
+	if ( not showHUD ) or ( not hudShowing ) or ( not getKeyState( "tab" ) ) or ( isMTAWindowActive( ) ) or ( isCursorShowing( ) ) then
 		return
 	end
 	
