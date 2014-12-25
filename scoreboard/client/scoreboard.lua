@@ -109,7 +109,7 @@ function scoreboardHUD( )
 				playerBoxColor = player == localPlayer and "myself" or playerBoxColor
 				playerBoxColor = colors[ playerBoxColor ]
 				
-				playerIDText = tostring( exports.common:getPlayerID( player ) )
+				playerIDText = exports.common:getPlayerID( player ) or ""
 				playerNameText = exports.common:getPlayerName( player )
 				
 				if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
