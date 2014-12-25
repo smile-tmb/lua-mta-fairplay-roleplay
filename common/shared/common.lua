@@ -144,24 +144,24 @@ function formatString( string )
 end
 
 function getCharacterID( player )
-	return getElementData( player, "character:id" ) and tonumber( getElementData( player, "character:id" ) ) or false
+	return ( isElement( player ) and getElementData( player, "character:id" ) ) and tonumber( getElementData( player, "character:id" ) ) or false
 end
 
 local _getPlayerName = getPlayerName
 function getPlayerName( player )
-	return _getPlayerName( player ):gsub( "_", " " )
+	return isElement( player ) and _getPlayerName( player ):gsub( "_", " " ) or false
 end
 
 function getAccountID( player )
-	return getElementData( player, "database:id" ) and tonumber( getElementData( player, "database:id" ) ) or false
+	return ( isElement( player ) and getElementData( player, "database:id" ) ) and tonumber( getElementData( player, "database:id" ) ) or false
 end
 
 function getAccountName( player )
-	return getElementData( player, "account:username" )
+	return ( isElement( player ) and getElementData( player, "account:username" ) ) and getElementData( player, "account:username" ) or false
 end
 
 function getPlayerID( player )
-	return getElementData( player, "player:id" ) and tonumber( getElementData( player, "player:id" ) ) or false
+	return ( isElement( player ) and getElementData( player, "player:id" ) ) and tonumber( getElementData( player, "player:id" ) ) or false
 end
 
 function getPlayerByID( id )
