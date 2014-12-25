@@ -3,6 +3,18 @@
 	<min_mta_version client="1.3.4-0.00000" />
 	
 	<script src="client/realism.lua" type="client" cache="false" />
+	<script src="client/respawn.lua" type="client" cache="false" />
 	<script src="client/strafe.lua" type="client" cache="false" />
+	
+	<script src="server/character_kill.lua" />
 	<script src="server/realism.lua" />
+	<script src="server/respawn.lua" />
+	
+	<export function="characterKill" />
+	<export function="characterResurrect" />
+	<export function="findCharacterKillPed" />
+	<export function="loadCharacterKills" />
+	
+	<export function="respawnCharacter" />
+	<export function="reviveCharacter" />
 </meta>

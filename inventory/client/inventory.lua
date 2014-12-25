@@ -673,7 +673,7 @@ addCommandHandler( "fixinventory",
 )
 
 local function toggleInventory( )
-	if ( exports.common:isPlayerPlaying( localPlayer ) ) then
+	if ( exports.common:isPlayerPlaying( localPlayer ) ) and ( not isPedDead( localPlayer ) ) then
 		if ( isInventoryLocked ) then
 			outputChatBox( "Inventory cannot be accessed at this time.", 245, 20, 20, false )
 		else
