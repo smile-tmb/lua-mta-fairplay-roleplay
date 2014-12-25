@@ -1,4 +1,4 @@
-database.configuration.automated_resources = { accounts = { "accounts", "characters" }, chat = { "languages" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -35,6 +35,8 @@ database.verification = {
 		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
 		{ name = "health", type = "smallint", length = 3, default = 100, is_unsigned = true },
 		{ name = "armor", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "is_dead", type = "smallint", length = 1, default = 0, is_unsigned = true },
+		{ name = "cause_of_death", type = "text" },
 		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
 	},
@@ -56,6 +58,20 @@ database.verification = {
 		{ name = "skill_1", type = "smallint", length = 3, default = 100, is_unsigned = true },
 		{ name = "skill_2", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "skill_3", type = "smallint", length = 3, default = 0, is_unsigned = true }
+	},
+	ticket_logs = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "source_character_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "target_character_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "message", type = "text" },
+		{ name = "type", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "players", type = "varchar", length = 1000, default = "[ [ ] ]" },
+		{ name = "location", type = "varchar", length = 255, default = "N/A" },
+		{ name = "time", type = "varchar", length = 255, default = "N/A" },
+		{ name = "assigned_time", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "assigned_to", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "closed_time", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "closed_state", type = "tinyint", length = 3, default = 0, is_unsigned = true }
 	},
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },

@@ -1,4 +1,5 @@
 local screenWidth, screenHeight = guiGetScreenSize( )
+local realScreenWidth, realScreenHeight = screenWidth, screenHeight
 
 local showHUD = false
 local adminCount = 0
@@ -7,16 +8,40 @@ local levelName = ""
 local adminMode = true
 local hudShowing = false
 
+local blinkTick = 500
+local blinkTickEnd = getTickCount( ) + blinkTick
+
+local isTicketBoxHover = false
+local isTicketBoxActive = false
+local isTicketBoxBlinkActive = false
+
+local ticketBoxX = 0
+local ticketBoxY = 0
+
+local ticketBoxWidth = 0
+local ticketBoxHeight = 0
+
 function updateAdminHUD( )
 	showHUD = exports.common:isPlayerServerTrialAdmin( localPlayer )
 	
 	if ( showHUD ) then
 		adminCount = #exports.common:getPriorityPlayers( )
-		ticketCount = #getTickets( )
+		ticketCount = exports.common:count( getTickets( ) )
 		levelName = exports.common:getLevelName( exports.common:getPlayerLevel( localPlayer ) )
 		adminMode = exports.common:isOnDuty( localPlayer )
+		
+		if ( ticketCount > 0 ) then
+			if ( not isTicketBoxActive ) then
+				isTicketBoxActive = true
+				isTicketBoxBlinkActive = true
+				blinkTickEnd = getTickCount( ) + blinkTick
+			end
+		else
+			isTicketBoxActive = false
+		end
 	end
 end
+addEventHandler( "onClientPlayerQuit", root, updateAdminHUD )
 
 function showAdminHUD( )
 	updateAdminHUD( )
@@ -43,6 +68,16 @@ addEvent( "admin:updateHUD", true )
 addEventHandler( "admin:updateHUD", root,
 	function( )
 		updateAdminHUD( )
+	end
+)
+
+addEventHandler( "onClientClick", root,
+	function( button, state, cursorX, cursorY )
+		if ( state == "down" ) and
+		   ( cursorX >= ticketBoxX ) and ( cursorX <= ticketBoxX + ticketBoxWidth ) and
+		   ( cursorY >= ticketBoxY ) and ( cursorY <= ticketBoxY + ticketBoxHeight ) then
+			openTicketBrowser( true )
+		end
 	end
 )
 
@@ -124,7 +159,39 @@ function adminHUD( )
 	boxX = screenWidth - ( textWidth + ( boxPaddingX * 2 ) )
 	boxY = screenHeight - ( textHeight + ( boxPaddingY * 2 ) )
 	
-	dxDrawRectangle( boxX, boxY, boxWidth, boxHeight, tocolor( 0, 0, 0, 175 ) )
+	ticketBoxX = boxX
+	ticketBoxY = boxY
+	
+	ticketBoxWidth = boxWidth
+	ticketBoxHeight = boxHeight
+	
+	if ( isCursorShowing( ) ) then
+		local cursorX, cursorY = getCursorPosition( )
+			  cursorX, cursorY = cursorX * realScreenWidth, cursorY * realScreenHeight
+		
+		if ( cursorX >= boxX ) and ( cursorX <= boxX + boxWidth ) and
+		   ( cursorY >= boxY ) and ( cursorY <= boxY + boxHeight ) then
+			isTicketBoxHover = true
+		else
+			isTicketBoxHover = false
+		end
+	end
+	
+	if ( isTicketBoxActive ) then
+		if ( getTickCount( ) >= blinkTickEnd ) then
+			if ( isTicketBoxBlinkActive ) then
+				isTicketBoxBlinkActive = false
+			else
+				isTicketBoxBlinkActive = true
+			end
+			
+			blinkTickEnd = getTickCount( ) + blinkTick
+		end
+	end
+	
+	local boxColor = isTicketBoxActive and ( isTicketBoxBlinkActive and ( isTicketBoxHover and tocolor( 150, 50, 50, 175 ) or tocolor( 125, 25, 25, 175 ) ) or ( isTicketBoxHover and tocolor( 125, 25, 25, 175 ) or tocolor( 100, 0, 0, 175 ) ) ) or ( isTicketBoxHover and tocolor( 0, 0, 0, 200 ) or tocolor( 0, 0, 0, 175 ) )
+	
+	dxDrawRectangle( boxX, boxY, boxWidth, boxHeight, boxColor )
 	dxDrawText( text, textX, textY, textX + textWidth, textY + textHeight, tocolor( 255, 255, 255, 200 ) )
 	
 	-- admin number hud

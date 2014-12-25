@@ -143,7 +143,7 @@ function saveCharacter( player )
 		local skinModel = getElementModel( player )
 		local characterID = exports.common:getCharacterID( player )
 		
-		return exports.database:execute( "UPDATE `characters` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rotation` = ?, `interior` = ?, `dimension` = ?, `skin_id` = ?, `last_played` = NOW() WHERE `id` = ?", x, y, z, rotation, interior, dimension, skinModel, characterID )
+		return exports.database:execute( "UPDATE `characters` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rotation` = ?, `interior` = ?, `dimension` = ?, `skin_id` = ?, `health` = ?, `armor` = ?, `last_played` = NOW() WHERE `id` = ?", x, y, z, rotation, interior, dimension, skinModel, getElementHealth( player ), getPedArmor( player ), characterID )
 	end
 end
 
@@ -176,7 +176,10 @@ function characterSelection( player )
 	
 	saveCharacter( player )
 	
+	triggerEvent( "admin:ticket_left", player )
+	
 	removeElementData( player, "player:playing" )
+	removeElementData( player, "player:waiting" )
 	
 	removeElementData( player, "character:id" )
 	removeElementData( player, "character:name" )
@@ -249,17 +252,27 @@ function spawnCharacter( player, character, fade )
 				end
 				
 				setPedRotation( player, character.rotation )
+				
 				setElementModel( player, character.skin_id )
 				setElementInterior( player, character.interior )
 				setElementDimension( player, character.dimension )
 				
+				if ( character.health > 0 ) then
+					setElementHealth( player, character.health )
+				else
+					killPed( player )
+				end
+				
+				setPedArmor( player, character.armor )
 				setPlayerName( player, character.name )
 				
 				exports.items:loadItems( player )
 				
 				triggerClientEvent( player, "characters:onSpawn", player )
 				
-				setCameraTarget( player, player )
+				if ( not isPedDead( player ) ) then
+					setCameraTarget( player, player )
+				end
 				
 				local pendingTutorial = get( exports.common:getAccountID( player ) ).tutorial == 0
 				
