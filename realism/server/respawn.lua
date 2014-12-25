@@ -61,7 +61,7 @@ addEventHandler( "realism:respawn", root,
 		if ( option == 1 ) then
 			respawnCharacter( client, details )
 		elseif ( option == 2 ) then
-			characterKill( client, details )
+			characterKill( exports.common:getCharacterID( client ), details )
 		elseif ( option == 3 ) then
 			exports.admin:createTicket( client, nil, details, 5 )
 			exports.messages:createMessage( client, "Please wait for an administrator to respond to your ticket.", "wait-for-admin" )
