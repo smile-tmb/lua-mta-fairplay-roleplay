@@ -19,14 +19,12 @@ addCommandHandler( { "createvehicle", "newvehicle", "createveh", "makeveh", "mak
 			faction = tonumber( faction ) == 1
 			
 			if ( not faction ) then
-				local targetPlayer = exports.common:getPlayerFromPartialName( ownerID )
+				local targetCharacter = exports.accounts:getCharacter( ownerID )
 				
-				if ( not targetPlayer ) then
+				if ( not targetCharacter ) then
 					outputChatBox( "No such character found.", player, 230, 95, 95, false )
 					
 					return
-				else
-					ownerID = exports.common:getCharacterID( targetPlayer )
 				end
 			else
 				local targetFaction = exports.factions:getFactionByID( ownerID )
