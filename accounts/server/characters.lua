@@ -43,7 +43,7 @@ end
 
 addEvent( "characters:create", true )
 addEventHandler( "characters:create", root,
-	function( characterSkinModel, characterName, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook )
+	function( characterSkinModel, characterName, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, characterLanguage )
 		if ( source ~= client ) then
 			return
 		end
@@ -58,7 +58,7 @@ addEventHandler( "characters:create", root,
 					local characterID = exports.database:insert_id( "INSERT INTO `characters` (`account`, `skin_id`, `name`, `pos_x`, `pos_y`, `pos_z`, `rotation`, `interior`, `dimension`, `date_of_birth`, `gender`, `skin_color`, `origin`, `look`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", exports.common:getAccountID( client ), characterSkinModel, characterName, defaultSpawnX, defaultSpawnY, defaultSpawnZ, defaultSpawnRotation, defaultSpawnInterior, defaultSpawnDimension, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, "NOW()" )
 					
 					if ( characterID ) then
-						exports.database:execute( "INSERT INTO `languages` (`character_id`, `language_1`) VALUES (?, ?)", characterID, characterLanguage )
+						exports.database:execute( "INSERT INTO `languages` (`character_id`, `language_1`) VALUES (?, ?)", characterID, characterLanguage or 1 )
 						
 						exports.messages:destroyMessage( client, "selection" )
 						

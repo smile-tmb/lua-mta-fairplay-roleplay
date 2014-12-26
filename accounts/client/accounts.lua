@@ -15,20 +15,18 @@ function showBackground( )
 	dxDrawRectangle( 0, 0, screenWidth, screenHeight, tocolor( 0, 0, 0, 0.5 * 255 ), false )
 end
 
-function showLoginMenu( forceClose )
+function showLoginMenu( forceEnd )
 	if ( isElement( accounts_login_view.window ) ) then
 		destroyElement( accounts_login_view.window )
+		
+		showCursor( false, false )
 	end
 	
-	showCursor( false )
-	guiSetInputEnabled( false )
-	
-	if ( forceClose ) then
+	if ( forceEnd ) then
 		return
 	end
 	
-	showCursor( true )
-	guiSetInputEnabled( true )
+	showCursor( true, true )
 	
 	addEventHandler( "onClientRender", root, showBackground )
 	

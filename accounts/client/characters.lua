@@ -9,24 +9,23 @@ local character_selection = {
 }
 
 local selectedSkin = 1
+local selectedLanguage = 1
 
 function showCharacterSelection( forceEnd )
 	if ( isElement( character_selection.window ) ) then
 		destroyElement( character_selection.window )
+		
+		showCursor( false, false )
 	end
-	
-	showCursor( false )
-	guiSetInputEnabled( false )
 	
 	if ( forceEnd ) then
 		return
 	end
 	
-	showCursor( true )
-	guiSetInputEnabled( true )
-	
 	triggerEvent( "accounts:showView", localPlayer )
 	addEventHandler( "onClientRender", root, showBackground )
+	
+	showCursor( true, true )
 	
 	character_selection.window = guiCreateWindow( ( screenWidth - 536 ) / 2, ( screenHeight - 346 ) / 2, 536, 376, "Character Selection", false )
 	guiWindowSetSizable( character_selection.window, false )
@@ -101,8 +100,11 @@ function showCharacterSelection( forceEnd )
 	
 	guiSetSize( character_selection.combobox.skin_color, width, 3 * 20 + 20, false )
 	
-	character_selection.label[ 7 ] = guiCreateLabel( 10, 250, 127, 15, "Language: Vietnamese", false, character_selection.tab.create )
-	guiSetFont( character_selection.label[ 7 ], "default-bold-small" )
+	local languages = exports.chat:getLanguages( )
+	selectedLanguage = math.random( 1, 35 )
+	
+	character_selection.label[ 8 ] = guiCreateLabel( 10, 250, 127, 15, "Language: " .. languages[ selectedLanguage ][ 2 ], false, character_selection.tab.create )
+	guiSetFont( character_selection.label[ 8 ], "default-bold-small" )
 	
 	character_selection.button.language_previous = guiCreateButton( 10, 275, 26, 23, "<", false, character_selection.tab.create )
 	character_selection.button.language_next = guiCreateButton( 47, 275, 26, 23, ">", false, character_selection.tab.create )
@@ -127,6 +129,22 @@ function showCharacterSelection( forceEnd )
 	
 	character_selection.button.create = guiCreateButton( 260, 206, 210, 33, "Create character", false, character_selection.tab.create )
 	character_selection.button.randomize = guiCreateButton( 260, 250, 210, 33, "Randomize", false, character_selection.tab.create )
+	
+	addEventHandler( "onClientGUIClick", character_selection.button.language_previous,
+		function( )
+			selectedLanguage = languages[ selectedLanguage - 1 ] and selectedLanguage - 1 or 1
+			
+			guiSetText( character_selection.label[ 8 ], "Language: " .. languages[ selectedLanguage ][ 2 ] )
+		end, false
+	)
+	
+	addEventHandler( "onClientGUIClick", character_selection.button.language_next,
+		function( )
+			selectedLanguage = languages[ selectedLanguage + 1 ] and selectedLanguage + 1 or 1
+			
+			guiSetText( character_selection.label[ 8 ], "Language: " .. languages[ selectedLanguage ][ 2 ] )
+		end, false
+	)
 	
 	addEventHandler( "onClientGUIClick", character_selection.button.skin_previous,
 		function( )
@@ -223,7 +241,7 @@ function showCharacterSelection( forceEnd )
 														exports.messages:createMessage( "Creating character, please wait.", "selection", nil, true )
 														guiSetEnabled( character_selection.window, false )
 														
-														triggerServerEvent( "characters:create", localPlayer, selectedSkin, characterName, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook )
+														triggerServerEvent( "characters:create", localPlayer, selectedSkin, characterName, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, characterLanguage, selectedLanguage )
 													else
 														exports.messages:createMessage( "Character origin must be at most " .. maximumOriginLength .. " characters long.", "selection" )
 														guiSetEnabled( character_selection.window, false )
@@ -265,6 +283,8 @@ function showCharacterSelection( forceEnd )
 	)
 	
 	function randomizeValues( )
+		math.randomseed( getTickCount( ) )
+		
 		local origins = { "New York City, New York USA", "Las Venturas, San Andreas USA", "San Fierro, San Andreas USA", "Los Santos, San Andreas USA", "Toronto, Canada", "Helsinki, Finland", "Amsterdam, The Netherlands", "Paris, France", "Cologne, Germany", "Stockholm, Sweden", "Sitka, Alaska USA", "Juneau, Alaska USA", "Wrangell, Alaska USA", "Anchorage, Alaska USA", "Jacksonville, Florida USA", "Anaconda, Montana USA", "Butte, Montana USA", "Oklahoma City, Oklahoma USA", "Houston, Texas USA", "Phoenix, Arizona USA", "Nashville, Tennessee USA", "San Antonio, Texas USA", "Suffolk, Virginia USA", "Buckeye, Arizona USA", "Indianapolis, Indiana USA", "Chesapeake, Virginia USA", "Dallas, Texas USA", "Fort Worth, Texas USA", "San Diego, California USA", "Memphis, Tennessee USA", "Kansas City, Missouri USA", "Augusta, Georgia USA", "Austin, Texas USA", "Charlotte, North Carolina USA", "Lexington, Kentucky USA", "El Paso, Texas USA", "Macon, Georgia USA", "Cusseta, Georgia USA", "Chicago, Illinois USA", "Tucson, Arizona USA", "Columbus, Ohio USA", "Columbus, Georgia USA", "Valdez, Alaska USA", "Preston, Georgia USA", "Huntsville, Alabama USA", "Boulder City, Nevada USA", "California City, California USA", "Tulsa, Oklahoma USA", "Goodyear, Arizona USA", "Albuquerque, New Mexico USA", "Scottsdale, Arizona USA", "London, United Kingdom", "Turku, Finland", "Moscow, Russia", "Saint Petersburg, Russia", "Sydney, Australia", "Melbourne, Australia", "Brisbane, Australia", "Belfast, Northern Ireland", "Hamburg, Germany", "Oslo, Norway", "Hilversum, The Netherlands", "Warsaw, Poland", "Madrid, Spain", "Mexico City, Mexico", "Philadelphia, Pennsylvania USA", "Phoenix, Arizona USA", "San Antonio, Texas USA", "Dallas, Texas USA", "San Jose, California USA", "Detroit, Michigan USA", "Seattle, Washington USA", "Denver, Colorado USA", "Washington, District of Columbia USA", "Boston, Massachusetts USA", "Baltimore, Maryland USA", "Louisville, Kentucky USA", "Portland, Oregon USA", "Milwaukee, Wisconsin USA", "Sacramento, California USA", "Kansas City, Missouri USA", "Mesa, Arizona USA", "Atlanta, Georgia USA", "Omaha, Nebraska USA", "Colorado Springs, Colorado USA", "Raleigh, North Carolina USA", "Miami, Florida USA", "Oakland, California USA", "Cleveland, Ohio USA", "Arlington, Texas USA", "New Orleans, Louisiana USA", "Bakersfield, California USA", "Tampa, Florida USA", "Honolulu, Hawai'i", "Aurora, Colorado USA", "Anaheim, California USA", "Santa Ana, California USA", "Saint Louis, Missouri USA", "Riverside, California USA", "Lexington, Kentucky USA", "Pittsburgh, Pennsylvania USA", "Stockton, California USA", "Buffalo, New York USA", "Saint Petersburg, Florida USA", "Davenport, Iowa USA", "Waterbury, Connecticut USA", "Elgin, Illinois USA", "Gresham, Oregon USA", "Billings, Montana USA", "Manchester, New Hampshire USA", "Wilmington, North Carolina USA", "Fargo, North Dakota", "Lansing, Michigan USA", "Provo, Utah USA", "Albany, New York USA", "Shanghai, China", "Tokyo, Japan", "Yerevan, Armenia", "Baku, Azerbaijan", "Manama, Bahrain", "Beijing, China", "Nicosia, Cyprus", "New Delhi, India", "Jakarta, Indonesia", "Tbilisi, Georgia", "Singapore, Republic of Singapore", "Bangkok, Thailand", "Ankara, Turkey", "Abu Dhabi, United Arab Emirates", "Tashkent, Uzbekistan", "Taipei, Taiwan", "Hong Kong, China" }
 		local month, year = math.random( minimumBirthMonth, maximumBirthMonth ), math.random( minimumBirthYear + 40, maximumBirthYear )
 		local daysInMonth = exports.common:getDaysInMonth( month, year )
@@ -288,7 +308,9 @@ function showCharacterSelection( forceEnd )
 		local skins = exports.common:getValidPedModelsByGenderAndColor( genderList[ genderSelected ]:lower( ), skinColorList[ skinColorSelected ]:lower( ) )
 		
 		selectedSkin = skins[ math.random( #skins ) ]
+		selectedLanguage = math.random( 1, 35 )
 		
+		guiSetText( character_selection.label[ 8 ], "Language: " .. languages[ selectedLanguage ][ 2 ] )
 		guiSetText( character_selection.label[ 7 ], "Skin (" .. selectedSkin .. ")" )
 		guiStaticImageLoadImage( character_selection.skin, "images/models/" .. selectedSkin .. ".png" )
 	end
