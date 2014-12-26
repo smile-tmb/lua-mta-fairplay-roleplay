@@ -36,6 +36,10 @@ function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, 
 	local numberplate = getNumberPlate( )
 	local vehicleID = exports.database:insert_id( "INSERT INTO `vehicles` (`model_id`, `pos_x`, `pos_y`, `pos_z`, `rot_x`, `rot_y`, `rot_z`, `interior`, `dimension`, `respawn_pos_x`, `respawn_pos_y`, `respawn_pos_z`, `respawn_rot_x`, `respawn_rot_y`, `respawn_rot_z`, `respawn_interior`, `respawn_dimension`, `numberplate`, `variant_1`, `variant_2`, `owner_id`, `color`, `is_locked`, `is_bulletproof`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, numberplate, variantA, variantB, ownerID, color, isLocked, isBulletproof )
 	
+	if ( vehicleID ) and ( not faction ) then
+		exports.items:giveItem( exports.common:getPlayerByCharacterID( ownerID ) or ownerID, 7, vehicleID, nil, nil, nil, true )
+	end
+	
 	return vehicleID, spawn( vehicleID, true )
 end
 
