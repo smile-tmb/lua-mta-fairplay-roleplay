@@ -32,7 +32,10 @@ function createMessage( message, messageType, messageGlobalID, hideButton, disab
 	guiLabelSetVerticalAlign( messages[ messageRealm ][ messageID ].message, "center" )
 
 	showCursor( true )
-	guiSetInputEnabled( disableInput or false )
+	
+	if ( disableInput ) then
+		guiSetInputEnabled( disableInput )
+	end
 	
 	if ( not hideButton ) then
 		messages[ messageRealm ][ messageID ].button = guiCreateButton( 16, 109, 284, 25, "Continue", false, messages[ messageRealm ][ messageID ].window )	

@@ -19,16 +19,18 @@ function showLoginMenu( forceEnd )
 	if ( isElement( accounts_login_view.window ) ) then
 		destroyElement( accounts_login_view.window )
 		
-		showCursor( false, false )
+		showCursor( false )
+		guiSetInputEnabled( false )
 	end
 	
 	if ( forceEnd ) then
 		return
 	end
 	
-	showCursor( true, true )
-	
 	addEventHandler( "onClientRender", root, showBackground )
+	
+	showCursor( true )
+	guiSetInputEnabled( true )
 	
 	accounts_login_view.window = guiCreateWindow( ( screenWidth - 273 ) / 2, ( screenHeight - 310 ) / 2, 273, 310, "FairPlay Gaming", false )
 	guiWindowSetSizable( accounts_login_view.window, false )
@@ -191,7 +193,6 @@ addEventHandler( "accounts:onLogin.accounts", root, onLogin )
 
 function onLogout( )
 	exports.messages:destroyMessage( "login" )
-	triggerEvent( "accounts:close_menu", localPlayer )
 	showLoginMenu( )
 end
 addEvent( "accounts:onLogout", true )

@@ -289,7 +289,10 @@ function spawnCharacter( player, character, fade )
 				fadeCamera( player, true, 2.0 )
 				
 				outputChatBox( "Welcome" .. ( not pendingTutorial and " back" or "" ) .. ", " .. character.name:gsub( "_", " " ) .. "!", player, 230, 180, 95, false )
-				outputChatBox( "You were last seen on this character on " .. exports.common:formatDate( character.last_played, true ) .. ".", player, 230, 180, 95, false )
+				
+				if ( not pendingTutorial ) and ( character.last_played ) then
+					outputChatBox( "You were last seen on this character on " .. exports.common:formatDate( character.last_played, true ) .. ".", player, 230, 180, 95, false )
+				end
 				
 				exports.admin:updateTickets( player )
 			end

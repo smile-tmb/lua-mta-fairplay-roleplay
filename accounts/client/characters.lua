@@ -15,7 +15,8 @@ function showCharacterSelection( forceEnd )
 	if ( isElement( character_selection.window ) ) then
 		destroyElement( character_selection.window )
 		
-		showCursor( false, false )
+		showCursor( false )
+		guiSetInputEnabled( false )
 	end
 	
 	if ( forceEnd ) then
@@ -25,7 +26,8 @@ function showCharacterSelection( forceEnd )
 	triggerEvent( "accounts:showView", localPlayer )
 	addEventHandler( "onClientRender", root, showBackground )
 	
-	showCursor( true, true )
+	showCursor( true )
+	guiSetInputEnabled( true )
 	
 	character_selection.window = guiCreateWindow( ( screenWidth - 536 ) / 2, ( screenHeight - 346 ) / 2, 536, 376, "Character Selection", false )
 	guiWindowSetSizable( character_selection.window, false )
@@ -368,7 +370,6 @@ addEvent( "characters:closeGUI", true )
 addEventHandler( "characters:closeGUI", root,
 	function( hideBackgroundOnSpawn )
 		exports.messages:destroyMessage( "selection" )
-		triggerEvent( "accounts:close_menu", localPlayer )
 		showCharacterSelection( true )
 		
 		if ( not hideBackgroundOnSpawn ) then
