@@ -11,7 +11,6 @@ do
 	end
 end
 
--- Inventory Settings
 local maximumIndex = 6
 local inventoryCooldownTimer = false
 
@@ -29,24 +28,25 @@ local localItemMargin = 3
 local currentLocalItemIndex = 0
 local currentLocalItemRow = 1
 
-local HOVER_currentIndex = 0
-local HOVER_currentRow = 1
+local currentHoverItemIndex = 0
+local currentHoverItemRow = 1
+local hoveringItemIndex = 0
+local deletingItemIndex = 0
 
-local CLICK_currentIndex = 0
-local CLICK_currentRow = 1
+local currentClickItemIndex = 0
+local currentClickItemRow = 1
 
-local distance
 local collision, x, y, z, element
 local _cursorX, _cursorY = 0, 0
 local maxDistance = 6
+local distance
+
 local draggingItemSlot
 local draggingIndex = 0
 local draggingRow = 1
 local isDeletingItem = false
 local isDraggingWorldItem = false
 
-local DRAGEND_currentIndex = 0
-local DRAGEND_currentRow = 1
 local isInventoryLocked = false
 
 local function doesContainData( case )
@@ -232,6 +232,8 @@ addEventHandler( "onClientRender", root,
 			-- Grid bottom fix
 			dxDrawRectangle( ( screenWidth - inventoryRowWidth * 2 ) / 2, screenHeight - ( inventoryRowOffset - 1 ), ( inventoryRowWidth * 2 ) - localItemMargin, localItemMargin, tocolor( 0, 0, 0, 0.65 * 255 ), true )
 			
+			local areWeHovering = false
+			
 			-- Item Grid
 			for localItemIndex, localItem in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
 				local hovering = false
@@ -254,6 +256,14 @@ addEventHandler( "onClientRender", root,
 					( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ) + localItemScale ) ) and
 					( not draggingItemSlot ) then
 					hovering = true
+					hoveringItemIndex = localItemIndex
+					areWeHovering = true
+					
+					if ( isDeletingItem ) then
+						deletingItemIndex = localItemIndex
+					else
+						deletingItemIndex = false
+					end
 				end
 				
 				local fileName = localItem.item_id
@@ -268,7 +278,13 @@ addEventHandler( "onClientRender", root,
 				end
 				
 				if ( draggingItemSlot ~= localItemIndex ) and ( not isDraggingWorldItem ) then
-					dxDrawRectangle( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemMargin / 2 ), ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) )  *2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ), localItemScale, localItemScale, tocolor( 0, 0, 0, ( hovering and 0.6 * 255 or 0.5 * 255 ) ), true)
+					local color = tocolor( 0, 0, 0, ( hovering and 0.6 * 255 or 0.5 * 255 ) )
+					
+					if ( isDeletingItem ) and ( deletingItemIndex == localItemIndex ) then
+						color = tocolor( 105, 20, 20, 0.75 * 255 )
+					end
+					
+					dxDrawRectangle( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ) + ( localItemMargin / 2 ), ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) )  *2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ), localItemScale, localItemScale, color, true)
 					dxDrawImage( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentLocalItemIndex - 2 ) ) ), ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentLocalItemRow - 1 ) ) ), localItemScale, localItemScale, "images/" .. fileName .. ".png", 0, 0, 0, tocolor( 255, 255, 255, ( hovering and 0.95 * 255 or 0.8 * 255 ) ), true )
 				else
 					local playerX, playerY, playerZ = getElementPosition( localPlayer )
@@ -286,8 +302,6 @@ addEventHandler( "onClientRender", root,
 						color = tocolor( 155, 25, 25, 0.7 * 255 )
 					elseif ( isElement( element ) ) and ( getElementType( element ) == "player" ) then
 						color = tocolor( 25, 155, 25, 0.7 * 255 )
-					elseif ( isDeletingItem ) then
-						color = tocolor( 105, 20, 20, 0.75 * 255 )
 					end
 					
 					dxDrawRectangle( cursorX, cursorY, localItemScale, localItemScale, color, true )
@@ -295,25 +309,30 @@ addEventHandler( "onClientRender", root,
 				end
 			end
 			
+			if ( not areWeHovering ) then
+				hoveringItemIndex = false
+				deletingItemIndex = false
+			end
+			
 			-- Hovering
 			if ( not draggingItemSlot ) then
 				for i, localItem in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
-					if ( HOVER_currentIndex == maximumIndex ) then
-						HOVER_currentIndex = 0
-						HOVER_currentRow = HOVER_currentRow + 1
+					if ( currentHoverItemIndex == maximumIndex ) then
+						currentHoverItemIndex = 0
+						currentHoverItemRow = currentHoverItemRow + 1
 					end
 					
 					if ( i == #items[ categories[ inventoryOpenCategoryID ] ] ) then
-						HOVER_currentIndex = 0
-						HOVER_currentRow = 1
+						currentHoverItemIndex = 0
+						currentHoverItemRow = 1
 					end
 					
-					HOVER_currentIndex = HOVER_currentIndex + 1
+					currentHoverItemIndex = currentHoverItemIndex + 1
 					
-					if	( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( HOVER_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
-						( cursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( HOVER_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
-						( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( HOVER_currentRow - 1 ) ) ) ) and
-						( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( HOVER_currentRow - 1 ) ) ) + localItemScale ) ) then
+					if	( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentHoverItemIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
+						( cursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentHoverItemIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
+						( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentHoverItemRow - 1 ) ) ) ) and
+						( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentHoverItemRow - 1 ) ) ) + localItemScale ) ) then
 						local item = exports.items:getItem( localItem.item_id )
 						local name = item.name
 						local value = item.description
@@ -406,28 +425,13 @@ addEventHandler( "onClientCursorMove", root,
 
 addEventHandler( "onClientKey", root,
 	function( button, pressOrRelease )
-		if ( not draggingItemSlot ) and ( isDeletingItem ) then
+		if ( draggingItemSlot ) then
 			isDeletingItem = false
+			return
 		end
 		
 		if ( button == "delete" ) then
-			if ( draggingItemSlot ) then
-				if ( pressOrRelease ) and ( not isDeletingItem ) then
-					isDeletingItem = true
-				else
-					if ( not isDeletingItem ) then
-						return
-					end
-					
-					localItem = items[ categories[ inventoryOpenCategoryID ] ][ draggingItemSlot ]
-					
-					isDeletingItem = false
-					triggerServerEvent( "items:delete", localPlayer, localItem.db_id, localItem.item_id, localItem.value )
-					draggingItemSlot = false
-				end
-			end
-		elseif ( ( button == "backspace" ) or ( button == "escape" ) ) and ( isDeletingItem ) then
-			isDeletingItem = false
+			isDeletingItem = pressOrRelease
 		end
 	end
 )
@@ -438,7 +442,7 @@ addEventHandler( "onClientClick", root,
 			return
 		end
 		
-		if ( not draggingItemSlot ) and ( isDeletingItem ) then
+		if ( draggingItemSlot ) and ( isDeletingItem ) then
 			isDeletingItem = false
 		end
 		
@@ -600,28 +604,34 @@ addEventHandler( "onClientClick", root,
 						end
 						
 						for i, v in pairs( items[ categories[ inventoryOpenCategoryID ] ] ) do
-							if ( CLICK_currentIndex == maximumIndex ) then
-								CLICK_currentIndex = 0
-								CLICK_currentRow = CLICK_currentRow + 1
+							if ( currentClickItemIndex == maximumIndex ) then
+								currentClickItemIndex = 0
+								currentClickItemRow = currentClickItemRow + 1
 							end
 							
 							if ( i == #items[ categories[ inventoryOpenCategoryID ] ] ) then
-								CLICK_currentIndex = 0
-								CLICK_currentRow = 1
+								currentClickItemIndex = 0
+								currentClickItemRow = 1
 							end
 							
-							CLICK_currentIndex = CLICK_currentIndex + 1
+							currentClickItemIndex = currentClickItemIndex + 1
 							
-							if  ( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( CLICK_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
-								( cursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( CLICK_currentIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
-								( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( CLICK_currentRow - 1 ) ) ) ) and
-								( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( CLICK_currentRow - 1 ) ) ) + localItemScale ) ) then
+							if  ( cursorX >= ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentClickItemIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) ) and
+								( cursorX <= ( ( ( ( ( screenWidth - inventoryRowWidth - ( localItemScale + localItemMargin ) ) / 2 ) + ( ( localItemScale + localItemMargin ) * ( currentClickItemIndex - 2 ) ) ) + ( localItemMargin / 2 ) ) + localItemScale ) ) and
+								( cursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentClickItemRow - 1 ) ) ) ) and
+								( cursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( currentClickItemRow - 1 ) ) ) + localItemScale ) ) then
 								local localItem = items[ categories[ inventoryOpenCategoryID ] ][ i ]
 								
-								triggerServerEvent( "items:act", localPlayer, localItem.db_id, localItem.item_id, localItem.value )
-								
-								if ( localItem.item_id == 10 ) then
-									isInventoryLocked = true
+								if ( isDeletingItem ) and ( deletingItemIndex == i ) then
+									deletingItemIndex = false
+									
+									triggerServerEvent( "items:delete", localPlayer, localItem.db_id, localItem.item_id, localItem.value )
+								else
+									triggerServerEvent( "items:act", localPlayer, localItem.db_id, localItem.item_id, localItem.value )
+									
+									if ( localItem.item_id == 10 ) then
+										isInventoryLocked = true
+									end
 								end
 							end
 						end
