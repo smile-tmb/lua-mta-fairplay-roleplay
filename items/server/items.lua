@@ -29,9 +29,9 @@ function loadItems( player )
 	end
 end
 
-function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID )
+function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID, ignoreWeight )
 	if ( getItems( itemID ) ) then
-		if ( ( tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ) ) > ( tonumber( getElementData( player, "character:max_weight" ) ) ) ) then
+		if ( not ignoreWeight ) and ( isElement( player ) ) and ( tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ) > tonumber( getElementData( player, "character:max_weight" ) ) ) then
 			return false
 		end
 		
@@ -39,21 +39,23 @@ function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID )
 			value = ""
 		end
 		
-		dbID = dbID or exports.database:insert_id( "INSERT INTO `inventory` (`character_id`, `item_id`, `value`, `ringtone_id`, `messagetone_id`, `created_time`) VALUES (?, ?, ?, ?, ?, NOW())", exports.common:getCharacterID( player ), itemID, value, ringtoneID or 1, messagetoneID or 1 )
+		dbID = dbID or exports.database:insert_id( "INSERT INTO `inventory` (`character_id`, `item_id`, `value`, `ringtone_id`, `messagetone_id`, `created_time`) VALUES (?, ?, ?, ?, ?, NOW())", isElement( player ) and exports.common:getCharacterID( player ) or player, itemID, value, ringtoneID or 1, messagetoneID or 1 )
 		
-		if ( itemID == 8 ) then
-			exports.security:modifyElementData( player, "character:max_weight", 20, true )
-		elseif ( itemID == 9 ) then
-			exports.security:modifyElementData( player, "character:max_weight", 30, true )
+		if ( isElement( player ) ) then
+			if ( itemID == 8 ) then
+				exports.security:modifyElementData( player, "character:max_weight", 20, true )
+			elseif ( itemID == 9 ) then
+				exports.security:modifyElementData( player, "character:max_weight", 30, true )
+			end
+			
+			exports.security:modifyElementData( player, "character:weight", tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ), true )
+			
+			table.insert( data[ player ].items, { db_id = dbID, item_id = itemID, value = value, ringtone_id = ringtoneID or 1, messagetone_id = messagetoneID or 1 } )
+			
+			triggerClientEvent( player, "inventory:synchronize", player, data[ player ].items )
+			
+			loadWeapons( player )
 		end
-		
-		exports.security:modifyElementData( player, "character:weight", tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ), true )
-		
-		table.insert( data[ player ].items, { db_id = dbID, item_id = itemID, value = value, ringtone_id = ringtoneID or 1, messagetone_id = messagetoneID or 1 } )
-		
-		triggerClientEvent( player, "inventory:synchronize", player, data[ player ].items )
-		
-		loadWeapons( player )
 		
 		return true
 	else
@@ -66,7 +68,7 @@ function takeItem( player, itemID, value, dbID )
 	
 	if ( data[ player ] ) then
 		for index, item in pairs( data[ player ].items ) do
-			if (item.item_id == itemID ) then
+			if ( item.item_id == itemID ) then
 				if ( value ) then
 					if ( not dbID ) then
 						if ( item.value == value ) then
@@ -109,10 +111,14 @@ function takeItem( player, itemID, value, dbID )
 		exports.database:execute( "DELETE FROM `inventory` WHERE `id` = ?", dbID )
 	end
 	
+	loadItems( player )
+	
 	return true
 end
 
 function hasItem( player, itemID, value, dbID )
+	loadItems( player )
+	
 	if ( getItems( )[ itemID ] ) then
 		for _, item in pairs( data[ player ].items ) do
 			if ( tonumber( item.item_id ) == tonumber( itemID ) ) then
