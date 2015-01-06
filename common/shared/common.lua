@@ -210,6 +210,7 @@ function formatDate( string, preparedString )
 	local day = date[ 3 ]:len( ) >= 2 and date[ 3 ]:sub( 2, 2 ) or date[ 3 ]
 		  day = tonumber( day )
 		  day = date[ 3 ] .. ( thExtension[ day ] or "th" )
+		  day = day:sub( 1, 1 ) == "0" and day:sub( 2 ) or day
 
 	local months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
 	local month = months[ tonumber( date[ 2 ] ) ]
