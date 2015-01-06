@@ -26,3 +26,7 @@ function getRealVehicleID( vehicle )
 	
 	return vehicleID and tonumber( vehicleID ) or false
 end
+
+function getRealVehicleEngineState( vehicle )
+	return getElementData( vehicle, "vehicle:engine" ) or false
+end

@@ -58,6 +58,7 @@
 	<export function="isValidVehicleModelID" type="shared" />
 	<export function="getValidVehicleModelIDs" type="shared" />
 	<export function="getRealVehicleID" type="shared" />
+	<export function="getRealVehicleEngineState" type="shared" />
 	
 	<export function="getFactionID" type="shared" />
 	
