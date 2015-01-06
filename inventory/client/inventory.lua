@@ -475,7 +475,7 @@ addEventHandler( "onClientClick", root,
 									( clickCursorY >= ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( draggingRow - 1 ) ) ) ) and
 									( clickCursorY <= ( ( ( screenHeight - ( ( localItemScale + ( localItemMargin + ( localItemMargin / 2 ) ) ) * 2 ) ) - ( ( localItemScale + localItemMargin ) * ( draggingRow - 1 ) ) ) + localItemScale ) ) then
 									if ( illegalDrop[ localItem.item_id ] ) and ( not exports.common:isPlayerServerTrialAdmin( localPlayer ) ) then
-										outputChatBox( "You are not able to drop this item.", 245, 20, 20, false )
+										outputChatBox( "You are not able to drop this item.", 230, 95, 95, false )
 									else
 										draggingItemSlot = localItemIndex
 									end
@@ -555,10 +555,10 @@ addEventHandler( "onClientClick", root,
 								
 								return
 							else
-								outputChatBox( "You don't have enough space for that item in your inventory.", 245, 20, 20, false )
+								outputChatBox( "You don't have enough space for that item in your inventory.", 230, 95, 95, false )
 							end
 						else
-							outputChatBox( "You have to get out of the vehicle in order to pick up the item.", 245, 20, 20, false )
+							outputChatBox( "You have to get out of the vehicle in order to pick up the item.", 230, 95, 95, false )
 						end
 					end
 				end
@@ -674,10 +674,10 @@ addCommandHandler( "fixinventory",
 				inventoryCooldownTimer = nil
 			end, 5000, 1 )
 			
-			outputChatBox( "Attempting to fix your inventory now...", 20, 245, 20, false )
+			outputChatBox( "Attempting to fix your inventory now...", 95, 230, 95, false )
 			triggerServerEvent( "items:get", localPlayer )
 		else
-			outputChatBox( "Please wait a moment before fixing the inventory again!", 245, 20, 20, false )
+			outputChatBox( "Please wait a moment before fixing the inventory again!", 230, 95, 95, false )
 		end
 	end
 )
@@ -685,7 +685,7 @@ addCommandHandler( "fixinventory",
 local function toggleInventory( )
 	if ( exports.common:isPlayerPlaying( localPlayer ) ) and ( not isPedDead( localPlayer ) ) then
 		if ( isInventoryLocked ) then
-			outputChatBox( "Inventory cannot be accessed at this time.", 245, 20, 20, false )
+			outputChatBox( "Inventory cannot be accessed at this time.", 230, 95, 95, false )
 		else
 			if ( not isInventoryVisible ) then
 				if ( getElementData( localPlayer, "temp:need_synchronization" ) ) then
