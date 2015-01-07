@@ -20,7 +20,7 @@ function getItem( id )
 end
 
 function getItemByName( name )
-	if (not name) then
+	if ( not name ) then
 		return false
 	end
 	
@@ -39,7 +39,7 @@ function getItemByName( name )
 	return false
 end
 
-function getItems( )
+function getItemList( )
 	return itemlist
 end
 

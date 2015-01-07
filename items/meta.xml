@@ -17,7 +17,7 @@
 	
 	<export function="getItem" type="shared" />
 	<export function="getItemByName" type="shared" />
-	<export function="getItems" type="shared" />
+	<export function="getItemList" type="shared" />
 	<export function="getItemName" type="shared" />
 	<export function="getItemDescription" type="shared" />
 	<export function="getItemValue" type="shared" />
@@ -37,12 +37,13 @@
 	<export function="getWeaponWeight" type="shared" />
 	<export function="getAmmoWeight" type="shared" />
 	
+	<export function="getItems" type="shared" />
+	<export function="hasItem" type="shared" />
+	<export function="getItemValue" type="shared" />
+	
 	<export function="loadItems" />
-	<export function="getPlayerItems" />
 	<export function="giveItem" />
 	<export function="takeItem" />
-	<export function="hasItem" />
-	<export function="getPlayerItemValue" />
 	
 	<export function="loadWeapons" />
 </meta>

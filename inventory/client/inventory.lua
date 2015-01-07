@@ -6,7 +6,8 @@ local categoryBoxScale = 80
 local categoryBoxSpacing = 5
 local categoryBoxSpaced = categoryBoxScale + categoryBoxSpacing
 local categoryBackgroundColor = tocolor( 5, 5, 5, 0.45 * 255 )
-local categoryActiveColor = tocolor( 5, 5, 5, 0.85 * 255 )
+local categoryActiveColor = tocolor( 150, 150, 150, 0.5 * 255 )
+local categoryHoverActiveColor = tocolor( 200, 200, 200, 0.5 * 255 )
 local categoryHoverColor = tocolor( 5, 5, 5, 0.95 * 255 )
 local categoryColor = tocolor( 5, 5, 5, 0.75 * 255 )
 
@@ -38,7 +39,7 @@ local inventoryRows = 4
 local inventoryColumns = 0
 
 local tooltipSpacing = 12
-local tooltipColor = tocolor( 5, 5, 5, 0.7 * 255 )
+local tooltipColor = tocolor( 5, 5, 5, 0.75 * 255 )
 local tooltipTextColor = tocolor( 250, 250, 250, 1.0 * 255 )
 
 local hoveringCategory = false
@@ -59,6 +60,8 @@ local function dxDrawTooltip( values, x, y )
 	local height = dxGetFontHeight( 1, "clear" )
 		  height = ( value and 5 or 0 ) + height + tooltipSpacing * 2
 	
+	local y = y + 15
+	
 	local x = math.max( tooltipSpacing, math.min( x, screenWidth - width - tooltipSpacing ) )
 	local y = math.max( tooltipSpacing, math.min( y, screenHeight - height - tooltipSpacing ) )
 	
@@ -72,11 +75,16 @@ function renderInventory( )
 	end
 	
 	inventory = { }
+	items = exports.items:getItems( localPlayer )
 	
-	for index, values in ipairs( items ) do
-		if ( values.type == activeCategory ) then
-			table.insert( inventory, values )
+	if ( items ) then
+		for index, values in ipairs( items ) do
+			if ( exports.items:getItemType( values.itemID ) == activeCategory ) then
+				table.insert( inventory, values )
+			end
 		end
+	else
+		return
 	end
 	
 	inventoryColumns = math.ceil( #inventory / inventoryRows )
@@ -99,14 +107,12 @@ function renderInventory( )
 		local y = y + categoryBoxSpacing + categoryBoxSpaced * ( index - 1 )
 		
 		local isHovering = exports.common:isWithin2DBounds( cursorX, cursorY, x, y, categoryBoxScale, categoryBoxScale )
-		local color = isHovering and categoryHoverColor or ( activeCategory == index and categoryActiveColor or categoryColor )
+		local color = isHovering and ( activeCategory == index and categoryHoverActiveColor or categoryHoverColor ) or ( activeCategory == index and categoryActiveColor or categoryColor )
 		
 		dxDrawRectangle( x, y, categoryBoxScale, categoryBoxScale, color )
-		--dxDrawImage( x, y, categoryBoxScale, categoryBoxScale, "assets/-" .. index .. ".png" )
+		dxDrawImage( x, y, categoryBoxScale, categoryBoxScale, "assets/-" .. index .. ".png" )
 		
 		if ( isHovering ) then
-			dxDrawTooltip( values, cursorX, cursorY )
-			
 			hoveringCategory = index
 		end
 	end
@@ -116,7 +122,7 @@ function renderInventory( )
 	local bgX = screenWidth - offsetX - inventoryColumns * inventoryBoxSpaced - inventoryBoxSpacing
 	local bgY = ( screenHeight - inventoryRows * inventoryBoxSpaced - inventoryBoxSpacing ) / 2
 	
-	if ( activeCategory ) then
+	if ( activeCategory ) and ( inventoryColumns > 0 ) then
 		-- Inventory background rendering
 		dxDrawRectangle( bgX, bgY, inventoryColumns * inventoryBoxSpaced + inventoryBoxSpacing, inventoryRows * inventoryBoxSpaced + inventoryBoxSpacing, categoryBackgroundColor )
 		
@@ -134,16 +140,30 @@ function renderInventory( )
 				local color = isHovering and inventoryHoverColor or inventoryColor
 				
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, color )
+				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ".png" )
 				
 				if ( isHovering ) then
-					dxDrawTooltip( item, cursorX, cursorY )
-					
 					hoveringItem = index
 				end
 			else
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, inventoryColorEmpty )
 			end
 		end
+	end
+	
+	if ( hoveringCategory ) then
+		dxDrawTooltip( categories[ hoveringCategory ], cursorX, cursorY )
+	elseif ( hoveringItem ) then
+		local item = inventory[ hoveringItem ]
+		local name = exports.items:getItemName( item.itemID )
+		local value = item.value
+		
+		if ( exports.items:getItemType( item.itemID ) == 2 ) then
+			name = name .. " (VIN " .. value .. ")"
+			value = exports.items:getItemDescription( item.itemID )
+		end
+		
+		dxDrawTooltip( { name = name, value = value }, cursorX, cursorY )
 	end
 end
 

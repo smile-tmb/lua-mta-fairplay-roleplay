@@ -17,7 +17,7 @@ end
 function getPlayerWeapons( player )
 	local playerWeapons = { }
 	
-	for _, item in ipairs( getPlayerItems( player ) ) do
+	for _, item in ipairs( getItems( player ) ) do
 		if ( item.item_id == 11 ) then
 			local weaponID = getWeaponID( item.value )
 			
@@ -33,7 +33,7 @@ end
 function getPlayerAmmo( player )
 	local playerWeapons = getPlayerWeapons( player )
 	
-	for _, item in ipairs( getPlayerItems( player ) ) do
+	for _, item in ipairs( getItems( player ) ) do
 		if ( item.item_id == 12 ) then
 			local ammoData = getItemSubValue( item.value )
 			
@@ -60,7 +60,7 @@ addEventHandler( "weapons:fire", root,
 			return
 		end
 		
-		for itemIndex, item in pairs( getPlayerItems( client ) ) do
+		for itemIndex, item in pairs( getItems( client ) ) do
 			if ( item.item_id == 12 ) then
 				local ammoData = getItemSubValue( item.value )
 				
@@ -79,7 +79,7 @@ addEventHandler( "weapons:fire", root,
 							exports.database:execute( "UPDATE `inventory` SET `value` = ? WHERE `id` = ?", value, id )
 						end, 15000, 1, data[ client ].items[ itemIndex ].value, item.db_id )
 						
-						--triggerClientEvent( client, "inventory:synchronize", client, getPlayerItems( client ) )
+						--triggerClientEvent( client, "inventory:synchronize", client, getItems( client ) )
 					end
 				end
 			end

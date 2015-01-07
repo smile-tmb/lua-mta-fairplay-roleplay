@@ -1,11 +1,7 @@
 ﻿data = { }
 
-function getPlayerItems( player )
-	if ( data[ player ] ) then
-		return data[ player ].items
-	else
-		return false
-	end
+function getItems( player )
+	return data[ player ] and data[ player ].items or { }
 end
 
 function loadItems( player )
@@ -30,7 +26,7 @@ function loadItems( player )
 end
 
 function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID, ignoreWeight )
-	if ( getItems( itemID ) ) then
+	if ( getItemList( itemID ) ) then
 		if ( not ignoreWeight ) and ( isElement( player ) ) and ( tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ) > tonumber( getElementData( player, "character:max_weight" ) ) ) then
 			return false
 		end
@@ -50,9 +46,9 @@ function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID, ignor
 			
 			exports.security:modifyElementData( player, "character:weight", tonumber( getElementData( player, "character:weight" ) ) + getItemWeight( itemID ), true )
 			
-			table.insert( data[ player ].items, { db_id = dbID, item_id = itemID, value = value, ringtone_id = ringtoneID or 1, messagetone_id = messagetoneID or 1 } )
+			table.insert( data[ player ].items, { id = dbID, itemID = itemID, value = value, ringtoneID = ringtoneID or 1, messagetoneID = messagetoneID or 1 } )
 			
-			triggerClientEvent( player, "inventory:synchronize", player, data[ player ].items )
+			triggerClientEvent( player, "items:update", player, getItems( player ) )
 			
 			loadWeapons( player )
 		end
@@ -119,7 +115,7 @@ end
 function hasItem( player, itemID, value, dbID )
 	loadItems( player )
 	
-	if ( getItems( )[ itemID ] ) then
+	if ( getItemList( )[ itemID ] ) then
 		for _, item in pairs( data[ player ].items ) do
 			if ( tonumber( item.item_id ) == tonumber( itemID ) ) then
 				if ( not value ) then
@@ -209,7 +205,7 @@ addCommandHandler( "giveitem",
 				if ( not targetPlayer ) then
 					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
 				else
-					if ( getItems( )[ itemID ] ) then
+					if ( getItemList( )[ itemID ] ) then
 						if ( data[ targetPlayer ] ) then
 							if ( ( tonumber( getElementData( targetPlayer, "character:weight" ) ) + getItemWeight( itemID ) ) <= tonumber( getElementData( targetPlayer, "character:max_weight" ) ) ) then
 								if ( giveItem( targetPlayer, itemID, value ) ) then
@@ -246,7 +242,7 @@ addCommandHandler( "takeitem",
 				if ( not targetPlayer ) then
 					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
 				else
-					if ( getItems( )[ itemID ] ) then
+					if ( getItemList( )[ itemID ] ) then
 						if ( data[ targetPlayer ] ) then
 							local deleted, itemValue = takeItem( targetPlayer, itemID, value, dbID )
 							
