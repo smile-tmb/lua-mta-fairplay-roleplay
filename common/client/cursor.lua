@@ -9,3 +9,12 @@ addEventHandler( "onClientResourceStart", resourceRoot,
 		bindKey( "m", "down", "togcursor" )
 	end
 )
+
+function isWithin2DBounds( sourceX, sourceY, targetX, targetY, targetWidth, targetHeight )
+	if ( sourceX >= targetX ) and ( sourceX <= targetX + targetWidth ) and
+	   ( sourceY >= targetY ) and ( sourceY <= targetY + targetHeight ) then
+		return true
+	end
+	
+	return false
+end

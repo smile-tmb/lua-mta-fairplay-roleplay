@@ -64,4 +64,6 @@
 	
 	<export function="stopSmoothMoveCamera" type="client" />
 	<export function="smoothMoveCamera" type="client" />
+	
+	<export function="isWithin2DBounds" type="client" />
 </meta>
