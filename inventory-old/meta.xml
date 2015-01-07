@@ -2,6 +2,7 @@
 	<info name="inventory@fairplay" author="socialz@fairplay" type="script" />
 	<min_mta_version client="1.3.4-0.00000" />
 	
+	<script src="client/utility.lua" type="client" cache="false" />
 	<script src="client/inventory.lua" type="client" cache="false" />
 	<script src="server/inventory.lua" />
 	
