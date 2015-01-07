@@ -59,57 +59,27 @@ function giveItem( player, itemID, value, dbID, ringtoneID, messagetoneID, ignor
 	end
 end
 
-function takeItem( player, itemID, value, dbID )
-	local dbID
+function takeItem( player, id )
+	local item = { }
 	
 	if ( data[ player ] ) then
-		for index, item in pairs( data[ player ].items ) do
-			if ( item.item_id == itemID ) then
-				if ( value ) then
-					if ( not dbID ) then
-						if ( item.value == value ) then
-							dbID = item.db_id
-							
-							table.remove( data[ player ].items, index )
-							
-							break
-						end
-					else
-						if ( item.db_id == dbID ) then
-							dbID = dbID
-							
-							table.remove( data[ player ].items, index )
-							
-							break
-						end
-					end
-				else
-					value = data[ player ].items[ i ].value
-					dbID = data[ player ].items[ i ].db_id
-					
-					table.remove( data[ player ].items, index )
-					
-					break
-				end
+		for index, values in pairs( data[ player ].items ) do
+			if ( values.id == id ) then
+				item = values
+				table.remove( data[ player ].items, index )
+				break
 			end
 		end
 		
+		exports.database:execute( "DELETE FROM `inventory` WHERE `id` = ?", id )
+		
+		loadItems( player )
 		loadWeapons( player )
-	else
-		return false
+		
+		return true
 	end
 	
-	exports.security:modifyElementData( player, "character:weight", tonumber( getElementData( player, "character:weight" ) ) - getItemWeight( itemID ), true )
-	
-	triggerClientEvent( player, "inventory:synchronize", player, data[ player ].items )
-	
-	if ( dbID ) then
-		exports.database:execute( "DELETE FROM `inventory` WHERE `id` = ?", dbID )
-	end
-	
-	loadItems( player )
-	
-	return true
+	return false
 end
 
 function hasItem( player, itemID, value, dbID )

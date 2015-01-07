@@ -1,41 +1,50 @@
-﻿addEvent( "items:act", true )
-addEventHandler( "items:act", root,
-	function( dbID, itemID, value )
+﻿addEvent( "items:use", true )
+addEventHandler( "items:use", root,
+	function( id )
 		if ( source ~= client ) then
 			return
 		end
 		
-		local itemName = getItemName( itemID )
-		local itemValue = getItemValue( itemID )
+		local item = nil
 		
-		if ( itemID == 1 ) then
+		for _, values in pairs( getItems( client ) ) do
+			if ( values.id == id ) then
+				item = values
+				break
+			end
+		end
+		
+		local itemName = getItemName( item.itemID )
+		local itemValue = getItemValue( item.itemID )
+		
+		if ( item.itemID == 1 ) then
 			setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
 			exports.chat:outputLocalActionMe( client, "moves a donut up to their mouth and eats a bite of it." )
-			takeItem( client, itemID, value, dbID )
-		elseif ( itemID == 2 ) then
+			takeItem( client, id )
+		elseif ( item.itemID == 2 ) then
 			exports.chat:outputLocalActionMe( client, "throws a dice and it reveals number " .. math.random( 1, 6 ) .. "." )
-		elseif ( itemID == 3 ) then
+		elseif ( item.itemID == 3 ) then
 			setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
 			exports.chat:outputLocalActionMe( client, "moves a water bottle up to their mouth, taking a sip of water." )
-			takeItem( client, itemID, value, dbID )
-		elseif ( itemID == 4 ) then
+			takeItem( client, id )
+		elseif ( item.itemID == 4 ) then
 			setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
 			exports.chat:outputLocalActionMe( client, "moves a coffee mug up to their mouth, taking a sip of coffee." )
-			takeItem( client, itemID, value, dbID )
-		elseif ( itemID == 10 ) then
-			--triggerEvent( ":_displayPhone_:", client, value )
+			takeItem( client, id )
+		elseif ( item.itemID == 10 ) then
+			--triggerEvent( ":_displayPhone_:", client, item.value )
 			exports.chat:outputLocalActionMe( client, "takes out a cellphone." )
-		elseif ( itemID == 11 ) then
-			local weaponID = getWeaponID( value )
+		elseif ( item.itemID == 11 ) then
+			local weaponID = getWeaponID( item.value )
 			
 			if ( weaponID ) then
-				exports.chat:outputLocalActionMe( client, "equips a " .. getWeaponName( value ) .. "." )
+				exports.chat:outputLocalActionMe( client, "equips a " .. getWeaponName( item.value ) .. "." )
 				
 				setPedWeaponSlot( client, getSlotFromWeapon( weaponID ) )
 			end
-		elseif ( itemID == 13 ) then
+		elseif ( item.itemID == 13 ) then
 			outputChatBox( "You can use this radio by typing /r <message>", client, 230, 180, 95, false )
-		elseif ( itemID == 14 ) then
+		elseif ( item.itemID == 14 ) then
 			outputChatBox( "You can use this megaphone by typing /m <message>", client, 230, 180, 95, false )
 		else
 			exports.chat:outputLocalActionMe( client, "shows their " .. itemName .. " to everyone." )
