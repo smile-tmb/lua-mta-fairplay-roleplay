@@ -29,11 +29,6 @@ local inventoryHoverColor = tocolor( 10, 10, 10, 0.8 * 255 )
 local inventoryColor = tocolor( 5, 5, 5, 0.75 * 255 )
 
 local inventory = { }
-local items = {
-	{ name = "Test item 1", type = 1 }, { name = "Test item 2", type = 1 }, { name = "Test item 3", type = 1 },
-	{ name = "Test key 1", type = 2 }, { name = "Test key 2", type = 2 },
-	{ name = "Test weapon 1", type = 3 }, { name = "Test weapon 2", type = 3 }, { name = "Test weapon 3", type = 3 }, { name = "Test weapon 4", type = 3 }, { name = "Test weapon 5", type = 3 },
-}
 
 local inventoryRows = 4
 local inventoryColumns = 0
@@ -75,7 +70,8 @@ function renderInventory( )
 	end
 	
 	inventory = { }
-	items = exports.items:getItems( localPlayer )
+	
+	local items = exports.items:getItems( localPlayer )
 	
 	if ( items ) then
 		for index, values in ipairs( items ) do
@@ -126,6 +122,7 @@ function renderInventory( )
 		-- Inventory background rendering
 		dxDrawRectangle( bgX, bgY, inventoryColumns * inventoryBoxSpaced + inventoryBoxSpacing, inventoryRows * inventoryBoxSpaced + inventoryBoxSpacing, categoryBackgroundColor )
 		
+		-- Inventory items rendering
 		for index = 1, inventoryColumns * inventoryRows do
 			local column = math.floor( ( index - 1 ) / inventoryRows )
 			local row = ( index - 1 ) % inventoryRows
@@ -140,7 +137,7 @@ function renderInventory( )
 				local color = isHovering and inventoryHoverColor or inventoryColor
 				
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, color )
-				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ".png" )
+				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ( exports.items:getItemType( item.itemID ) == 3 and "_" .. exports.items:getWeaponID( item.value ) or "" ) .. ".png" )
 				
 				if ( isHovering ) then
 					hoveringItem = index
@@ -151,17 +148,27 @@ function renderInventory( )
 		end
 	end
 	
+	-- Hover tooltips
 	if ( hoveringCategory ) then
 		dxDrawTooltip( categories[ hoveringCategory ], cursorX, cursorY )
 	elseif ( hoveringItem ) then
 		local item = inventory[ hoveringItem ]
 		local name = exports.items:getItemName( item.itemID )
-		local value = item.value
+		local value = item.value:len( ) > 0 and item.value or false
 		
 		if ( exports.items:getItemType( item.itemID ) == 2 ) then
-			name = name .. " (VIN " .. value .. ")"
-			value = exports.items:getItemDescription( item.itemID )
+			if ( item.itemID == 6 ) then
+				name = name .. " (PRN " .. ( value or "?" ) .. ")"
+			elseif ( item.itemID == 7 ) then
+				name = name .. " (VIN " .. ( value or "?" ) .. ")"
+			end
+		elseif ( exports.items:getItemType( item.itemID ) == 3 ) then
+			local weaponName = exports.items:getWeaponName( value )
+			
+			name = name .. " (" .. weaponName .. ")"
 		end
+		
+		value = exports.items:getItemDescription( item.itemID )
 		
 		dxDrawTooltip( { name = name, value = value }, cursorX, cursorY )
 	end
@@ -177,9 +184,11 @@ end
 
 addEventHandler( "onClientClick", root,
 	function( button, state, cursorX, cursorY, worldX, worldY, worldZ )
-		if ( button == "left" ) then
+		if ( button == "left" ) and ( state == "down" ) then
 			if ( hoveringCategory ) then
 				activeCategory = hoveringCategory
+			elseif ( hoveringItem ) then
+				triggerServerEvent( "items:use", localPlayer, inventory[ hoveringItem ].id )
 			end
 		end
 	end
