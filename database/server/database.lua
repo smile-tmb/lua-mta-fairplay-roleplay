@@ -10,7 +10,7 @@ database.configuration.database_tag = get( "database_tag" ) or "script"
 
 database.configuration.hostname = get( "hostname" ) or "127.0.0.1"
 database.configuration.username = get( "username" ) or "root"
-database.configuration.password = get( "password" ) or "251096pmj"
+database.configuration.password = get( "password" ) or "q2B6ZFHC"
 database.configuration.database = get( "database" ) or "fairplay_rp"
 
 database.connection = nil
