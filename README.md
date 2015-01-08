@@ -1,6 +1,6 @@
 ## Welcome to FairPlay Gaming
 
-FairPlay Gaming is a gaming community created in December 2010. We enjoy playing games without limits and we try to push our community forward by having fun and searching new unique ways to expand our community to more games for more people. Are you perhaps a player that wants to hold on to a community and play with friendly people, or are you a person that wants to be part of the community and represent it and help it get larger? Either way you are more than welcome to our community and we hope that you will enjoy your stay with us!
+FairPlay Gaming is a gaming community created in December 2010. We enjoy playing games without limits and we try to push our community forward by having fun and searching new unique ways to expand our community to more games for more people. You are more than welcome to our community and we hope that you will enjoy your stay with us!
 
 ### Gamemode introduction
 
