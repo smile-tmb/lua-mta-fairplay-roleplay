@@ -38,4 +38,11 @@
 	<export function="free_result" />
 	<export function="escape_string" />
 	<export function="verify_table" />
+
+	<settings>
+		<setting name="hostname" value="127.0.0.1" />
+		<setting name="username" value="" />
+		<setting name="password" value="" />
+		<setting name="database" value="" />
+	</settings>
 </meta>

@@ -33,23 +33,23 @@ database.configuration.database_log = get( "database_log" ) or 1
 database.configuration.database_tag = get( "database_tag" ) or "script"
 
 database.configuration.hostname = get( "hostname" ) or "127.0.0.1"
-database.configuration.username = get( "username" ) or "root"
-database.configuration.password = get( "password" ) or "q2B6ZFHC"
-database.configuration.database = get( "database" ) or "fairplay_rp"
+database.configuration.username = get( "username" ) or ""
+database.configuration.password = get( "password" ) or ""
+database.configuration.database = get( "database" ) or ""
 
 database.connection = nil
 
 local patterns = {
 	-- gsub pattern, strip double/triple/... whitespaces
-	[ "all_no_double" ] 		= { "[^%a%d%s%.%-%_%:%,%;]", true },
-	[ "all" ] 					= { "[^%a%d%s%.%-%_%:%,%;]" },
-	[ "account" ]				= { "[^%a%d%.%-%_%!%?]" },
-	[ "character" ]				= { "[^%a%d%s%-]" },
-	[ "digit" ] 				= { "[^%d]" },
-	[ "char_digit" ] 			= { "[^%a%d]" },
-	[ "char_digit_special" ]	= { "[^%a%d%_]" },
-	[ "less_no_double" ] 		= { "[^%a%d%s]", true },
-	[ "less" ] 					= { "[^%a%d%s]" },
+	[ "all_no_double" ] = { "[^%a%d%s%.%-%_%:%,%;]", true },
+	[ "all" ] = { "[^%a%d%s%.%-%_%:%,%;]" },
+	[ "account" ] = { "[^%a%d%.%-%_%!%?]" },
+	[ "character" ] = { "[^%a%d%s%-]" },
+	[ "digit" ] = { "[^%d]" },
+	[ "char_digit" ] = { "[^%a%d]" },
+	[ "char_digit_special" ] = { "[^%a%d%_]" },
+	[ "less_no_double" ] = { "[^%a%d%s]", true },
+	[ "less" ] = { "[^%a%d%s]" },
 }
 
 local function connect( )
