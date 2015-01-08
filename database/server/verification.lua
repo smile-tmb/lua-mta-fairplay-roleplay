@@ -42,11 +42,9 @@ database.verification = {
 	},
 	inventory = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
-		{ name = "character_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "owner_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "item_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
-		{ name = "value", type = "varchar", length = 1000, default = "" },
-		{ name = "ringtone_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "item_value", type = "varchar", length = 1000, default = "" },
 		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
 	},
 	languages = {
