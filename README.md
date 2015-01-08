@@ -10,11 +10,13 @@ This is a Multi Theft Auto Roleplay gamemode, designed specifically for FairPlay
 
 1. **Clone the repository.** Clone the repository to your Multi Theft Auto folder through your favoured Git program, if you do not yet have a Git program I highly recommend you get one, or otherwise you will not be able to make changes on your computer (except online on GitHub, which is a bit difficult at times). You can find a list of a few Git programs below.
 
-2. **Start the Multi Theft Auto server.** You now have a full copy of the repository on your computer. With this copy you should now be able to run your server.
+2. **Set up database configuration.** Set up your database configuration in `database/meta.xml` settings.
 
-3. **Join your local server.** After you started your Multi Theft Auto server you are now able to play on it. Your server has automatically initialized all the resources just like on the live server.
+3. **Start the Multi Theft Auto server.** You now have a full copy of the repository on your computer. With this copy you should now be able to run your server.
 
-4. **You are ready to go.** Now I would say you are pretty much done! You can now develop on your local server and make changes to the resource files as much as you want. You do not need to push through the Git server each time you make a commit necessarily, but even if you do, it is easy since all changes are automatically subscribed on to your local Git copy. This helps you do your work faster and more efficiently!
+4. **Join your local server.** After you started your Multi Theft Auto server you are now able to play on it. Your server has automatically initialized all the resources just like on the live server.
+
+5. **You are ready to go.** Now I would say you are pretty much done! You can now develop on your local server and make changes to the resource files as much as you want. You do not need to push through the Git server each time you make a commit necessarily, but even if you do, it is easy since all changes are automatically subscribed on to your local Git copy. This helps you do your work faster and more efficiently!
 
 ### Quick start
 
