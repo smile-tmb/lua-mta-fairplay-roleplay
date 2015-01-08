@@ -1,4 +1,188 @@
-﻿data = { }
+﻿local items = { }
+
+local function getID( element )
+	if ( getElementType( element ) == "player" ) then
+		if ( getElementData( element, "player:playing" ) ) then
+			return exports.common:getCharacterID( element )
+		end
+	elseif ( getElementType( element ) == "vehicle" ) then
+		return exports.common:getRealVehicleID( element )
+	end
+
+	return false
+end
+
+function getItems( element )
+	return items[ element ] or { }
+end
+
+function loadItems( element )
+	local ownerID = getID( element )
+
+	if ( ownerID ) then
+		local result = exports.database:query( "SELECT * FROM `inventory` WHERE `owner_id` = ?", ownerID )
+
+		for _, item in ipairs( result ) do
+			table.insert( items[ element ], { id = item.id, itemID = item.item_id, itemValue = item.item_value } )
+		end
+
+		return true
+	end
+
+	return false
+end
+
+function giveItem( element, itemID, itemValue )
+	local ownerID = getID( element )
+
+	if ( ownerID ) then
+		local id = exports.database:insert_id( "INSERT INTO `inventory` (`owner_id`, `item_id`, `item_value`) VALUES (?, ?, ?)", ownerID, itemID, itemValue )
+
+		if ( id ) then
+			table.insert( items[ element ], { id = id, itemID = itemID, itemValue = itemValue } )
+
+			return true
+		end
+	end
+
+	return false
+end
+
+function takeItem( element, id )
+	local ownerID = getID( element )
+
+	if ( ownerID ) then
+		local item, index = hasItem( element, false, false, id )
+
+		if ( item ) then
+			if ( exports.database:execute( "DELETE FROM `inventory` WHERE `id` = ? AND `owner_id` = ?", id, ownerID ) ) then
+				table.remove( items[ element ], index )
+
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
+function hasItem( element, itemID, itemValue, id )
+	for index, values in ipairs( getItems( element ) ) do
+		if ( ( not id ) and ( values.itemID == itemID ) and ( ( not itemValue ) or ( values.itemValue == itemValue ) ) ) or ( ( id ) and ( values.id == id ) ) then
+			return true, index, values
+		end
+	end
+
+	return false
+end
+
+addEvent( "items:get", true )
+addEventHandler( "items:get", root,
+	function( )
+		if ( source ~= client ) then
+			return
+		end
+
+		loadItems( client )
+
+		triggerClientEvent( client, "items:update", client, getItems( client ) )
+	end
+)
+
+addEventHandler( "onResourceStop", resourceRoot,
+	function( )
+		for _, player in ipairs( getElementsByType( "player" ) ) do
+			takeAllWeapons( player )
+		end
+	end
+)
+
+addCommandHandler( "giveitem",
+	function( player, cmd, targetPlayer, itemID, ... )
+		if ( exports.common:isPlayerServerAdmin( player ) ) then
+			local itemID = tonumber( itemID )
+			
+			if ( not targetPlayer ) or ( not itemID ) or ( ( itemID ) and ( itemID <= 0 ) ) then
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95, false )
+				return
+			else
+				if ( ... ) then
+					value = table.concat( { ... }, " " )
+				end
+				
+				local targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
+				
+				if ( not targetPlayer ) then
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+				else
+					if ( getItemList( )[ itemID ] ) then
+						if ( items[ targetPlayer ] ) then
+							if ( giveItem( targetPlayer, itemID, value ) ) then
+								outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
+								outputChatBox( "You were given a " .. getItemName( itemID ) .. " (" .. itemID .. ") with value \"" .. value .. "\".", player, 95, 230, 95, false )
+							else
+								outputChatBox( "Error occurred (0x0000FE).", player, 230, 95, 95, false )
+							end
+						else
+							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95, false )
+						end
+					else
+						outputChatBox( "Invalid item ID.", player, 230, 95, 95, false )
+					end
+				end
+			end
+		end
+	end
+)
+
+addCommandHandler( "takeitem",
+	function( player, cmd, targetPlayer, itemID, value )
+		if ( exports.common:isPlayerServerAdmin( player ) ) then
+			local itemID = tonumber( itemID )
+			
+			if ( not targetPlayer ) or ( not itemID ) or ( ( itemID ) and ( itemID <= 0 ) ) or ( ( value ) and ( string.len( value ) < 2 ) ) then
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95, false )
+				return
+			else
+				local targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
+
+				if ( not targetPlayer ) then
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+				else
+					if ( getItemList( )[ itemID ] ) then
+						if ( items[ targetPlayer ] ) then
+							local item, index, values = hasItem( targetPlayer, itemID, value )
+
+							if ( item ) then
+								if ( takeItem( targetPlayer, values.id ) ) then
+									local vehicle = getPedOccupiedVehicle( targetPlayer )
+									
+									if ( vehicle ) and ( getVehicleController( vehicle ) == targetPlayer ) and ( exports.vehicles:getVehicleRealID( vehicle ) == values.itemValue ) then
+										exports.security:modifyElementData( vehicle, "vehicle:engine", false, true )
+										setVehicleEngineState( vehicle, false )
+									end
+									
+									outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getPlayerName(targetPlayer) .. ".", player, 95, 230, 95, false )
+								else
+									outputChatBox( "Error occurred (0x0000FF).", player, 230, 95, 95, false )
+								end
+							else
+								outputChatBox( "That player doesn't have an item.", player, 230, 95, 95, false )
+							end
+						else
+							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95, false )
+						end
+					else
+						outputChatBox( "Invalid item ID.", player, 230, 95, 95, false )
+					end
+				end
+			end
+		end
+	end
+)
+
+--[[
+data = { }
 
 function getItems( player )
 	return data[ player ] and data[ player ].items or { }
@@ -239,3 +423,4 @@ addCommandHandler( "takeitem",
 		end
 	end
 )
+]]
