@@ -6,6 +6,8 @@ FairPlay Gaming is a gaming community created in December 2010. We enjoy playing
 
 This is a Multi Theft Auto Roleplay gamemode, designed specifically for FairPlay Gaming.
 
+Please note, that this is in development, and should not be used for anything yet! You can mark issues and make pull requests. This script is missing some features, which is exactly why this should not be used yet.
+
 ### Installation and setup
 
 1. **Clone the repository.** Clone the repository to your Multi Theft Auto folder through your favoured Git program, if you do not yet have a Git program I highly recommend you get one, or otherwise you will not be able to make changes on your computer (except online on GitHub, which is a bit difficult at times). You can find a list of a few Git programs below.
