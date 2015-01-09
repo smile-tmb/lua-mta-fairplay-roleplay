@@ -6,7 +6,7 @@ FairPlay Gaming is a gaming community created in December 2010. We enjoy playing
 
 This is a Multi Theft Auto Roleplay gamemode, designed specifically for FairPlay Gaming.
 
-Please note, that this is in development, and should not be used for anything yet! You can mark issues and make pull requests. This script is missing some features, which is exactly why this should not be used yet.
+**Please note**, that this is in development, and should not be used for anything yet! You can mark issues and make pull requests. This script is missing some features, which is exactly why this should not be used yet.
 
 ### Installation and setup
 
