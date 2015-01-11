@@ -24,21 +24,14 @@
 
 addEvent( "items:use", true )
 addEventHandler( "items:use", root,
-	function( id )
-		if ( source ~= client ) then
+	function( clientItem )
+		if ( source ~= client ) or ( not exports.common:isPlayerPlaying( client ) ) then
 			return
 		end
 		
-		local item = nil
+		local hasItem, _, item = hasItem( client, clientItem.itemID, clientItem.itemValue, clientItem.id )
 		
-		for _, values in pairs( getItems( client ) ) do
-			if ( values.id == id ) then
-				item = values
-				break
-			end
-		end
-		
-		if ( item ) then
+		if ( clientItem ) and ( hasItem ) then
 			local itemName = getItemName( item.itemID )
 			local itemValue = item.itemValue
 			
@@ -74,25 +67,48 @@ addEventHandler( "items:use", root,
 			else
 				exports.chat:outputLocalActionMe( client, "shows their " .. itemName .. " to everyone." )
 			end
+		else
+			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
+		end
+	end
+)
+
+addEvent( "items:show", true )
+addEventHandler( "items:show", root,
+	function( clientItem )
+		if ( source ~= client ) or ( not exports.common:isPlayerPlaying( client ) ) then
+			return
+		end
+		
+		local hasItem, _, item = hasItem( client, clientItem.itemID, clientItem.itemValue, clientItem.id )
+		
+		if ( clientItem ) and ( hasItem ) then
+			exports.chat:outputLocalActionMe( client, "shows their " .. ( item.itemID == 11 and getWeaponName( itemValue ) or getItemName( item.itemID ) ) .. " to everyone." )
+		else
+			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
 		end
 	end
 )
 
 addEvent( "items:delete", true )
 addEventHandler( "items:delete", root,
-	function( dbID, itemID, value )
-		if ( source ~= client ) then
+	function( clientItem )
+		if ( source ~= client ) or ( not exports.common:isPlayerPlaying( client ) ) then
 			return
 		end
 		
-		local itemName = getItemName( itemID )
-		local itemValue = getItemValue( itemID )
+		local hasItem, _, item = hasItem( client, clientItem.itemID, clientItem.itemValue, clientItem.id )
 		
-		exports.chat:outputLocalActionMe( client, "destroyed a " .. itemName .. "." )
-		takeItem( client, itemID, value, dbID )
-		
-		if ( itemID == 10 ) then
-			--triggerClientEvent( client, ":_exitPhoneWindows_:", client, value )
+		if ( clientItem ) and ( hasItem ) then
+			exports.chat:outputLocalActionMe( client, "destroyed a " .. getItemName( item.itemID ) .. "." )
+			
+			takeItem( client, item.id )
+			
+			if ( itemID == 10 ) then
+				--triggerClientEvent( client, ":_exitPhoneWindows_:", client, value )
+			end
+		else
+			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
 		end
 	end
 )

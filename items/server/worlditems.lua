@@ -26,56 +26,59 @@ local worldItems = { }
 
 addEvent( "items:drop", true )
 addEventHandler( "items:drop", root,
-	function( element, dbID, itemID, value, ringtoneID, messagetoneID, x, y, z )
+	function( clientItem, x, y, z, element )
 		if ( source ~= client ) then
 			return
 		end
 		
-		if ( not hasItem( client, itemID, value ) ) then
-			outputChatBox( "Oh, you do not own that item any longer.", client, 230, 95, 95, false )
-			return
-		end
+		local hasItem, _, item = hasItem( client, clientItem.itemID, clientItem.itemValue, clientItem.id )
 		
-		local rx, ry, rz = getElementRotation( client )
-		local item = getItems( )[ itemID ]
-		
-		if ( not isElement( element ) ) or ( isElement( element ) and getElementType( element ) ~= "player" ) or ( not exports.common:isPlayerPlaying( element ) ) then
-			if ( takeItem( client, itemID, value, dbID ) ) then
-				local x, y, z = x + item.offsetX, y + item.offsetY, z + item.offsetZ
-				local rx, ry, rz = rx + item.offsetRX, ry + item.offsetRY, rz + item.offsetRZ
-				local interior = getElementInterior( client )
-				local dimension = getElementDimension( client )
-				local lastid = exports.database:insert_id( "INSERT INTO `worlditems` (`item_id`, `value`, `pos_x`, `pos_y`, `pos_z`, `rot_x`, `rot_y`, `rot_z`, `interior`, `dimension`, `ringtone_id`, `messagetone_id`, `user_id`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", itemID, value, x, y, z, rx, ry, rz, interior, dimension, ringtoneID, messagetoneID, exports.common:getCharacterID( client ) )
-				
-				if ( lastid ) then
-					local object = createObject( item.model, x, y, z, rx, ry, rz )
+		if ( clientItem ) and ( hasItem ) then
+			--[[
+			--will be rewritten later
+			local rx, ry, rz = getElementRotation( client )
+			
+			if ( not isElement( element ) ) or ( isElement( element ) and getElementType( element ) ~= "player" ) or ( not exports.common:isPlayerPlaying( element ) ) then
+				if ( takeItem( client, itemID, value, dbID ) ) then
+					local x, y, z = x + item.offsetX, y + item.offsetY, z + item.offsetZ
+					local rx, ry, rz = rx + item.offsetRX, ry + item.offsetRY, rz + item.offsetRZ
+					local interior = getElementInterior( client )
+					local dimension = getElementDimension( client )
+					local lastid = exports.database:insert_id( "INSERT INTO `worlditems` (`item_id`, `value`, `pos_x`, `pos_y`, `pos_z`, `rot_x`, `rot_y`, `rot_z`, `interior`, `dimension`, `ringtone_id`, `messagetone_id`, `user_id`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", itemID, value, x, y, z, rx, ry, rz, interior, dimension, ringtoneID, messagetoneID, exports.common:getCharacterID( client ) )
 					
-					setElementInterior( object, interior )
-					setElementDimension( object, dimension )
-					setElementAlpha( object, item.alpha )
-					setElementCollisionsEnabled( object, item.collisions )
-					
-					worldItems[ lastid ] = { item_id = itemID, value = value, user_id = exports.common:getCharacterID( client ), pos_x = x, pos_y = y, pos_z = z, rot_x = rx, rot_y = ry, rot_z = rz, object = object, ringtone_id = 0, messagetone_id = 0 }
-					
-					exports.security:modifyElementData( object, "worlditem:id", lastid, true )
-					exports.security:modifyElementData( object, "worlditem:item_id", itemID, true )
-					exports.security:modifyElementData( object, "worlditem:value", value, true )
-					exports.security:modifyElementData( object, "worlditem:ringtone_id", ringtoneID, true )
-					exports.security:modifyElementData( object, "worlditem:messagetone_id", messagetoneID, true )
-					
-					exports.chat:outputLocalActionMe( client, "dropped down a " .. item.name .. "." )
-					
-					if ( itemID == 10 ) then
-						--triggerClientEvent(client, ":_exitPhoneWindows_:", client, value)
+					if ( lastid ) then
+						local object = createObject( item.model, x, y, z, rx, ry, rz )
+						
+						setElementInterior( object, interior )
+						setElementDimension( object, dimension )
+						setElementAlpha( object, item.alpha )
+						setElementCollisionsEnabled( object, item.collisions )
+						
+						worldItems[ lastid ] = { item_id = itemID, value = value, user_id = exports.common:getCharacterID( client ), pos_x = x, pos_y = y, pos_z = z, rot_x = rx, rot_y = ry, rot_z = rz, object = object, ringtone_id = 0, messagetone_id = 0 }
+						
+						exports.security:modifyElementData( object, "worlditem:id", lastid, true )
+						exports.security:modifyElementData( object, "worlditem:item_id", itemID, true )
+						exports.security:modifyElementData( object, "worlditem:value", value, true )
+						exports.security:modifyElementData( object, "worlditem:ringtone_id", ringtoneID, true )
+						exports.security:modifyElementData( object, "worlditem:messagetone_id", messagetoneID, true )
+						
+						exports.chat:outputLocalActionMe( client, "dropped down a " .. item.name .. "." )
+						
+						if ( itemID == 10 ) then
+							--triggerClientEvent(client, ":_exitPhoneWindows_:", client, value)
+						end
 					end
+				else
+					outputChatBox( "Something is wrong.", client, 230, 95, 95, false )
 				end
 			else
-				outputChatBox( "Something is wrong.", client, 230, 95, 95, false )
+				exports.chat:outputLocalActionMe( client, "gave " .. exports.common:getPlayerName( element ) .. " a " .. item.name .. "." )
+				takeItem( client, itemID, value, dbID )
+				giveItem( element, itemID, value )
 			end
+			]]
 		else
-			exports.chat:outputLocalActionMe( client, "gave " .. exports.common:getPlayerName( element ) .. " a " .. item.name .. "." )
-			takeItem( client, itemID, value, dbID )
-			giveItem( element, itemID, value )
+			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
 		end
 	end
 )

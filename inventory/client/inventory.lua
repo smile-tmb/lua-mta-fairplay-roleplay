@@ -47,6 +47,9 @@ local inventoryBoxScale = 60
 local inventoryBoxSpacing = 4
 local inventoryBoxSpaced = inventoryBoxScale + inventoryBoxSpacing
 local inventoryBackgroundColor = tocolor( 5, 5, 5, 0.55 * 255 )
+local inventoryDeleteColor = tocolor( 100, 5, 5, 0.65 * 255 )
+local inventoryShowColor = tocolor( 15, 15, 100, 0.65 * 255 )
+local inventoryDropColor = tocolor( 5, 100, 5, 0.65 * 255 )
 local inventoryColorEmpty = tocolor( 5, 5, 5, 0.45 * 255 )
 local inventoryActiveColor = tocolor( 5, 5, 5, 0.85 * 255 )
 local inventoryHoverColor = tocolor( 10, 10, 10, 0.8 * 255 )
@@ -158,7 +161,7 @@ function renderInventory( )
 			
 			if ( item ) then
 				local isHovering = exports.common:isWithin2DBounds( cursorX, cursorY, x, y, inventoryBoxScale, inventoryBoxScale )
-				local color = isHovering and inventoryHoverColor or inventoryColor
+				local color = isHovering and ( getKeyState( "delete" ) and inventoryDeleteColor or ( ( ( getKeyState( "lctrl" ) ) or ( getKeyState( "rctrl" ) ) ) and inventoryDropColor or ( ( ( getKeyState( "lalt" ) ) or ( getKeyState( "ralt" ) ) ) and  inventoryShowColor or inventoryHoverColor ) ) ) or inventoryColor
 				
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, color )
 				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ( exports.items:getItemType( item.itemID ) == 3 and "_" .. exports.items:getWeaponID( item.itemValue ) or "" ) .. ".png" )
@@ -214,7 +217,17 @@ addEventHandler( "onClientClick", root,
 			if ( hoveringCategory ) then
 				activeCategory = hoveringCategory
 			elseif ( hoveringItem ) then
-				triggerServerEvent( "items:use", localPlayer, inventory[ hoveringItem ].id )
+				local item = inventory[ hoveringItem ]
+				
+				if ( getKeyState( "delete" ) ) then
+					triggerServerEvent( "items:delete", localPlayer, item )
+				elseif ( getKeyState( "lctrl" ) ) or ( getKeyState( "rctrl" ) ) then
+					triggerServerEvent( "items:drop", localPlayer, item )
+				elseif ( getKeyState( "lalt" ) ) or ( getKeyState( "ralt" ) ) then
+					triggerServerEvent( "items:show", localPlayer, item )
+				else
+					triggerServerEvent( "items:use", localPlayer, item )
+				end
 			end
 		end
 	end
@@ -228,7 +241,7 @@ addEventHandler( "onClientResourceStart", resourceRoot,
 
 addCommandHandler( "inventory",
 	function( cmd )
-		if ( getElementData( localPlayer, "player:playing" ) ) or ( isInventoryShowing ) then
+		if ( exports.common:isPlayerPlaying( localPlayer ) ) or ( isInventoryShowing ) then
 			toggleInventory( )
 		end
 	end
