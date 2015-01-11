@@ -44,15 +44,17 @@ function getWeaponModel( weaponID )
 end
 
 function getWeaponID( value )
-	return getItemSubValue( value )[ 1 ]
+	return exports.common:getSplitValues( value )[ 1 ]
 end
 
 function getWeaponName( value )
-	return getItemSubValue( value )[ 2 ] or ( getWeaponNameFromID( getItemSubValue( value )[ 1 ] ) or itemlist[ 11 ].name )
+	local splitValues = exports.common:getSplitValues( value )
+	
+	return splitValues[ 2 ] or ( getWeaponNameFromID( splitValues[ 1 ] ) or itemlist[ 11 ].name )
 end
 
 function getWeaponDescription( value )
-	return getItemSubValue( value )[ 3 ]
+	return exports.common:getSplitValues( value )[ 3 ]
 end
 
 function getWeaponWeight( weaponID )

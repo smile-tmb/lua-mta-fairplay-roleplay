@@ -59,7 +59,7 @@ function getPlayerAmmo( player )
 	
 	for _, item in ipairs( getItems( player ) ) do
 		if ( item.itemID == 12 ) then
-			local ammoData = getItemSubValue( item.itemValue )
+			local ammoData = exports.common:getSplitValues( item.itemValue )
 			
 			if ( ammoData ) then
 				local weaponID = ammoData[ 1 ]
@@ -86,7 +86,7 @@ addEventHandler( "weapons:fire", root,
 		
 		for itemIndex, item in pairs( getItems( client ) ) do
 			if ( item.itemID == 12 ) then
-				local ammoData = getItemSubValue( item.itemValue )
+				local ammoData = exports.common:getSplitValues( item.itemValue )
 				
 				if ( ammoData ) then
 					local weaponID = ammoData[ 1 ]

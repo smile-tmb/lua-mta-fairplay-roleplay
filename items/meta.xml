@@ -51,8 +51,6 @@
 	<export function="isItemCollisionsEnabled" type="shared" />
 	<export function="getItemType" type="shared" />
 	<export function="getItemWeight" type="shared" />
-	<export function="isWorldItem" type="shared" />
-	<export function="getItemSubValue" type="shared" />
 	
 	<export function="getWeaponID" type="shared" />
 	<export function="getWeaponName" type="shared" />
