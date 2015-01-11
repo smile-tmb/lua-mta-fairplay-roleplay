@@ -34,21 +34,25 @@ addEventHandler( "items:use", root,
 		if ( clientItem ) and ( hasItem ) then
 			local itemName = getItemName( item.itemID )
 			local itemValue = item.itemValue
+			local id = item.id
 			
 			if ( item.itemID == 1 ) then
-				setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
-				exports.chat:outputLocalActionMe( client, "moves a donut up to their mouth and eats a bite of it." )
-				takeItem( client, id )
+				if ( takeItem( client, id ) ) then
+					setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
+					exports.chat:outputLocalActionMe( client, "moves a donut up to their mouth and eats a bite of it." )
+				end
 			elseif ( item.itemID == 2 ) then
 				exports.chat:outputLocalActionMe( client, "throws a dice and it reveals number " .. math.random( 1, 6 ) .. "." )
 			elseif ( item.itemID == 3 ) then
-				setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
-				exports.chat:outputLocalActionMe( client, "moves a water bottle up to their mouth, taking a sip of water." )
-				takeItem( client, id )
+				if ( takeItem( client, id ) ) then
+					setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
+					exports.chat:outputLocalActionMe( client, "moves a water bottle up to their mouth, taking a sip of water." )
+				end
 			elseif ( item.itemID == 4 ) then
-				setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
-				exports.chat:outputLocalActionMe( client, "moves a coffee mug up to their mouth, taking a sip of coffee." )
-				takeItem( client, id )
+				if ( takeItem( client, id ) ) then
+					setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
+					exports.chat:outputLocalActionMe( client, "moves a coffee mug up to their mouth, taking a sip of coffee." )
+				end
 			elseif ( item.itemID == 10 ) then
 				--triggerEvent( ":_displayPhone_:", client, item.value )
 				exports.chat:outputLocalActionMe( client, "takes out a cellphone." )

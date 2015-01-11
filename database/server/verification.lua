@@ -134,7 +134,7 @@ database.verification = {
 	worlditems = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "item_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "value", type = "varchar", length = 1000, default = "" },
+		{ name = "item_value", type = "varchar", length = 1000, default = "" },
 		{ name = "pos_x", type = "float", default = 0 },
 		{ name = "pos_y", type = "float", default = 0 },
 		{ name = "pos_z", type = "float", default = 0 },
@@ -143,11 +143,8 @@ database.verification = {
 		{ name = "rot_z", type = "float", default = 0 },
 		{ name = "interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
 		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
-		{ name = "ringtone_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "messagetone_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "user_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "protection", type = "int", length = 10, default = 0 },
-		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
+		{ name = "protection", type = "int", length = 10, default = 0 }
 	}
 }
 

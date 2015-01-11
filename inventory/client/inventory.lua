@@ -54,6 +54,8 @@ local inventoryColorEmpty = tocolor( 5, 5, 5, 0.45 * 255 )
 local inventoryActiveColor = tocolor( 5, 5, 5, 0.85 * 255 )
 local inventoryHoverColor = tocolor( 10, 10, 10, 0.8 * 255 )
 local inventoryColor = tocolor( 5, 5, 5, 0.75 * 255 )
+local inventoryDragAvailable = tocolor( 5, 100, 5, 0.65 * 255 )
+local inventoryDragUnavailable = tocolor( 100, 5, 5, 0.65 * 255 )
 
 local inventory = { }
 
@@ -64,8 +66,13 @@ local tooltipSpacing = 12
 local tooltipColor = tocolor( 5, 5, 5, 0.75 * 255 )
 local tooltipTextColor = tocolor( 250, 250, 250, 1.0 * 255 )
 
+local maximumTriggerDistance = 12.725
+
 local hoveringCategory = false
 local hoveringItem = false
+local hoveringWorldItem = false
+
+local dragTimer
 
 local function dxDrawTooltip( values, x, y )
 	local name = values.name or "[no title]"
@@ -91,7 +98,41 @@ local function dxDrawTooltip( values, x, y )
 	dxDrawText( output, x, y, x + width, y + height, tooltipTextColor, 1, "clear", "center", "center", false, false, true )
 end
 
-function renderInventory( )
+local function getWorldItemFromCursor( )
+	local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
+	local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
+	local collision, hitX, hitY, hitZ, hitElement = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ, true, true, true, true, true, true, true, nil, false, true )
+	
+	if ( hitElement ) and ( getElementParent( getElementParent( hitElement ) ) == getResourceRootElement( getResourceFromName( "items" ) ) ) and ( exports.common:getRealWorldItemID( hitElement ) ) then
+		return hitElement
+	elseif ( ( hitX ) and ( hitY ) and ( hitZ ) ) then
+		hitElement = nil
+		local x, y, z = nil
+		local maxDistance = 0.35
+		
+		for _, element in ipairs( getElementsByType( "object", getResourceRootElement( getResourceFromName( "items" ) ) ) ) do
+			if ( exports.common:getRealWorldItemID( hitElement ) ) and ( isElementStreamedIn( element ) ) and ( isElementOnScreen( element ) ) then
+				x, y, z = getElementPosition( element )
+				local distance = getDistanceBetweenPoints3D( x, y, z, hitX, hitY, hitZ )
+				
+				if ( distance < maxDistance ) then
+					hitElement = element
+					maxDistance = distance
+				end
+			end
+		end
+		
+		if ( hitElement ) then
+			local x, y, z = getElementPosition( localPlayer )
+			
+			return getDistanceBetweenPoints3D( x, y, z, getElementPosition( hitElement ) ) <= maximumTriggerDistance and hitElement
+		end
+	end
+	
+	return false
+end
+
+local function renderInventory( )
 	if ( not isInventoryShowing ) or ( not isCursorShowing( ) ) then
 		return
 	end
@@ -115,7 +156,7 @@ function renderInventory( )
 	hoveringCategory = false
 	hoveringItem = false
 	
-	local cursorX, cursorY = getCursorPosition( )
+	local cursorX, cursorY, worldX, worldY, worldZ = getCursorPosition( )
 		  cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
 	
 	local x = screenWidth - categoryBoxSpaced - categoryBoxSpacing
@@ -146,8 +187,10 @@ function renderInventory( )
 	local bgY = ( screenHeight - inventoryRows * inventoryBoxSpaced - inventoryBoxSpacing ) / 2
 	
 	if ( activeCategory ) and ( inventoryColumns > 0 ) then
-		-- Inventory background rendering
-		dxDrawRectangle( bgX, bgY, inventoryColumns * inventoryBoxSpaced + inventoryBoxSpacing, inventoryRows * inventoryBoxSpaced + inventoryBoxSpacing, categoryBackgroundColor )
+		if ( not draggingItem ) then
+			-- Inventory background rendering
+			dxDrawRectangle( bgX, bgY, inventoryColumns * inventoryBoxSpaced + inventoryBoxSpacing, inventoryRows * inventoryBoxSpaced + inventoryBoxSpacing, categoryBackgroundColor )
+		end
 		
 		-- Inventory items rendering
 		for index = 1, inventoryColumns * inventoryRows do
@@ -163,11 +206,28 @@ function renderInventory( )
 				local isHovering = exports.common:isWithin2DBounds( cursorX, cursorY, x, y, inventoryBoxScale, inventoryBoxScale )
 				local color = isHovering and ( getKeyState( "delete" ) and inventoryDeleteColor or ( ( ( getKeyState( "lctrl" ) ) or ( getKeyState( "rctrl" ) ) ) and inventoryDropColor or ( ( ( getKeyState( "lalt" ) ) or ( getKeyState( "ralt" ) ) ) and  inventoryShowColor or inventoryHoverColor ) ) ) or inventoryColor
 				
+				if ( draggingItem == index ) then
+					x, y = cursorX, cursorY
+					
+					local cameraX, cameraY, cameraZ = getWorldFromScreenPosition( cursorX, cursorY, 0.1 )
+					local collision, hitX, hitY, hitZ, hitElement = processLineOfSight( cameraX, cameraY, cameraZ, worldX, worldY, worldZ, true, true, true, true, true, false, true, false, localPlayer, false, true )
+					
+					if ( collision ) and ( getDistanceBetweenPoints3D( hitX, hitY, hitZ, getElementPosition( localPlayer ) ) <= maximumTriggerDistance ) then
+						color = inventoryDragAvailable
+					else
+						color = inventoryDragUnavailable
+					end
+				end
+				
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, color )
 				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ( exports.items:getItemType( item.itemID ) == 3 and "_" .. exports.items:getWeaponID( item.itemValue ) or "" ) .. ".png" )
 				
 				if ( isHovering ) then
 					hoveringItem = index
+				end
+				
+				if ( draggingItem == index ) then
+					break
 				end
 			else
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, inventoryColorEmpty )
@@ -201,6 +261,44 @@ function renderInventory( )
 	end
 end
 
+local function renderWorldItems( )
+	hoveringWorldItem = false
+	
+	if ( not isCursorShowing( ) ) or ( hoveringCategory ) or ( hoveringItem ) then
+		return
+	end
+	
+	local worldItem = getWorldItemFromCursor( )
+	
+	if ( worldItem ) then
+		hoveringWorldItem = worldItem
+		
+		local cursorX, cursorY = getCursorPosition( )
+			  cursorX, cursorY = cursorX * screenWidth, cursorY * screenHeight
+		
+		local itemID = exports.common:getWorldItemID( worldItem )
+		local name = exports.items:getItemName( itemID )
+		local value = exports.common:getWorldItemValue( worldItem )
+			  value = tostring( value ):len( ) > 0 and value or false
+		
+		if ( exports.items:getItemType( itemID ) == 2 ) then
+			if ( itemID == 6 ) then
+				name = name .. " (PRN " .. ( value or "?" ) .. ")"
+			elseif ( itemID == 7 ) then
+				name = name .. " (VIN " .. ( value or "?" ) .. ")"
+			end
+		elseif ( exports.items:getItemType( itemID ) == 3 ) then
+			local weaponName = exports.items:getWeaponName( value )
+			
+			name = name .. " (" .. weaponName .. ")"
+		end
+		
+		value = exports.items:getItemDescription( itemID )
+		
+		dxDrawTooltip( { name = name, value = value }, cursorX, cursorY )
+	end
+end
+
 function toggleInventory( )
 	local fn = isInventoryShowing and removeEventHandler or addEventHandler
 	
@@ -209,26 +307,62 @@ function toggleInventory( )
 	isInventoryShowing = not isInventoryShowing
 	
 	showCursor( isInventoryShowing )
+	
+	draggingItem = false
 end
 
 addEventHandler( "onClientClick", root,
-	function( button, state, cursorX, cursorY, worldX, worldY, worldZ )
-		if ( button == "left" ) and ( state == "down" ) then
-			if ( hoveringCategory ) then
-				activeCategory = hoveringCategory
-			elseif ( hoveringItem ) then
-				local item = inventory[ hoveringItem ]
+	function( button, state, cursorX, cursorY, worldX, worldY, worldZ, clickedElement )
+		if ( not isInventoryShowing ) then
+			return
+		end
+		
+		if ( button == "left" ) then
+			if ( state == "down" ) then
+				if ( hoveringItem ) then
+					if ( isTimer( dragTimer ) ) then
+						resetTimer( dragTimer )
+					else
+						dragTimer = setTimer( function( hoveredItem )
+							if ( hoveringItem == hoveredItem ) then
+								draggingItem = hoveringItem
+							end
+						end, 185, 1, hoveringItem )
+					end
+				end
+			else
+				if ( isTimer( dragTimer ) ) then
+					killTimer( dragTimer )
+				end
 				
-				if ( getKeyState( "delete" ) ) then
-					triggerServerEvent( "items:delete", localPlayer, item )
-				elseif ( getKeyState( "lctrl" ) ) or ( getKeyState( "rctrl" ) ) then
-					triggerServerEvent( "items:drop", localPlayer, item )
-				elseif ( getKeyState( "lalt" ) ) or ( getKeyState( "ralt" ) ) then
-					triggerServerEvent( "items:show", localPlayer, item )
-				else
-					triggerServerEvent( "items:use", localPlayer, item )
+				if ( draggingItem ) then
+					if ( getDistanceBetweenPoints3D( worldX, worldY, worldZ, getElementPosition( localPlayer ) ) <= maximumTriggerDistance ) then
+						triggerServerEvent( "items:drop", localPlayer, inventory[ draggingItem ], worldX, worldY, worldZ )
+					end
+					
+					draggingItem = false
+				elseif ( hoveringCategory ) then
+					activeCategory = hoveringCategory
+				elseif ( hoveringItem ) then
+					local item = inventory[ hoveringItem ]
+					
+					if ( getKeyState( "delete" ) ) then
+						triggerServerEvent( "items:delete", localPlayer, item )
+					elseif ( getKeyState( "lctrl" ) ) or ( getKeyState( "rctrl" ) ) then
+						local x, y, z = getElementPosition( localPlayer )
+							  z = getGroundPosition( x, y, z + 2 )
+						triggerServerEvent( "items:drop", localPlayer, item, x, y, z )
+					elseif ( getKeyState( "lalt" ) ) or ( getKeyState( "ralt" ) ) then
+						triggerServerEvent( "items:show", localPlayer, item )
+					else
+						triggerServerEvent( "items:use", localPlayer, item )
+					end
+				elseif ( hoveringWorldItem ) then
+					triggerServerEvent( "items:pickup", localPlayer, hoveringWorldItem )
 				end
 			end
+		elseif ( button == "right" ) then
+			draggingItem = false
 		end
 	end
 )
@@ -236,6 +370,8 @@ addEventHandler( "onClientClick", root,
 addEventHandler( "onClientResourceStart", resourceRoot,
 	function( )
 		bindKey( "I", "down", "inventory" )
+		
+		addEventHandler( "onClientRender", root, renderWorldItems )
 	end
 )
 

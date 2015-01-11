@@ -105,6 +105,8 @@
 	<export function="isValidVehicleModelID" type="shared" />
 	
 	<!-- shared/worlditems.lua -->
+	<export function="getRealWorldItemID" type="shared" />
 	<export function="getWorldItemID" type="shared" />
+	<export function="getWorldItemValue" type="shared" />
 	<export function="isWorldItem" type="shared" />
 </meta>
