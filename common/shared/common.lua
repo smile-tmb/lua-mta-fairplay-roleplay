@@ -122,7 +122,7 @@ function getRandomString( length )
 end
 
 function getSplitValues( string )
-	return split( value, ";_;" )
+	return split( string, ";_;" )
 end
 
 function getValidPedModelsByGenderAndColor( gender, color )
