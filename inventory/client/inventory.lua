@@ -204,6 +204,8 @@ function toggleInventory( )
 	fn( "onClientHUDRender", root, renderInventory )
 	
 	isInventoryShowing = not isInventoryShowing
+	
+	showCursor( isInventoryShowing )
 end
 
 addEventHandler( "onClientClick", root,
@@ -221,8 +223,6 @@ addEventHandler( "onClientClick", root,
 addEventHandler( "onClientResourceStart", resourceRoot,
 	function( )
 		bindKey( "I", "down", "inventory" )
-		
-		toggleInventory( )
 	end
 )
 
