@@ -46,9 +46,7 @@ function getValidVehicleModelIDs( )
 end
 
 function getRealVehicleID( vehicle )
-	local vehicleID = getElementData( vehicle, "vehicle:id" )
-	
-	return vehicleID and tonumber( vehicleID ) or false
+	return getElementData( vehicle, "vehicle:id" ) or false
 end
 
 function getRealVehicleEngineState( vehicle )
