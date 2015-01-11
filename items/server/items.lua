@@ -103,7 +103,7 @@ end
 
 function hasItem( element, itemID, itemValue, id )
 	for index, values in ipairs( getItems( element ) ) do
-		if ( ( not id ) and ( values.itemID == itemID ) and ( ( not itemValue ) or ( values.itemValue == itemValue ) ) ) or ( ( id ) and ( values.id == id ) ) then
+		if ( ( not id ) and ( values.itemID == itemID ) and ( ( not itemValue ) or ( tostring( values.itemValue ) == tostring( itemValue ) ) ) ) or ( ( id ) and ( values.id == id ) ) then
 			return true, index, values
 		end
 	end
