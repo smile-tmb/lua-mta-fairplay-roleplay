@@ -44,12 +44,19 @@ function loadItems( element )
 	local ownerID = getID( element )
 
 	if ( ownerID ) then
+		items[ element ] = { }
+		
 		local result = exports.database:query( "SELECT * FROM `inventory` WHERE `owner_id` = ?", ownerID )
-
+		
 		for _, item in ipairs( result ) do
 			table.insert( items[ element ], { id = item.id, itemID = item.item_id, itemValue = item.item_value } )
 		end
-
+		
+		if ( getElementType( element ) == "player" ) then
+			loadWeapons( element )
+			triggerClientEvent( element, "items:update", element, getItems( element ) )
+		end
+		
 		return true
 	end
 
@@ -64,6 +71,8 @@ function giveItem( element, itemID, itemValue )
 
 		if ( id ) then
 			table.insert( items[ element ], { id = id, itemID = itemID, itemValue = itemValue } )
+			
+			loadItems( element )
 
 			return true
 		end
@@ -81,7 +90,9 @@ function takeItem( element, id )
 		if ( item ) then
 			if ( exports.database:execute( "DELETE FROM `inventory` WHERE `id` = ? AND `owner_id` = ?", id, ownerID ) ) then
 				table.remove( items[ element ], index )
-
+				
+				loadItems( element )
+				
 				return true
 			end
 		end
@@ -141,9 +152,11 @@ addCommandHandler( "giveitem",
 				else
 					if ( getItemList( )[ itemID ] ) then
 						if ( items[ targetPlayer ] ) then
+							value = value or getItemValue( itemID )
+							
 							if ( giveItem( targetPlayer, itemID, value ) ) then
 								outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
-								outputChatBox( "You were given a " .. getItemName( itemID ) .. " (" .. itemID .. ") with value \"" .. value .. "\".", player, 95, 230, 95, false )
+								outputChatBox( "You were given a " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
 							else
 								outputChatBox( "Error occurred (0x0000FE).", player, 230, 95, 95, false )
 							end

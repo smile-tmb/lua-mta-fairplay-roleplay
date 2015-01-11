@@ -161,7 +161,7 @@ function renderInventory( )
 				local color = isHovering and inventoryHoverColor or inventoryColor
 				
 				dxDrawRectangle( x, y, inventoryBoxScale, inventoryBoxScale, color )
-				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ( exports.items:getItemType( item.itemID ) == 3 and "_" .. exports.items:getWeaponID( item.value ) or "" ) .. ".png" )
+				dxDrawImage( x, y, inventoryBoxScale, inventoryBoxScale, "assets/" .. item.itemID .. ( exports.items:getItemType( item.itemID ) == 3 and "_" .. exports.items:getWeaponID( item.itemValue ) or "" ) .. ".png" )
 				
 				if ( isHovering ) then
 					hoveringItem = index
@@ -178,7 +178,7 @@ function renderInventory( )
 	elseif ( hoveringItem ) then
 		local item = inventory[ hoveringItem ]
 		local name = exports.items:getItemName( item.itemID )
-		local value = item.value:len( ) > 0 and item.value or false
+		local value = tostring( item.itemValue ):len( ) > 0 and item.itemValue or false
 		
 		if ( exports.items:getItemType( item.itemID ) == 2 ) then
 			if ( item.itemID == 6 ) then

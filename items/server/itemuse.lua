@@ -38,40 +38,42 @@ addEventHandler( "items:use", root,
 			end
 		end
 		
-		local itemName = getItemName( item.itemID )
-		local itemValue = getItemValue( item.itemID )
-		
-		if ( item.itemID == 1 ) then
-			setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
-			exports.chat:outputLocalActionMe( client, "moves a donut up to their mouth and eats a bite of it." )
-			takeItem( client, id )
-		elseif ( item.itemID == 2 ) then
-			exports.chat:outputLocalActionMe( client, "throws a dice and it reveals number " .. math.random( 1, 6 ) .. "." )
-		elseif ( item.itemID == 3 ) then
-			setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
-			exports.chat:outputLocalActionMe( client, "moves a water bottle up to their mouth, taking a sip of water." )
-			takeItem( client, id )
-		elseif ( item.itemID == 4 ) then
-			setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
-			exports.chat:outputLocalActionMe( client, "moves a coffee mug up to their mouth, taking a sip of coffee." )
-			takeItem( client, id )
-		elseif ( item.itemID == 10 ) then
-			--triggerEvent( ":_displayPhone_:", client, item.value )
-			exports.chat:outputLocalActionMe( client, "takes out a cellphone." )
-		elseif ( item.itemID == 11 ) then
-			local weaponID = getWeaponID( item.value )
+		if ( item ) then
+			local itemName = getItemName( item.itemID )
+			local itemValue = item.itemValue
 			
-			if ( weaponID ) then
-				exports.chat:outputLocalActionMe( client, "equips a " .. getWeaponName( item.value ) .. "." )
+			if ( item.itemID == 1 ) then
+				setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
+				exports.chat:outputLocalActionMe( client, "moves a donut up to their mouth and eats a bite of it." )
+				takeItem( client, id )
+			elseif ( item.itemID == 2 ) then
+				exports.chat:outputLocalActionMe( client, "throws a dice and it reveals number " .. math.random( 1, 6 ) .. "." )
+			elseif ( item.itemID == 3 ) then
+				setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
+				exports.chat:outputLocalActionMe( client, "moves a water bottle up to their mouth, taking a sip of water." )
+				takeItem( client, id )
+			elseif ( item.itemID == 4 ) then
+				setElementHealth( client, math.min( 100, getElementHealth( client ) + itemValue ) )
+				exports.chat:outputLocalActionMe( client, "moves a coffee mug up to their mouth, taking a sip of coffee." )
+				takeItem( client, id )
+			elseif ( item.itemID == 10 ) then
+				--triggerEvent( ":_displayPhone_:", client, item.value )
+				exports.chat:outputLocalActionMe( client, "takes out a cellphone." )
+			elseif ( item.itemID == 11 ) then
+				local weaponID = getWeaponID( itemValue )
 				
-				setPedWeaponSlot( client, getSlotFromWeapon( weaponID ) )
+				if ( weaponID ) then
+					exports.chat:outputLocalActionMe( client, "equips a " .. getWeaponName( itemValue ) .. "." )
+					
+					setPedWeaponSlot( client, getSlotFromWeapon( weaponID ) )
+				end
+			elseif ( item.itemID == 13 ) then
+				outputChatBox( "You can use this radio by typing /r <message>", client, 230, 180, 95, false )
+			elseif ( item.itemID == 14 ) then
+				outputChatBox( "You can use this megaphone by typing /m <message>", client, 230, 180, 95, false )
+			else
+				exports.chat:outputLocalActionMe( client, "shows their " .. itemName .. " to everyone." )
 			end
-		elseif ( item.itemID == 13 ) then
-			outputChatBox( "You can use this radio by typing /r <message>", client, 230, 180, 95, false )
-		elseif ( item.itemID == 14 ) then
-			outputChatBox( "You can use this megaphone by typing /m <message>", client, 230, 180, 95, false )
-		else
-			exports.chat:outputLocalActionMe( client, "shows their " .. itemName .. " to everyone." )
 		end
 	end
 )

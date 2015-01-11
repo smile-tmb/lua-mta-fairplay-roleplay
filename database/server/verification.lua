@@ -68,8 +68,7 @@ database.verification = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "owner_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "item_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
-		{ name = "item_value", type = "varchar", length = 1000, default = "" },
-		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
+		{ name = "item_value", type = "varchar", length = 1000, default = "" }
 	},
 	languages = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
