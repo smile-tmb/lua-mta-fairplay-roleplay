@@ -26,7 +26,7 @@ local items = { }
 
 local function getID( element )
 	if ( getElementType( element ) == "player" ) then
-		if ( getElementData( element, "player:playing" ) ) then
+		if ( exports.common:isPlayerPlaying( element ) ) then
 			return exports.common:getCharacterID( element )
 		end
 	elseif ( getElementType( element ) == "vehicle" ) then

@@ -77,7 +77,7 @@ function characterResurrect( characterID )
 		
 		local player = exports.common:getPlayerByAccountID( character.account )
 		
-		if ( player ) and ( not getElementData( player, "player:playing" ) ) then
+		if ( player ) and ( not exports.common:isPlayerPlaying( player ) ) then
 			exports.accounts:updateCharacters( player )
 		end
 		

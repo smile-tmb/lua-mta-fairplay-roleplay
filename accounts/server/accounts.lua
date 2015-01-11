@@ -171,7 +171,7 @@ addEventHandler( "accounts:ready", root,
 			
 			fadeCamera( client, true )
 		else
-			if ( not getElementData( client, "player:playing" ) ) then
+			if ( not exports.common:isPlayerPlaying( client ) ) then
 				exports.messages:createMessage( client, "Loading characters. Please wait.", "selection", nil, true, true )
 				
 				triggerClientEvent( client, "accounts:showCharacterSelection", client )
@@ -184,11 +184,11 @@ addEventHandler( "accounts:ready", root,
 			end
 		end
 		
-		if ( not getElementData( client, "player:playing" ) ) then
+		if ( not exports.common:isPlayerPlaying( client ) ) then
 			triggerClientEvent( client, "accounts:showView", client )
 		end
 		
-		if ( not getElementData( client, "player:id" ) ) then
+		if ( not exports.common:getPlayerID( client ) ) then
 			givePlayerID( client )
 		end
 		

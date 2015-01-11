@@ -230,7 +230,7 @@ function toggleEngine( player )
 	local player = player or source
 	local vehicle = ( getPedOccupiedVehicle( player ) and getPedOccupiedVehicleSeat( player ) == 0 ) and getPedOccupiedVehicle( player ) or nil
 	
-	if ( not isElement( player ) ) or ( not getElementData( player, "player:playing" ) ) or ( not vehicle ) then
+	if ( not isElement( player ) ) or ( not exports.common:isPlayerPlaying( player ) ) or ( not vehicle ) then
 		return false
 	end
 	
@@ -251,7 +251,7 @@ end
 function toggleLock( player )
 	local player = player or source
 	
-	if ( not isElement( player ) ) or ( not getElementData( player, "player:playing" ) ) then
+	if ( not isElement( player ) ) or ( not exports.common:isPlayerPlaying( player ) ) then
 		return false
 	end
 	
@@ -289,7 +289,7 @@ function toggleLights( player )
 	local player = player or source
 	local vehicle = ( getPedOccupiedVehicle( player ) and getPedOccupiedVehicleSeat( player ) == 0 ) and getPedOccupiedVehicle( player ) or nil
 	
-	if ( not isElement( player ) ) or ( not getElementData( player, "player:playing" ) ) or ( not vehicle ) then
+	if ( not isElement( player ) ) or ( not exports.common:isPlayerPlaying( player ) ) or ( not vehicle ) then
 		return false
 	end
 	

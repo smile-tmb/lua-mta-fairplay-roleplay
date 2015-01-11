@@ -181,7 +181,7 @@ end
 
 addEventHandler( "onClientResourceStart", resourceRoot,
 	function( )
-		if ( not getElementData( localPlayer, "player:playing" ) ) then
+		if ( not exports.common:isPlayerPlaying( localPlayer ) ) then
 			for i = 1, getChatboxLayout( ).chat_lines do
 				outputChatBox( "" )
 			end

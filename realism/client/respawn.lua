@@ -84,7 +84,7 @@ addEventHandler( "realism:hide_death_scene", root,
 
 addEventHandler( "onClientResourceStart", resourceRoot,
 	function( )
-		if ( not getElementData( localPlayer, "player:waiting" ) ) and ( isPedDead( localPlayer ) ) and ( getElementData( localPlayer, "player:playing" ) ) then
+		if ( not getElementData( localPlayer, "player:waiting" ) ) and ( isPedDead( localPlayer ) ) and ( exports.common:isPlayerPlaying( localPlayer ) ) then
 			showDeathScene( )
 		end
 	end

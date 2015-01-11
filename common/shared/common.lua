@@ -114,7 +114,7 @@ function getRandomString( length )
 end
 
 function isPlayerPlaying( player )
-	return getElementData( player, "player:playing" ) and true or false
+	return isElement( player ) and getElementData( player, "player:playing" ) or false
 end
 
 function getPlayerFromPartialName( string, player )
@@ -181,7 +181,7 @@ function getAccountID( player )
 end
 
 function getAccountName( player )
-	return ( isElement( player ) and getElementData( player, "account:username" ) ) and getElementData( player, "account:username" ) or false
+	return isElement( player ) and getElementData( player, "account:username" ) or false
 end
 
 function getPlayerID( player )
