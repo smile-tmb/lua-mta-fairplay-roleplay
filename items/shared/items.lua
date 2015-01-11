@@ -138,15 +138,3 @@ function getItemWeight( itemID )
 		return false
 	end
 end
-
-function isWorldItem( element )
-	if ( not isElement( element ) ) or ( getElementType( element ) ~= "object" ) or ( not getElementData( element, "worlditem:id" ) ) then
-		return false
-	end
-	
-	return { id = tonumber( getElementData( element, "worlditem:id" ) ), item_id = tonumber( getElementData( element, "worlditem:item_id" ) ), value = getElementData( element, "worlditem:value" ) }
-end
-
-function getItemSubValue( value )
-	return split( value, ";" )
-end

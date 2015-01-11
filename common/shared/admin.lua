@@ -40,47 +40,22 @@ function getLevels( )
 	return adminLevels
 end
 
-function getLevelPriority( level )
-	local priority = adminLevels[ level ] and adminLevels[ level ].priority or 0
-	
-	return priority
-end
-
 function getLevelName( level )
 	local name = adminLevels[ level ] and adminLevels[ level ].name or ""
 	
 	return name
 end
 
-function isCommunityAdmin( level )
-	local status = adminLevels[ level ] and adminLevels[ level ].community or false
+function getLevelPriority( level )
+	local priority = adminLevels[ level ] and adminLevels[ level ].priority or 0
 	
-	return status
-end
-
-function isPriorityHigher( levelFrom, levelTo )
-	local levelFromPriority = getLevelPriority( levelFrom )
-	local levelToPriority = getLevelPriority( levelTo )
-	
-	if ( levelFromPriority > levelToPriority ) then
-		return true
-	end
-	
-	return false
+	return priority
 end
 
 function getPlayerLevel( player )
 	local playerLevel = getElementData( player, "account:level" ) and tonumber( getElementData( player, "account:level" ) ) or 0
 	
 	return playerLevel
-end
-
-function isPlayerCommunityAdmin( player )
-	return isCommunityAdmin( getPlayerLevel( player ) )
-end
-
-function isPlayerPriorityHigher( playerFrom, playerTo )
-	return isPriorityHigher( getPlayerLevel( playerFrom ), getPlayerLevel( playerTo ) )
 end
 
 function getPriorityPlayers( lowestPriority, highestPriority )
@@ -99,42 +74,67 @@ function getPriorityPlayers( lowestPriority, highestPriority )
 	return priorityPlayers
 end
 
+function isCommunityAdmin( level )
+	local status = adminLevels[ level ] and adminLevels[ level ].community or false
+	
+	return status
+end
+
 function isOnDuty( player )
 	return getElementData( player, "account:duty" ) and true or false
 end
 
-function isPlayerServerTrialAdmin( player )
-	return getPlayerLevel( player ) >= 1
+function isPriorityHigher( levelFrom, levelTo )
+	local levelFromPriority = getLevelPriority( levelFrom )
+	local levelToPriority = getLevelPriority( levelTo )
+	
+	if ( levelFromPriority > levelToPriority ) then
+		return true
+	end
+	
+	return false
 end
 
-function isPlayerServerJuniorAdmin( player )
-	return getPlayerLevel( player ) >= 2
-end
-
-function isPlayerServerAdmin( player )
-	return getPlayerLevel( player ) >= 3
-end
-
-function isPlayerServerSeniorAdmin( player )
-	return getPlayerLevel( player ) >= 4
-end
-
-function isPlayerServerManager( player )
-	return getPlayerLevel( player ) >= 5
-end
-
-function isPlayerCommunityModerator( player )
-	return getPlayerLevel( player ) >= 6
+function isPlayerPriorityHigher( playerFrom, playerTo )
+	return isPriorityHigher( getPlayerLevel( playerFrom ), getPlayerLevel( playerTo ) )
 end
 
 function isPlayerCommunityAdmin( player )
-	return getPlayerLevel( player ) >= 7
+	return isCommunityAdmin( getPlayerLevel( player ) )
+end
+
+function isPlayerCommunityDirector( player )
+	return getPlayerLevel( player ) >= 9
 end
 
 function isPlayerCommunitySeniorAdmin( player )
 	return getPlayerLevel( player ) >= 8
 end
 
-function isPlayerCommunityDirector( player )
-	return getPlayerLevel( player ) >= 9
+function isPlayerCommunityAdmin( player )
+	return getPlayerLevel( player ) >= 7
+end
+
+function isPlayerCommunityModerator( player )
+	return getPlayerLevel( player ) >= 6
+end
+
+function isPlayerServerManager( player )
+	return getPlayerLevel( player ) >= 5
+end
+
+function isPlayerServerSeniorAdmin( player )
+	return getPlayerLevel( player ) >= 4
+end
+
+function isPlayerServerAdmin( player )
+	return getPlayerLevel( player ) >= 3
+end
+
+function isPlayerServerJuniorAdmin( player )
+	return getPlayerLevel( player ) >= 2
+end
+
+function isPlayerServerTrialAdmin( player )
+	return getPlayerLevel( player ) >= 1
 end

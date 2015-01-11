@@ -28,67 +28,83 @@
 	
 	<script src="shared/common.lua" type="shared" cache="false" />
 	<script src="shared/admin.lua" type="shared" cache="false" />
+	<script src="shared/elements.lua" type="shared" cache="false" />
 	<script src="shared/factions.lua" type="shared" cache="false" />
+	<script src="shared/players.lua" type="shared" cache="false" />
 	<script src="shared/vehicles.lua" type="shared" cache="false" />
+	<script src="shared/worlditems.lua" type="shared" cache="false" />
 	
 	<script src="client/utility.lua" type="client" cache="false" />
 	<script src="client/camera.lua" type="client" cache="false" />
 	<script src="client/cursor.lua" type="client" cache="false" />
 	
-	<export function="nextIndex" type="shared" />
-	<export function="findByValue" type="shared" />
-	<export function="count" type="shared" />
-	<export function="isLeapYear" type="shared" />
-	<export function="getDaysInMonth" type="shared" />
-	<export function="getValidPedModelsByGenderAndColor" type="shared" />
-	<export function="getRandomString" type="shared" />
-	<export function="isPlayerPlaying" type="shared" />
-	<export function="getPlayerFromPartialName" type="shared" />
-	<export function="howToWrite" type="shared" />
-	<export function="formatString" type="shared" />
-	<export function="getCharacterID" type="shared" />
-	<export function="getPlayerName" type="shared" />
-	<export function="getAccountID" type="shared" />
-	<export function="getAccountName" type="shared" />
-	<export function="getPlayerID" type="shared" />
-	<export function="getPlayerByID" type="shared" />
-	<export function="nextToPosition" type="shared" />
+	<!-- client/camera.lua -->
+	<export function="smoothMoveCamera" type="client" />
+	<export function="stopSmoothMoveCamera" type="client" />
+	
+	<!-- client/cursor.lua -->
+	<export function="isWithin2DBounds" type="client" />
+	
+	<!-- shared/admin.lua -->
+	<export function="getLevels" type="shared" />
+	<export function="getLevelName" type="shared" />
+	<export function="getLevelPriority" type="shared" />
+	<export function="getPlayerLevel" type="shared" />
+	<export function="getPriorityPlayers" type="shared" />
+	<export function="isCommunityAdmin" type="shared" />
+	<export function="isOnDuty" type="shared" />
+	<export function="isPriorityHigher" type="shared" />
+	<export function="isPlayerPriorityHigher" type="shared" />
+	<export function="isPlayerCommunityDirector" type="shared" />
+	<export function="isPlayerCommunitySeniorAdmin" type="shared" />
+	<export function="isPlayerCommunityAdmin" type="shared" />
+	<export function="isPlayerCommunityModerator" type="shared" />
+	<export function="isPlayerServerManager" type="shared" />
+	<export function="isPlayerServerSeniorAdmin" type="shared" />
+	<export function="isPlayerServerAdmin" type="shared" />
+	<export function="isPlayerServerJuniorAdmin" type="shared" />
+	<export function="isPlayerServerTrialAdmin" type="shared" />
+	
+	<!-- shared/common.lua -->
 	<export function="cleanString" type="shared" />
+	<export function="count" type="shared" />
+	<export function="findByValue" type="shared" />
 	<export function="formatDate" type="shared" />
-	<export function="getPlayerByAccountID" type="shared" />
-	<export function="getPlayerByCharacterID" type="shared" />
+	<export function="formatString" type="shared" />
+	<export function="getDaysInMonth" type="shared" />
+	<export function="getRandomString" type="shared" />
+	<export function="getSplitValues" type="shared" />
+	<export function="getValidPedModelsByGenderAndColor" type="shared" />
+	<export function="howToWrite" type="shared" />
+	<export function="nextIndex" type="shared" />
+	<export function="nextToPosition" type="shared" />
+	<export function="isLeapYear" type="shared" />
+	
+	<!-- shared/elements.lua -->
 	<export function="getNearbyElementsByType" type="shared" />
 	
-	<export function="getLevels" type="shared" />
-	<export function="getLevelPriority" type="shared" />
-	<export function="getLevelName" type="shared" />
-	<export function="isCommunityAdmin" type="shared" />
-	<export function="isPriorityHigher" type="shared" />
-	<export function="getPlayerLevel" type="shared" />
-	<export function="isPlayerCommunityAdmin" type="shared" />
-	<export function="isPlayerPriorityHigher" type="shared" />
-	<export function="getPriorityPlayers" type="shared" />
-	<export function="isOnDuty" type="shared" />
-	
-	<export function="isPlayerServerTrialAdmin" type="shared" />
-	<export function="isPlayerServerJuniorAdmin" type="shared" />
-	<export function="isPlayerServerAdmin" type="shared" />
-	<export function="isPlayerServerSeniorAdmin" type="shared" />
-	<export function="isPlayerServerManager" type="shared" />
-	<export function="isPlayerCommunityModerator" type="shared" />
-	<export function="isPlayerCommunityAdmin" type="shared" />
-	<export function="isPlayerCommunitySeniorAdmin" type="shared" />
-	<export function="isPlayerCommunityDirector" type="shared" />
-	
-	<export function="isValidVehicleModelID" type="shared" />
-	<export function="getValidVehicleModelIDs" type="shared" />
-	<export function="getRealVehicleID" type="shared" />
-	<export function="getRealVehicleEngineState" type="shared" />
-	
+	<!-- shared/factions.lua -->
 	<export function="getFactionID" type="shared" />
 	
-	<export function="stopSmoothMoveCamera" type="client" />
-	<export function="smoothMoveCamera" type="client" />
+	<!-- shared/players.lua -->
+	<export function="getAccountID" type="shared" />
+	<export function="getAccountName" type="shared" />
+	<export function="getCharacterID" type="shared" />
+	<export function="getPlayerByAccountID" type="shared" />
+	<export function="getPlayerByCharacterID" type="shared" />
+	<export function="getPlayerByID" type="shared" />
+	<export function="getPlayerFromPartialName" type="shared" />
+	<export function="getPlayerID" type="shared" />
+	<export function="getPlayerName" type="shared" />
+	<export function="isPlayerPlaying" type="shared" />
 	
-	<export function="isWithin2DBounds" type="client" />
+	<!-- shared/vehicles.lua -->
+	<export function="getRealVehicleID" type="shared" />
+	<export function="getRealVehicleEngineState" type="shared" />
+	<export function="getValidVehicleModelIDs" type="shared" />
+	<export function="isValidVehicleModelID" type="shared" />
+	
+	<!-- shared/worlditems.lua -->
+	<export function="getWorldItemID" type="shared" />
+	<export function="isWorldItem" type="shared" />
 </meta>

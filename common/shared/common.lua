@@ -36,16 +36,22 @@ pedModels = {
 	}
 }
 
-function nextIndex( table )
-	local index = 1
-
-	while ( true ) do
-		if ( not table[ index ] ) then
-			return index
-		else
-			index = index + 1
-		end
+function cleanString( string )
+	while ( string:find( "  " ) ) do
+		string:gsub( "  ", " " )
 	end
+	
+	return string
+end
+
+function count( table )
+	local count = 0
+	
+	for _ in pairs( table ) do
+		count = count + 1
+	end
+	
+	return count
 end
 
 function findByValue( _table, value, multiple, strict )
@@ -76,27 +82,29 @@ function findByValue( _table, value, multiple, strict )
 	return result
 end
 
-function count( table )
-	local count = 0
+function formatDate( string, preparedString )
+	local dateAndTime = split( string, " " )
+	local date = split( dateAndTime[ 1 ], "-" )
+	local time = split( dateAndTime[ 2 ], ":" )
+
+	local thExtension = { "st", "nd", "rd" }
+	local day = date[ 3 ]:len( ) >= 2 and date[ 3 ]:sub( 2, 2 ) or date[ 3 ]
+		  day = tonumber( day )
+		  day = date[ 3 ] .. ( thExtension[ day ] or "th" )
+		  day = day:sub( 1, 1 ) == "0" and day:sub( 2 ) or day
+
+	local months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
+	local month = months[ tonumber( date[ 2 ] ) ]
 	
-	for _ in pairs( table ) do
-		count = count + 1
-	end
-	
-	return count
+	return preparedString and day .. " of " .. month .. " " .. date[ 1 ] .. " " .. dateAndTime[ 2 ] or { day = day, month = month, year = date[ 1 ], hour = time[ 1 ], minute = time[ 2 ], second = time[ 3 ] }
 end
 
-function isLeapYear( year )
-	return ( year % 4 == 0 ) and ( year % 100 ~= 0 or year % 400 == 0 )
+function formatString( string )
+	return howToWrite( string ) and string .. "'" or string .. "'s"
 end
 
 function getDaysInMonth( month, year )
 	return month == 2 and isLeapYear( year ) and 29 or ( "\31\28\31\30\31\30\31\31\30\31\30\31" ):byte( month )
-end
-
-function getValidPedModelsByGenderAndColor( gender, color )
-	local gender, color = gender:lower( ), color:lower( )
-	return pedModels[ gender ] and pedModels[ gender ][ color ] or { }
 end
 
 function getRandomString( length )
@@ -113,43 +121,13 @@ function getRandomString( length )
 	return buffer
 end
 
-function isPlayerPlaying( player )
-	return isElement( player ) and getElementData( player, "player:playing" ) or false
+function getSplitValues( string )
+	return split( value, ";_;" )
 end
 
-function getPlayerFromPartialName( string, player )
-	if ( not string ) then
-		return false
-	end
-	
-	if ( not tonumber( string ) ) and ( string == "*" ) and ( getElementType( player ) == "player" ) then
-		return isPlayerPlaying( player ) and player or false
-	else
-		if ( tonumber( string ) ) and ( tonumber( string ) > 0 ) then
-			return getPlayerByID( tonumber( string ), player )
-		end
-		
-		local matches = { }
-		
-		for _, player in ipairs( getElementsByType( "player" ) ) do
-			if ( getPlayerName( player ) == string ) and ( isPlayerPlaying( player ) ) then
-				return player
-			end
-			
-			local playerName = getPlayerName( player ):gsub( "#%x%x%x%x%x%x", "" )
-			playerName = playerName:lower( )
-			
-			if ( playerName:find( string:lower( ), 0 ) ) and ( isPlayerPlaying( player ) ) then
-				table.insert( matches, player )
-			end
-		end
-		
-		if ( #matches == 1 ) then
-			return matches[ 1 ]
-		end
-		
-		return false, #matches
-	end
+function getValidPedModelsByGenderAndColor( gender, color )
+	local gender, color = gender:lower( ), color:lower( )
+	return pedModels[ gender ] and pedModels[ gender ][ color ] or { }
 end
 
 function howToWrite( string )
@@ -163,39 +141,20 @@ function howToWrite( string )
 	return false
 end
 
-function formatString( string )
-	return howToWrite( string ) and string .. "'" or string .. "'s"
+function isLeapYear( year )
+	return ( year % 4 == 0 ) and ( year % 100 ~= 0 or year % 400 == 0 )
 end
 
-function getCharacterID( player )
-	return ( isElement( player ) and getElementData( player, "character:id" ) ) and tonumber( getElementData( player, "character:id" ) ) or false
-end
+function nextIndex( table )
+	local index = 1
 
-local _getPlayerName = getPlayerName
-function getPlayerName( player )
-	return isElement( player ) and _getPlayerName( player ):gsub( "_", " " ) or false
-end
-
-function getAccountID( player )
-	return ( isElement( player ) and getElementData( player, "database:id" ) ) and tonumber( getElementData( player, "database:id" ) ) or false
-end
-
-function getAccountName( player )
-	return isElement( player ) and getElementData( player, "account:username" ) or false
-end
-
-function getPlayerID( player )
-	return ( isElement( player ) and getElementData( player, "player:id" ) ) and tonumber( getElementData( player, "player:id" ) ) or false
-end
-
-function getPlayerByID( id )
-	for _, player in ipairs( getElementsByType( "player" ) ) do
-		if ( getPlayerID( player ) == id ) then
-			return player
+	while ( true ) do
+		if ( not table[ index ] ) then
+			return index
+		else
+			index = index + 1
 		end
 	end
-	
-	return false
 end
 
 function nextToPosition( x, y, z, rotation, radius )
@@ -215,61 +174,4 @@ function nextToPosition( x, y, z, rotation, radius )
 	y = y + ( ( math.sin( math.rad( rotation ) ) ) * radius )
 	
 	return x, y, z
-end
-
-function cleanString( string )
-	while ( string:find( "  " ) ) do
-		string:gsub( "  ", " " )
-	end
-	
-	return string
-end
-
-function formatDate( string, preparedString )
-	local dateAndTime = split( string, " " )
-	local date = split( dateAndTime[ 1 ], "-" )
-	local time = split( dateAndTime[ 2 ], ":" )
-
-	local thExtension = { "st", "nd", "rd" }
-	local day = date[ 3 ]:len( ) >= 2 and date[ 3 ]:sub( 2, 2 ) or date[ 3 ]
-		  day = tonumber( day )
-		  day = date[ 3 ] .. ( thExtension[ day ] or "th" )
-		  day = day:sub( 1, 1 ) == "0" and day:sub( 2 ) or day
-
-	local months = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" }
-	local month = months[ tonumber( date[ 2 ] ) ]
-	
-	return preparedString and day .. " of " .. month .. " " .. date[ 1 ] .. " " .. dateAndTime[ 2 ] or { day = day, month = month, year = date[ 1 ], hour = time[ 1 ], minute = time[ 2 ], second = time[ 3 ] }
-end
-
-function getPlayerByAccountID( accountID )
-	for _, player in ipairs( getElementsByType( "player" ) ) do
-		if ( getAccountID( player ) == accountID ) then
-			return player
-		end
-	end
-	
-	return false
-end
-
-function getPlayerByCharacterID( characterID )
-	for _, player in ipairs( getElementsByType( "player" ) ) do
-		if ( getCharacterID( player ) == characterID ) then
-			return player
-		end
-	end
-	
-	return false
-end
-
-function getNearbyElementsByType( x, y, z, type, distance )
-	local elements = { }
-	
-	for _, element in ipairs( getElementsByType( type ) ) do
-		if ( getDistanceBetweenPoints3D( x, y, z, getElementPosition( element ) ) < distance ) then
-			table.insert( elements, element )
-		end
-	end
-	
-	return elements
 end

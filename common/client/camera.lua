@@ -40,28 +40,6 @@ local function render( )
 	setCameraMatrix( posX, posY, posZ, aimX, aimY, aimZ, cameraRoll, cameraFoV )
 end
 
-function stopSmoothMoveCamera( )
-	if ( isCameraMoving ) then
-		if ( isTimer( smoothStopTimer ) ) then
-			killTimer( smoothStopTimer )
-		end
-		
-		if ( isElement( smoothMovers.source ) ) then
-			destroyElement( smoothMovers.source )
-		end
-		
-		if ( isElement( smoothMovers.target ) ) then
-			destroyElement( smoothMovers.target )
-		end
-		
-		removeEventHandler( "onClientPreRender", root, render )
-		
-		isCameraMoving = false
-	end
-end
-addEvent( "common:stop_camera", true )
-addEventHandler( "common:stop_camera", root, stopSmoothMoveCamera )
-
 function smoothMoveCamera( x1, y1, z1, x1t, y1t, z1t, x2, y2, z2, x2t, y2t, z2t, time, easing, roll, fov )
 	if ( isCameraMoving ) then
 		return false
@@ -96,3 +74,25 @@ function smoothMoveCamera( x1, y1, z1, x1t, y1t, z1t, x2, y2, z2, x2t, y2t, z2t,
 end
 addEvent( "common:move_camera", true )
 addEventHandler( "common:move_camera", root, smoothMoveCamera )
+
+function stopSmoothMoveCamera( )
+	if ( isCameraMoving ) then
+		if ( isTimer( smoothStopTimer ) ) then
+			killTimer( smoothStopTimer )
+		end
+		
+		if ( isElement( smoothMovers.source ) ) then
+			destroyElement( smoothMovers.source )
+		end
+		
+		if ( isElement( smoothMovers.target ) ) then
+			destroyElement( smoothMovers.target )
+		end
+		
+		removeEventHandler( "onClientPreRender", root, render )
+		
+		isCameraMoving = false
+	end
+end
+addEvent( "common:stop_camera", true )
+addEventHandler( "common:stop_camera", root, stopSmoothMoveCamera )
