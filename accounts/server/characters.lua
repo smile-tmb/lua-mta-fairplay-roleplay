@@ -277,10 +277,6 @@ function spawnCharacter( player, character, fade )
 				
 				spawnPlayer( player, character.pos_x, character.pos_y, character.pos_z )
 				
-				if ( getTeamFromName( "Civilian" ) ) then
-					setPlayerTeam( player, getTeamFromName( "Civilian" ) )
-				end
-				
 				setPedRotation( player, character.rotation )
 				
 				setElementModel( player, character.skin_id )
