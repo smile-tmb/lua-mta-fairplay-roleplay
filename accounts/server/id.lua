@@ -30,6 +30,8 @@ function givePlayerID( player )
 	IDs[ playerID ] = player
 	
 	exports.security:modifyElementData( player, "player:id", playerID, true )
+
+	return playerID
 end
 
 addEventHandler( "onPlayerQuit", root,
