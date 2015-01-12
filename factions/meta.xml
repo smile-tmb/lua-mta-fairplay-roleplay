@@ -26,9 +26,25 @@
 	<info name="factions@fairplay" author="socialz@fairplay" type="script" />
 	<min_mta_version client="1.3.4-0.00000" />
 	
+	<script src="shared/factions.lua" type="shared" cache="false" />
 	<script src="server/factions.lua" />
 	
 	<export function="getFactions" />
 	<export function="getFactionByID" />
 	<export function="getFactionByName" />
+	<export function="createFaction" />
+	<export function="deleteFaction" />
+	<export function="addCharacterToFaction" />
+	<export function="addPlayerToFaction" />
+	<export function="removeCharacterFromFaction" />
+	<export function="removePlayerFromFaction" />
+	<export function="isCharacterInFaction" />
+	<export function="isPlayerInFaction" />
+	<export function="getCharacterFactions" />
+	<export function="getPlayerFactions" />
+
+	<!--
+	<export function="loadFaction" />
+	<export function="loadFactions" />
+	-->
 </meta>
