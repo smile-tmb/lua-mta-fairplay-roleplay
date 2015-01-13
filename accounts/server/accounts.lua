@@ -29,7 +29,27 @@ function get( id )
 end
 
 function new( username, password )
-	return exports.database:insert_id( "INSERT INTO `accounts` (`username`, `password`) VALUES (?, ?)", username, exports.security:hashString( password ) )
+	local id = exports.database:insert_id( "INSERT INTO `accounts` (`username`, `password`) VALUES (?, ?)", username, exports.security:hashString( password ) )
+
+	if ( id ) then
+		local query = exports.database:query_single( "SELECT COUNT(*) AS `count` FROM `accounts`" )
+
+		if ( query ) and ( query.count == 1 ) then
+			local playerLevel = 0
+
+			for level in pairs( exports.common:getLevels( ) ) do
+				if ( exports.common:getLevelPriority( level ) > exports.common:getLevelPriority( playerLevel ) ) then
+					playerLevel = level
+				end
+			end
+
+			exports.database:execute( "UPDATE `accounts` SET `level` = ? WHERE `id` = ?", playerLevel, id )
+		end
+
+		return id
+	end
+
+	return false
 end
 
 function login( player, username, password )
