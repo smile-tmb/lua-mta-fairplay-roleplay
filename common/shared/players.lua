@@ -80,8 +80,14 @@ function getPlayerID( player )
 end
 
 local _getPlayerName = getPlayerName
-function getPlayerName( player )
-	return isElement( player ) and _getPlayerName( player ):gsub( "_", " " ) or false
+function getPlayerName( player, format )
+	if ( isElement( player ) ) then
+		local name = _getPlayerName( player ):gsub( "_", " " )
+		
+		return format and formatString( name ) or name
+	end
+
+	return false
 end
 
 function isPlayerPlaying( player )
