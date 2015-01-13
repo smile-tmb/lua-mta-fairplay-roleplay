@@ -110,6 +110,7 @@ database.verification = {
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "model_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "custom", type = "text" },
 		{ name = "pos_x", type = "float", default = 0 },
 		{ name = "pos_y", type = "float", default = 0 },
 		{ name = "pos_z", type = "float", default = 0 },

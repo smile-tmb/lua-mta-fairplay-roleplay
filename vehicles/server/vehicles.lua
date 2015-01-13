@@ -22,6 +22,7 @@
 	SOFTWARE.
 ]]
 
+local vehicles = { }
 local threads = { }
 
 local loadingVehiclesGlobalID
@@ -34,17 +35,17 @@ function get( id )
 end
 
 function getVehicle( id )
-	local foundVehicle = false
-	
-	for _, vehicle in ipairs( getElementsByType( "vehicle" ) ) do
-		local vehicleID = getElementData( vehicle, "vehicle:id" )
-		
-		if ( vehicleID ) and ( vehicleID == id ) then
-			foundVehicle = vehicle
-		end
+	local data = getVehicleData( id )
+
+	if ( data ) and ( isElement( data.vehicle ) ) then
+		return data.vehicle
 	end
-	
-	return foundVehicle
+
+	return false
+end
+
+function getVehicleData( id )
+	return vehicles[ id ] or false
 end
 
 function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, variantA, variantB, ownerID, faction, color, isLocked, isBulletproof )
@@ -80,11 +81,15 @@ function spawn( vehicleID, respawnVehicle, hasCoroutine )
 		if ( isElement( vehicle ) ) then
 			destroyElement( vehicle )
 		end
+
+		vehicles[ data.id ] = data
 		
 		local posX, posY, posZ = data[ ( respawnVehicle and "respawn_" or "" ) .. "pos_x" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "pos_y" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "pos_z" ]
 		local rotX, rotY, rotZ = data[ ( respawnVehicle and "respawn_" or "" ) .. "rot_x" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "rot_y" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "rot_z" ]
-		local vehicle = createVehicle( data.model_id, posX, posY, posZ, rotX, rotY, rotZ, data.numberplate, false, data.variant_1, data.variant_2 )
-		
+		vehicles[ data.id ].vehicle = createVehicle( data.model_id, posX, posY, posZ, rotX, rotY, rotZ, data.numberplate, false, data.variant_1, data.variant_2 )
+
+		local vehicle = vehicles[ data.id ].vehicle
+
 		if ( vehicle ) then
 			setElementInterior( vehicle, data.respawn_interior )
 			setElementDimension( vehicle, data.respawn_dimension )
@@ -99,10 +104,9 @@ function spawn( vehicleID, respawnVehicle, hasCoroutine )
 			toggleVehicleRespawn( vehicle, false )
 			
 			exports.security:modifyElementData( vehicle, "vehicle:id", data.id, true )
-			exports.security:modifyElementData( vehicle, "vehicle:owner_id", math.abs( data.owner_id ), true )
-			exports.security:modifyElementData( vehicle, "vehicle:faction", data.owner_id < 0, true )
-			exports.security:modifyElementData( vehicle, "vehicle:civilian", data.owner_id == 0, true )
+			exports.security:modifyElementData( vehicle, "vehicle:custom", data.custom, true )
 			exports.security:modifyElementData( vehicle, "vehicle:engine", data.is_engine_on == 1, true )
+			exports.security:modifyElementData( vehicle, "vehicle:broken", data.is_broken == 1, true )
 			
 			local colors = fromJSON( data.color )
 			
@@ -133,6 +137,12 @@ end
 
 function despawn( vehicle )
 	if ( save( vehicle ) ) then
+		local id = exports.common:getRealVehicleID( vehicle )
+
+		if ( id ) then
+			vehicles[ id ].vehicle = nil
+		end
+
 		destroyElement( vehicle )
 		
 		return true
@@ -145,7 +155,7 @@ function reload( vehicle )
 	local vehicleID = exports.common:getRealVehicleID( vehicle )
 	
 	despawn( vehicle )
-	spawn( vehicleID )
+	spawn( getVehicleData( vehicleID ) )
 end
 
 function save( vehicle )
@@ -168,7 +178,7 @@ function save( vehicle )
 			doors[ i ] = getVehicleDoorState( vehicle, i )
 		end
 		
-		return exports.database:execute( "UPDATE `vehicles` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rot_x` = ?, `rot_y` = ?, `rot_z` = ?, `interior` = ?, `dimension` = ?, `panel_states` = ?, `door_states` = ?, `is_locked` = ?, `is_engine_on` = ?, `headlight_state` = ? WHERE `id` = ?", posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, toJSON( panels ), toJSON( doors ), isVehicleLocked( vehicle ), getVehicleEngineState( vehicle ), getVehicleOverrideLights( vehicle ) == 2, vehicleID )
+		return exports.database:execute( "UPDATE `vehicles` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rot_x` = ?, `rot_y` = ?, `rot_z` = ?, `interior` = ?, `dimension` = ?, `panel_states` = ?, `door_states` = ?, `is_locked` = ?, `is_engine_on` = ?, `is_broken` = ?, `headlight_state` = ? WHERE `id` = ?", posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, toJSON( panels ), toJSON( doors ), isVehicleLocked( vehicle ), getVehicleEngineState( vehicle ), exports.common:isVehicleBroken( vehicle ), getVehicleOverrideLights( vehicle ) == 2, vehicleID )
 	end
 end
 
@@ -189,12 +199,12 @@ function spawnAllVehicles( )
 		end
 	end
 	
-	local vehicles = exports.database:query( "SELECT * FROM `vehicles` WHERE `is_deleted` = '0' ORDER BY `id`" )
+	local query = exports.database:query( "SELECT * FROM `vehicles` WHERE `is_deleted` = '0' ORDER BY `id`" )
 	
-	if ( vehicles ) then
-		vehiclesToLoadCount = #vehicles
+	if ( query ) then
+		vehiclesToLoadCount = #query
 		
-		for _, vehicle in ipairs( vehicles ) do
+		for _, vehicle in ipairs( query ) do
 			local spawnCoroutine = coroutine.create( spawn )
 			coroutine.resume( spawnCoroutine, vehicle, false, true )
 			table.insert( threads, spawnCoroutine )
@@ -209,7 +219,7 @@ function resumeCoroutines( )
 		coroutine.resume( spawnCoroutine )
 	end
 	
-	if ( #getElementsByType( "vehicle", getResourceDynamicElementRoot( resource ) ) >= vehiclesToLoadCount ) then
+	if ( exports.common:count( vehicles ) >= vehiclesToLoadCount ) then
 		exports.messages:destroyGlobalMessage( loadingVehiclesGlobalID )
 	end
 end
@@ -221,69 +231,61 @@ end
 function isNumberPlateInUse( numberplate )
 	local query = exports.database:query_single( "SELECT `id` FROM `vehicles` WHERE `numberplate` = ? LIMIT 1", numberplate )
 	
-	if ( query ) then
-		return query.id
-	end
-	
-	return false
+	return query and query.id or false
 end
 
 function toggleEngine( player )
 	local player = player or source
 	local vehicle = ( getPedOccupiedVehicle( player ) and getPedOccupiedVehicleSeat( player ) == 0 ) and getPedOccupiedVehicle( player ) or nil
 	
-	if ( not isElement( player ) ) or ( not exports.common:isPlayerPlaying( player ) ) or ( not vehicle ) then
-		return false
-	end
-	
-	if ( getVehicleEngineState( vehicle ) ) then
-		setVehicleEngineState( vehicle, false )
-	else
-		if ( ( exports.items:hasItem( player, 7, exports.common:getRealVehicleID( vehicle ) ) ) or ( exports.common:isOnDuty( player ) ) ) then
-			setVehicleEngineState( vehicle, true )
+	if ( isElement( player ) ) and ( exports.common:isPlayerPlaying( player ) ) and ( vehicle ) then
+		if ( getVehicleEngineState( vehicle ) ) then
+			setVehicleEngineState( vehicle, false )
 		else
-			outputChatBox( "You require a key to turn on the engine of this vehicle.", player, 230, 95, 95, false )
-			return
+			if ( ( exports.items:hasItem( player, 7, exports.common:getRealVehicleID( vehicle ) ) ) or ( exports.common:isOnDuty( player ) ) ) then
+				setVehicleEngineState( vehicle, true )
+			else
+				outputChatBox( "You require a key to turn on the engine of this vehicle.", player, 230, 95, 95 )
+				return
+			end
 		end
+		
+		exports.security:modifyElementData( vehicle, "vehicle:engine", getVehicleEngineState( vehicle ), true )
 	end
-	
-	exports.security:modifyElementData( vehicle, "vehicle:engine", getVehicleEngineState( vehicle ), true )
 end
 
 function toggleLock( player )
 	local player = player or source
 	
-	if ( not isElement( player ) ) or ( not exports.common:isPlayerPlaying( player ) ) then
-		return false
-	end
-	
-	local x, y, z = getElementPosition( player )
-	local vehicle = ( getPedOccupiedVehicle( player ) and getPedOccupiedVehicleSeat( player ) < 2 ) and getPedOccupiedVehicle( player ) or nil
-	
-	if ( not vehicle ) then
-		local foundVehicle, foundDistance = nil, 15
+	if ( isElement( player ) ) and ( exports.common:isPlayerPlaying( player ) ) then
+		local x, y, z = getElementPosition( player )
+		local vehicle = ( getPedOccupiedVehicle( player ) and getPedOccupiedVehicleSeat( player ) < 2 ) and getPedOccupiedVehicle( player ) or nil
 		
-		for _, nearbyVehicle in ipairs( getElementsByType( "vehicle", getResourceDynamicElementRoot( resource ) ) ) do
-			local distance = getDistanceBetweenPoints3D( x, y, z, getElementPosition( nearbyVehicle ) )
+		if ( not vehicle ) then
+			local foundVehicle, foundDistance = nil, 15
 			
-			if ( distance < foundDistance ) and ( ( exports.items:hasItem( player, 7, exports.common:getRealVehicleID( nearbyVehicle ) ) ) or ( exports.common:isOnDuty( player ) ) ) then
-				foundVehicle = nearbyVehicle
-				foundDistance = distance
+			for _, nearbyVehicle in ipairs( getElementsByType( "vehicle", getResourceDynamicElementRoot( resource ) ) ) do
+				local distance = getDistanceBetweenPoints3D( x, y, z, getElementPosition( nearbyVehicle ) )
+				
+				if ( distance < foundDistance ) and ( ( exports.items:hasItem( player, 7, exports.common:getRealVehicleID( nearbyVehicle ) ) ) or ( exports.common:isOnDuty( player ) ) ) then
+					foundVehicle = nearbyVehicle
+					foundDistance = distance
+				end
 			end
+			
+			if ( not foundVehicle ) then
+				return
+			end
+			
+			vehicle = foundVehicle
 		end
 		
-		if ( not foundVehicle ) then
-			return
+		if ( vehicle ) then
+			setVehicleLocked( vehicle, not isVehicleLocked( vehicle ) )
+			exports.chat:outputLocalActionMe( player, ( isVehicleLocked( vehicle ) and "" or "un" ) .. "locks the " .. getVehicleName( vehicle ) .. "." )
+		else
+			outputChatBox( "You require a key to toggle the locks of this vehicle.", player, 230, 95, 95 )
 		end
-		
-		vehicle = foundVehicle
-	end
-	
-	if ( vehicle ) then
-		setVehicleLocked( vehicle, not isVehicleLocked( vehicle ) )
-		exports.chat:outputLocalActionMe( player, ( isVehicleLocked( vehicle ) and "" or "un" ) .. "locks the " .. getVehicleName( vehicle ) .. "." )
-	else
-		outputChatBox( "You require a key to toggle the locks of this vehicle.", player, 230, 95, 95, false )
 	end
 end
 
@@ -291,11 +293,9 @@ function toggleLights( player )
 	local player = player or source
 	local vehicle = ( getPedOccupiedVehicle( player ) and getPedOccupiedVehicleSeat( player ) == 0 ) and getPedOccupiedVehicle( player ) or nil
 	
-	if ( not isElement( player ) ) or ( not exports.common:isPlayerPlaying( player ) ) or ( not vehicle ) then
-		return false
+	if ( isElement( player ) ) and ( exports.common:isPlayerPlaying( player ) ) and ( vehicle ) then
+		setVehicleOverrideLights( vehicle, getVehicleOverrideLights( vehicle ) == 2 and 1 or 2 )
 	end
-	
-	setVehicleOverrideLights( vehicle, getVehicleOverrideLights( vehicle ) == 2 and 1 or 2 )
 end
 
 addEventHandler( "onResourceStart", resourceRoot,
@@ -336,7 +336,7 @@ addEventHandler( "onVehicleStartExit", root,
 	function( player )
 		if ( exports.common:getRealVehicleID( source ) ) and ( isVehicleLocked( source ) ) then
 			cancelEvent( )
-			outputChatBox( "The door is locked.", player, 230, 95, 95, false )
+			outputChatBox( "The door is locked.", player, 230, 95, 95 )
 		end
 	end
 )
