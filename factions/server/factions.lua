@@ -49,7 +49,16 @@ function getFactionByName( name )
 end
 
 function createFaction( name )
-	local id = exports.database:insert_id( "INSERT INTO `factions` (name) VALUES (?)", name )
+	local ranks = { }
+
+	for i = 1, factionRankCount do
+		table.insert( ranks, {
+			name = "Rank #" .. i,
+			wage = 0
+		} )
+	end
+
+	local id = exports.database:insert_id( "INSERT INTO `factions` (`name`, `ranks`) VALUES (?, ?)", name, toJSON( ranks ) )
 
 	return id and loadFaction( id ) or false
 end
@@ -166,27 +175,40 @@ function loadFaction( id )
 	local query = exports.database:query_single( "SELECT * FROM `factions` WHERE `id` = ? LIMIT 1", id )
 
 	if ( query ) then
+		local ranks = fromJSON( query.ranks )
 		local faction = {
 			id = query.id,
 			name = query.name,
 			motd = query.motd,
-			ranks = { },
+			ranks = ranks,
 			players = { }
 		}
 
 		for i = 1, factionRankCount do
-			local rank = fromJSON( query[ "rank_" .. i ] )
+			if ( not faction.ranks[ i ] ) then
+				faction.ranks[ i ] = {
+					name = "Rank #" .. i,
+					wage = 0
+				}
+			end
+		end
 
-			faction.ranks[ i ] = {
-				name = rank.name,
-				wage = rank.wage
-			}
+		if ( exports.common:count( faction.ranks ) ~= exports.common:count( ranks ) ) then
+			exports.database:execute( "UPDATE `factions` SET `ranks` = ? WHERE `id` = ?", toJSON( faction.ranks ) )
 		end
 
 		local players = exports.database:query( "SELECT `character_id` FROM `factions_characters` WHERE `faction_id` = ?", query.id )
 
 		if ( players ) then
 			for _, data in ipairs( players ) do
+				local rank = data.rank
+
+				if ( not faction.ranks[ rank ] ) then
+					rank = math.min( factionRankCount, math.max( 1, rank ) )
+
+					exports.database:execute( "UPDATE `faction_characters` SET `rank` = ? WHERE `character_id` = ?", rank, data.character_id )
+				end
+
 				table.insert( faction.players, { id = data.character_id, rank = data.rank, leader = data.is_leader == 1 } )
 
 				local player = exports.common:getPlayerByCharacterID( data.character_id )

@@ -22,7 +22,7 @@
 	SOFTWARE.
 ]]
 
-database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, factions = { "factions", "factions_characters" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -61,8 +61,21 @@ database.verification = {
 		{ name = "armor", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "is_dead", type = "smallint", length = 1, default = 0, is_unsigned = true },
 		{ name = "cause_of_death", type = "text" },
-		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" },
-		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" }
+		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" }
+	},
+	factions = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "name", type = "varchar", length = 50, default = "" },
+		{ name = "type", type = "smallint", length = 3, default = 1, is_unsigned = true },
+		{ name = "motd", type = "text" },
+		{ name = "ranks", type = "text" }
+	},
+	factions_characters = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "character_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "faction_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "rank", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "is_leader", type = "tinyint", length = 1, default = 0, is_unsigned = true }
 	},
 	inventory = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -128,7 +141,6 @@ database.verification = {
 		{ name = "is_deleted", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_broken", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_bulletproof", type = "tinyint", length = 1, default = 0, is_unsigned = true },
-		{ name = "created_time", type = "timestamp", default = "CURRENT_TIMESTAMP" },
 		{ name = "created_by", type = "int", length = 11, default = 0, is_unsigned = true }
 	},
 	worlditems = {
