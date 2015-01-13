@@ -40,11 +40,25 @@ function load_resource( resource_name )
 	
 	if ( resource ) then
 		local resource_name = getResourceName( resource )
+		local load_failed = false
 		
 		if ( getResourceState( resource ) == "running" ) then
-			stopResource( resource )
+			if ( not restartResource( resource ) ) then
+				load_failed = "restartResource failed"
+			end
+		elseif ( getResourceState( resource ) == "loaded" ) then
+			if ( not startResource( resource ) ) then
+				load_failed = "startResource failed"
+			end
+		else
+			load_failed = "unknown resource state [\"" .. getResourceState( resource ) .. "\"]"
 		end
-		
+
+		if ( load_failed ) then
+			outputDebugString( "Resource could not be started (" .. load_failed .. ").", 3 )
+		end
+
+		--[[
 		local resource_path = ":" .. resource_name .. "/"
 		local xml_file = xmlLoadFile( resource_path .. resource_config_file )
 		local script_files_to_combine = { }
@@ -57,7 +71,7 @@ function load_resource( resource_name )
 			local xml_found_combined_file, xml_found_shared_content = false, false
 			
 			for _,xml_node in ipairs( xml_script_children ) do
-				if ( xmlNodeGetName( xml_node ) == "_script" ) and ( ( xmlNodeGetAttribute( xml_node, "type" ) == "client" ) --[[or ( xmlNodeGetAttribute( xml_node, "type" ) == "shared" )]] ) then
+				if ( xmlNodeGetName( xml_node ) == "_script" ) and ( xmlNodeGetAttribute( xml_node, "type" ) == "client" ) then --or ( xmlNodeGetAttribute( xml_node, "type" ) == "shared" )
 					if ( xmlNodeGetAttribute( xml_node, "type" ) == "shared" ) then
 						xml_found_shared_content = true
 					end
@@ -224,8 +238,9 @@ function load_resource( resource_name )
 			
 			outputDebugString( "Resource \"" .. resource_name .. "\" started." )
 		end
+		]]
 	else
-		outputDebugString( "Resource could not be started.", 3 )
+		outputDebugString( "Resource could not be started (not found).", 3 )
 	end
 end
 addEvent( "onResourceRequestedStart", true )
