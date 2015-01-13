@@ -61,7 +61,8 @@ database.verification = {
 		{ name = "armor", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "is_dead", type = "smallint", length = 1, default = 0, is_unsigned = true },
 		{ name = "cause_of_death", type = "text" },
-		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" }
+		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "created_time", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	factions = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },

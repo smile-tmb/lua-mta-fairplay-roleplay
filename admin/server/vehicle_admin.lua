@@ -67,7 +67,7 @@ addCommandHandler( { "createvehicle", "newvehicle", "createveh", "makeveh", "mak
 							outputChatBox( "However, we were unable to spawn the vehicle, please try spawning it manually via /spawnvehicle.", player, 230, 95, 95 )
 						end
 					else
-						outputChatBox( "Could not create a " .. getVehicleNameFromModel( modelID ) .. ". Please try again.", player, 230, 95, 95, )
+						outputChatBox( "Could not create a " .. getVehicleNameFromModel( modelID ) .. ". Please try again.", player, 230, 95, 95 )
 					end
 				else
 					outputChatBox( "This vehicle ID is not valid.", player, 230, 95, 95 )

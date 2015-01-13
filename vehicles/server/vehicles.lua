@@ -45,7 +45,7 @@ function getVehicle( id )
 end
 
 function getVehicleData( id )
-	return vehicles[ id ] or false
+	return vehicles [ id ] or false
 end
 
 function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, variantA, variantB, ownerID, faction, color, isLocked, isBulletproof )

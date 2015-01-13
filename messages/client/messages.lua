@@ -78,13 +78,16 @@ addEvent( "messages:create", true )
 addEventHandler( "messages:create", root, createMessage )
 
 function destroyMessage( messageType, messageGlobalID )
+	local disableInput = true
 	if ( not messageGlobalID ) then
 		for index, data in pairs( messages.client ) do
 			if ( data.messageType == messageType ) then
 				if ( isElement( messages.client[ index ].window ) ) then
 					destroyElement( messages.client[ index ].window )
 				end
-				
+
+				disableInput = data.disableInput
+
 				triggerEvent( "messages:onContinue", localPlayer, index, data.messageType, "client", data.disableInput )
 				
 				messages.client[ index ] = nil
@@ -95,7 +98,9 @@ function destroyMessage( messageType, messageGlobalID )
 			if ( isElement( messages.global[ messageGlobalID ].window ) ) then
 				destroyElement( messages.global[ messageGlobalID ].window )
 			end
-			
+
+			disableInput = messages.global[ messageGlobalID ].disableInput
+
 			triggerEvent( "messages:onContinue", localPlayer, messageID, messages.global[ messageGlobalID ].messageType, "global", messages.global[ messageGlobalID ].disableInput )
 			
 			messages.global[ messageGlobalID ] = nil
@@ -104,7 +109,9 @@ function destroyMessage( messageType, messageGlobalID )
 	
 	if ( not isMessageOpen( ) ) then
 		showCursor( false )
-		guiSetInputEnabled( false )
+		if ( disableInput ) then
+			guiSetInputEnabled( disableInput )
+		end
 	end
 end
 addEvent( "messages:destroy", true )
