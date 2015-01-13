@@ -41,8 +41,8 @@
 
 	<settings>
 		<setting name="hostname" value="127.0.0.1" />
-		<setting name="username" value="" />
-		<setting name="password" value="" />
-		<setting name="database" value="" />
+		<setting name="username" value="root" />
+		<setting name="password" value="-.-123-.-" />
+		<setting name="database" value="mta" />
 	</settings>
 </meta>
