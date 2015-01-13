@@ -31,6 +31,18 @@ local vehicleIDs = { 602, 545, 496, 517, 401, 410, 518, 600, 527, 436, 589, 580,
 444, 556, 429, 411, 541, 559, 415, 561, 480, 560, 562, 506, 565, 451, 434, 558, 494, 555, 502, 477, 503, 579, 400, 404, 489, 505, 479, 442, 458, 
 606, 607, 610, 590, 569, 611, 584, 608, 435, 450, 591, 594 }
 
+function getRealVehicleEngineState( vehicle )
+	return getElementData( vehicle, "vehicle:engine" ) or false
+end
+
+function getRealVehicleID( vehicle )
+	return getElementData( vehicle, "vehicle:id" ) or false
+end
+
+function getValidVehicleModelIDs( )
+	return vehicleIDs
+end
+
 function isValidVehicleModelID( vehicleID )
 	for _, id in ipairs( vehicleIDs ) do
 		if ( id == vehicleID ) then
@@ -41,14 +53,6 @@ function isValidVehicleModelID( vehicleID )
 	return false
 end
 
-function getValidVehicleModelIDs( )
-	return vehicleIDs
-end
-
-function getRealVehicleID( vehicle )
-	return getElementData( vehicle, "vehicle:id" ) or false
-end
-
-function getRealVehicleEngineState( vehicle )
-	return getElementData( vehicle, "vehicle:engine" ) or false
+function isVehicleBroken( vehicle )
+	return getElementData( vehicle, "vehicle:broken" ) or false
 end

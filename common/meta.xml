@@ -103,6 +103,7 @@
 	<export function="getRealVehicleEngineState" type="shared" />
 	<export function="getValidVehicleModelIDs" type="shared" />
 	<export function="isValidVehicleModelID" type="shared" />
+	<export function="isVehicleBroken" type="shared" />
 	
 	<!-- shared/worlditems.lua -->
 	<export function="getRealWorldItemID" type="shared" />
