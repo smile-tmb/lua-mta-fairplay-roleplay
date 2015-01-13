@@ -103,18 +103,22 @@ function loadCharacterKills( )
 			destroyElement( ped )
 		end
 	end
-	
-	for _, data in ipairs( exports.database:query( "SELECT * FROM `characters` WHERE `is_dead` = '1'" ) ) do
-		local ped = createPed( data.skin_id, data.pos_x, data.pos_y, data.pos_z )
-		
-		setPedRotation( ped, data.rotation )
-		setElementInterior( ped, data.interior )
-		setElementDimension( ped, data.dimension )
-		
-		killPed( ped )
-		
-		exports.security:modifyElementData( ped, "npc:character_kill.id", data.id, true )
-		exports.security:modifyElementData( ped, "npc:character_kill.reason", data.cause_of_death, true )
+
+	local characterKills = exports.database:query( "SELECT * FROM `characters` WHERE `is_dead` = '1'" )
+
+	if ( characterKills ) then
+		for _, data in ipairs( characterKills ) do
+			local ped = createPed( data.skin_id, data.pos_x, data.pos_y, data.pos_z )
+			
+			setPedRotation( ped, data.rotation )
+			setElementInterior( ped, data.interior )
+			setElementDimension( ped, data.dimension )
+			
+			killPed( ped )
+			
+			exports.security:modifyElementData( ped, "npc:character_kill.id", data.id, true )
+			exports.security:modifyElementData( ped, "npc:character_kill.reason", data.cause_of_death, true )
+		end
 	end
 end
 
