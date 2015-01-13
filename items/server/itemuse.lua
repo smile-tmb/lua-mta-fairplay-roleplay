@@ -65,14 +65,14 @@ addEventHandler( "items:use", root,
 					setPedWeaponSlot( client, getSlotFromWeapon( weaponID ) )
 				end
 			elseif ( item.itemID == 13 ) then
-				outputChatBox( "You can use this radio by typing /r <message>", client, 230, 180, 95, false )
+				outputChatBox( "You can use this radio by typing /r <message>", client, 230, 180, 95 )
 			elseif ( item.itemID == 14 ) then
-				outputChatBox( "You can use this megaphone by typing /m <message>", client, 230, 180, 95, false )
+				outputChatBox( "You can use this megaphone by typing /m <message>", client, 230, 180, 95 )
 			else
 				exports.chat:outputLocalActionMe( client, "shows their " .. itemName .. " to everyone." )
 			end
 		else
-			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
+			outputChatBox( "You do not have such item.", client, 230, 95, 95 )
 		end
 	end
 )
@@ -89,7 +89,7 @@ addEventHandler( "items:show", root,
 		if ( clientItem ) and ( hasItem ) then
 			exports.chat:outputLocalActionMe( client, "shows their " .. ( item.itemID == 11 and getWeaponName( itemValue ) or getItemName( item.itemID ) ) .. " to everyone." )
 		else
-			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
+			outputChatBox( "You do not have such item.", client, 230, 95, 95 )
 		end
 	end
 )
@@ -112,7 +112,7 @@ addEventHandler( "items:delete", root,
 				--triggerClientEvent( client, ":_exitPhoneWindows_:", client, value )
 			end
 		else
-			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
+			outputChatBox( "You do not have such item.", client, 230, 95, 95 )
 		end
 	end
 )

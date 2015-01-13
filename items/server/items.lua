@@ -138,7 +138,7 @@ addCommandHandler( "giveitem",
 			local itemID = tonumber( itemID )
 			
 			if ( not targetPlayer ) or ( not itemID ) or ( ( itemID ) and ( itemID <= 0 ) ) then
-				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95, false )
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95 )
 				return
 			else
 				if ( ... ) then
@@ -148,23 +148,23 @@ addCommandHandler( "giveitem",
 				local targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
 				
 				if ( not targetPlayer ) then
-					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
 				else
 					if ( getItemList( )[ itemID ] ) then
 						if ( items[ targetPlayer ] ) then
 							value = value or getItemValue( itemID )
 							
 							if ( giveItem( targetPlayer, itemID, value ) ) then
-								outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
-								outputChatBox( "You were given a " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
+								outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95 )
+								outputChatBox( "You were given a " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95 )
 							else
-								outputChatBox( "Error occurred (0x0000FE).", player, 230, 95, 95, false )
+								outputChatBox( "Error occurred (0x0000FE).", player, 230, 95, 95 )
 							end
 						else
-							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95, false )
+							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95 )
 						end
 					else
-						outputChatBox( "Invalid item ID.", player, 230, 95, 95, false )
+						outputChatBox( "Invalid item ID.", player, 230, 95, 95 )
 					end
 				end
 			end
@@ -178,13 +178,13 @@ addCommandHandler( "takeitem",
 			local itemID = tonumber( itemID )
 			
 			if ( not targetPlayer ) or ( not itemID ) or ( ( itemID ) and ( itemID <= 0 ) ) or ( ( value ) and ( string.len( value ) < 2 ) ) then
-				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95, false )
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95 )
 				return
 			else
 				local targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
 
 				if ( not targetPlayer ) then
-					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
 				else
 					if ( getItemList( )[ itemID ] ) then
 						if ( items[ targetPlayer ] ) then
@@ -199,18 +199,18 @@ addCommandHandler( "takeitem",
 										setVehicleEngineState( vehicle, false )
 									end
 									
-									outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getPlayerName(targetPlayer) .. ".", player, 95, 230, 95, false )
+									outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getPlayerName(targetPlayer) .. ".", player, 95, 230, 95 )
 								else
-									outputChatBox( "Error occurred (0x0000FF).", player, 230, 95, 95, false )
+									outputChatBox( "Error occurred (0x0000FF).", player, 230, 95, 95 )
 								end
 							else
-								outputChatBox( "That player doesn't have an item.", player, 230, 95, 95, false )
+								outputChatBox( "That player doesn't have an item.", player, 230, 95, 95 )
 							end
 						else
-							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95, false )
+							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95 )
 						end
 					else
-						outputChatBox( "Invalid item ID.", player, 230, 95, 95, false )
+						outputChatBox( "Invalid item ID.", player, 230, 95, 95 )
 					end
 				end
 			end
@@ -384,7 +384,7 @@ addCommandHandler( "giveitem",
 			local itemID = tonumber( itemID )
 			
 			if ( not targetPlayer ) or ( not itemID ) or ( ( itemID ) and ( itemID <= 0 ) ) then
-				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95, false )
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]>", player, 230, 180, 95 )
 				return
 			else
 				if ( ... ) then
@@ -394,24 +394,24 @@ addCommandHandler( "giveitem",
 				local targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
 				
 				if ( not targetPlayer ) then
-					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
 				else
 					if ( getItemList( )[ itemID ] ) then
 						if ( data[ targetPlayer ] ) then
 							if ( ( tonumber( getElementData( targetPlayer, "character:weight" ) ) + getItemWeight( itemID ) ) <= tonumber( getElementData( targetPlayer, "character:max_weight" ) ) ) then
 								if ( giveItem( targetPlayer, itemID, value ) ) then
-									outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95, false )
+									outputChatBox( "Gave " .. exports.common:getPlayerName( targetPlayer ) .. " item " .. getItemName( itemID ) .. " (" .. itemID .. ").", player, 95, 230, 95 )
 								else
-									outputChatBox( "Error occurred - 0x0220.", player, 230, 95, 95, false )
+									outputChatBox( "Error occurred - 0x0220.", player, 230, 95, 95 )
 								end
 							else
-								outputChatBox( "That player does not have enough space for that item.", player, 230, 95, 95, false )
+								outputChatBox( "That player does not have enough space for that item.", player, 230, 95, 95 )
 							end
 						else
-							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95, false )
+							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95 )
 						end
 					else
-						outputChatBox( "Invalid item ID.", player, 230, 95, 95, false )
+						outputChatBox( "Invalid item ID.", player, 230, 95, 95 )
 					end
 				end
 			end
@@ -426,12 +426,12 @@ addCommandHandler( "takeitem",
 			local dbID = tonumber( dbID )
 			
 			if ( not targetPlayer ) or ( not itemID ) or ( ( itemID ) and ( itemID <= 0 ) ) or ( ( value ) and ( string.len( value ) < 2 ) ) or ( ( dbID ) and ( dbID <= 0 ) ) then
-				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]> <[entry id]>", player, 230, 180, 95, false )
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [item id] <[value]> <[entry id]>", player, 230, 180, 95 )
 				return
 			else
 				local targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
 				if ( not targetPlayer ) then
-					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
 				else
 					if ( getItemList( )[ itemID ] ) then
 						if ( data[ targetPlayer ] ) then
@@ -445,15 +445,15 @@ addCommandHandler( "takeitem",
 									setVehicleEngineState( vehicle, false )
 								end
 								
-								outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getPlayerName(targetPlayer) .. ".", player, 95, 230, 95, false )
+								outputChatBox( "Took " .. getItemName( itemID ) .. " from " .. exports.common:getPlayerName(targetPlayer) .. ".", player, 95, 230, 95 )
 							else
-								outputChatBox( "That player doesn't have an item.", player, 230, 95, 95, false )
+								outputChatBox( "That player doesn't have an item.", player, 230, 95, 95 )
 							end
 						else
-							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95, false )
+							outputChatBox( "That player doesn't have item data initialized yet.", player, 230, 95, 95 )
 						end
 					else
-						outputChatBox( "Invalid item ID.", player, 230, 95, 95, false )
+						outputChatBox( "Invalid item ID.", player, 230, 95, 95 )
 					end
 				end
 			end

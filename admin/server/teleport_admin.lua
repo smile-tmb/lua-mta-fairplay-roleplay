@@ -28,7 +28,7 @@ addCommandHandler( { "getpos", "pos", "getposition", "getxyz", "getloc", "loc", 
 			targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
 			
 			if ( not targetPlayer ) then
-				outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95, false )
+				outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
 				
 				return
 			end
@@ -45,9 +45,9 @@ addCommandHandler( { "getpos", "pos", "getposition", "getxyz", "getloc", "loc", 
 		
 		local playerName = exports.common:getPlayerName( targetPlayer )
 		
-		outputChatBox( ( targetPlayer ~= player and exports.common:formatPlayerName( playerName ) or "Your" ) .. " position:", player, 230, 180, 95, false )
-		outputChatBox( " Position: " .. x .. ", " .. y .. ", " .. z, player, 230, 180, 95, false )
-		outputChatBox( " Rotation: " .. rotation .. ", Interior: " .. interior .. ", Dimension: " .. dimension, player, 230, 180, 95, false )
+		outputChatBox( ( targetPlayer ~= player and exports.common:formatPlayerName( playerName ) or "Your" ) .. " position:", player, 230, 180, 95 )
+		outputChatBox( " Position: " .. x .. ", " .. y .. ", " .. z, player, 230, 180, 95 )
+		outputChatBox( " Rotation: " .. rotation .. ", Interior: " .. interior .. ", Dimension: " .. dimension, player, 230, 180, 95 )
 	end
 )
 

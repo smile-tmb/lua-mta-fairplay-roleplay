@@ -69,7 +69,7 @@ addEventHandler( "onPlayerWasted", root,
 			reviveCharacter( source )
 		else
 			for _, player in ipairs( exports.common:getPriorityPlayers( ) ) do
-				outputChatBox( exports.common:getPlayerName( source ) .. " died (" .. ( ( not killer or source == killer ) and "Suicide" or killerWeapon .. " by " .. exports.common:getPlayerName( killer ) ) .. ").", player, 230, 95, 95, false )
+				outputChatBox( exports.common:getPlayerName( source ) .. " died (" .. ( ( not killer or source == killer ) and "Suicide" or killerWeapon .. " by " .. exports.common:getPlayerName( killer ) ) .. ").", player, 230, 95, 95 )
 			end
 		end
 	end
@@ -90,7 +90,7 @@ addEventHandler( "realism:respawn", root,
 			exports.admin:createTicket( client, nil, details, 5 )
 			exports.messages:createMessage( client, "Please wait for an administrator to respond to your ticket.", "wait-for-admin" )
 			exports.security:modifyElementData( client, "player:waiting", details, true )
-			outputChatBox( "You have opened a new ticket regarding your death. Please wait for an administrator.", client, 180, 230, 95, false )
+			outputChatBox( "You have opened a new ticket regarding your death. Please wait for an administrator.", client, 180, 230, 95 )
 		end
 	end
 )
@@ -110,7 +110,7 @@ addEventHandler( "onResourceStop", root,
 		if ( getResourceName( resource ) == "admin" ) then
 			for _, player in ipairs( getElementsByType( "player" ) ) do
 				if ( getElementData( player, "player:waiting" ) ) then
-					outputChatBox( "Because of technical reasons your ticket was closed. You can report again now. Your old message was outputted to the F8 console.", player, 230, 95, 95, false )
+					outputChatBox( "Because of technical reasons your ticket was closed. You can report again now. Your old message was outputted to the F8 console.", player, 230, 95, 95 )
 					outputConsole( "Old admin assistance message:", player )
 					outputConsole( getElementData( player, "player:waiting" ), player )
 					removeElementData( player, "player:waiting" )

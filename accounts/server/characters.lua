@@ -149,7 +149,7 @@ addEventHandler( "characters:play", root,
 					triggerClientEvent( client, "characters:closeGUI", client, true )
 					spawnCharacter( client, character, true )
 				else
-					outputChatBox( "That character is dead, you cannot play on it anymore.", client, 230, 95, 95, false )
+					outputChatBox( "That character is dead, you cannot play on it anymore.", client, 230, 95, 95 )
 				end
 			else
 				exports.messages:createMessage( client, "Unable to retrieve information for this character. Please try again.", "selection" )
@@ -178,7 +178,7 @@ end
 addCommandHandler( "saveme",
 	function( player )
 		if ( saveCharacter( player ) ) then
-			outputChatBox( "Your character has been successfully saved.", player, 95, 230, 95, false )
+			outputChatBox( "Your character has been successfully saved.", player, 95, 230, 95 )
 		end
 	end
 )
@@ -308,10 +308,10 @@ function spawnCharacter( player, character, fade )
 				
 				fadeCamera( player, true, 2.0 )
 				
-				outputChatBox( "Welcome" .. ( not pendingTutorial and " back" or "" ) .. ", " .. character.name:gsub( "_", " " ) .. "!", player, 230, 180, 95, false )
+				outputChatBox( "Welcome" .. ( not pendingTutorial and " back" or "" ) .. ", " .. character.name:gsub( "_", " " ) .. "!", player, 230, 180, 95 )
 				
 				if ( not pendingTutorial ) and ( character.last_played ) then
-					outputChatBox( "You were last seen on this character on " .. exports.common:formatDate( character.last_played, true ) .. ".", player, 230, 180, 95, false )
+					outputChatBox( "You were last seen on this character on " .. exports.common:formatDate( character.last_played, true ) .. ".", player, 230, 180, 95 )
 				end
 				
 				exports.admin:updateTickets( player )

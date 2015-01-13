@@ -175,7 +175,7 @@ addEventHandler( "admin:ticket_close", root,
 				assignTicket( id, client )
 			else
 				if ( tickets[ id ].assignedTo ~= exports.common:getAccountID( client ) ) then
-					outputChatBox( "This is not your ticket!", client, 230, 95, 95, false )
+					outputChatBox( "This is not your ticket!", client, 230, 95, 95 )
 				end
 			end
 			
@@ -190,9 +190,9 @@ addEventHandler( "admin:ticket_close", root,
 			
 			destroyTicket( id, isSpam and 2 or 1 )
 			
-			outputChatBox( "Ticket marked as resolved!", client, 95, 230, 95, false )
+			outputChatBox( "Ticket marked as resolved!", client, 95, 230, 95 )
 		else
-			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95, false )
+			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95 )
 			
 			triggerClientEvent( client, "admin:update_tickets", client, tickets )
 		end
@@ -208,10 +208,10 @@ addEventHandler( "admin:ticket_assign", root,
 		
 		if ( tickets[ id ] ) then
 			if ( assignTicket( id, client ) ) then
-				outputChatBox( "Ticket assigned to you!", client, 95, 230, 95, false )
+				outputChatBox( "Ticket assigned to you!", client, 95, 230, 95 )
 			end
 		else
-			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95, false )
+			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95 )
 			
 			triggerClientEvent( client, "admin:update_tickets", client, tickets )
 		end
@@ -240,10 +240,10 @@ addEventHandler( "admin:new_ticket", root,
 				triggerClientEvent( client, "admin:hide_ticket_ui", client )
 				exports.messages:createMessage( client, "You have successfully submitted your ticket. You will be contacted by an administrator soon.", "new-ticket-msg" )
 			else
-				outputChatBox( "Could not create a ticket, please try again.", client, 230, 95, 95, false )
+				outputChatBox( "Could not create a ticket, please try again.", client, 230, 95, 95 )
 			end
 		else
-			outputChatBox( "Message length is not sufficient. Minimum length is 15 and maximum length is 1000 characters.", client, 230, 95, 95, false )
+			outputChatBox( "Message length is not sufficient. Minimum length is 15 and maximum length is 1000 characters.", client, 230, 95, 95 )
 		end
 	end
 )
@@ -261,16 +261,16 @@ addEventHandler( "admin:goto_player", root,
 			if ( player ~= client ) then
 				if ( isElement( player ) ) then
 					if ( teleportPlayer( client, player ) ) then
-						outputChatBox( "You teleported to " .. exports.common:getPlayerName( player ) .. ".", client, 230, 180, 95, false )
+						outputChatBox( "You teleported to " .. exports.common:getPlayerName( player ) .. ".", client, 230, 180, 95 )
 					else
-						outputChatBox( "Could not teleport to that player, try again.", client, 230, 95, 95, false )
+						outputChatBox( "Could not teleport to that player, try again.", client, 230, 95, 95 )
 					end
 				else
-					outputChatBox( "That player does not exist anymore.", client, 230, 95, 95, false )
+					outputChatBox( "That player does not exist anymore.", client, 230, 95, 95 )
 				end
 			end
 		else
-			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95, false )
+			outputChatBox( "This ticket does not exist anymore. Sorry!", client, 230, 95, 95 )
 			
 			triggerClientEvent( client, "admin:update_tickets", client, tickets )
 		end

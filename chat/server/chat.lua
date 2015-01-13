@@ -72,7 +72,7 @@ function outputLocalChat( player, message, originalDistance )
 	local senderLanguage, senderSkill = getPlayerLanguage( player, 1 )
 	
 	if ( not senderLanguage ) then
-		outputChatBox( "Wops, you do not have a language!", player, 230, 95, 95, false )
+		outputChatBox( "Wops, you do not have a language!", player, 230, 95, 95 )
 		return
 	end
 	

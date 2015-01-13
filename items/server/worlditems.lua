@@ -70,16 +70,16 @@ addEventHandler( "items:drop", root,
 						end
 						
 						if ( not takeItem( client, item.id ) ) then
-							outputChatBox( "Something is wrong (0xFE0000).", client, 230, 95, 95, false )
+							outputChatBox( "Something is wrong (0xFE0000).", client, 230, 95, 95 )
 							table.remove( worldItems, id )
 							destroyElement( object )
 							exports.database:execute( "DELETE FROM `worlditems` WHERE `id` = ?", id )
 						end
 					else
-						outputChatBox( "Something is wrong (0xEF0000).", client, 230, 95, 95, false )
+						outputChatBox( "Something is wrong (0xEF0000).", client, 230, 95, 95 )
 					end
 				else
-					outputChatBox( "Something is wrong (0xFF0000).", client, 230, 95, 95, false )
+					outputChatBox( "Something is wrong (0xFF0000).", client, 230, 95, 95 )
 				end
 			else
 				exports.chat:outputLocalActionMe( client, "gave " .. exports.common:getPlayerName( element ) .. " a " .. getItemName( item.itemID ) .. "." )
@@ -87,7 +87,7 @@ addEventHandler( "items:drop", root,
 				giveItem( element, item.itemID, value )
 			end
 		else
-			outputChatBox( "You do not have such item.", client, 230, 95, 95, false )
+			outputChatBox( "You do not have such item.", client, 230, 95, 95 )
 		end
 	end
 )
@@ -102,7 +102,7 @@ addEventHandler( "items:pickup", root,
 		local id = exports.common:getRealWorldItemID( object )
 		
 		if ( not isElement( object ) ) or ( not worldItems[ id ] ) then
-			outputChatBox( "Oh, that item is no longer.", client, 230, 95, 95, false )
+			outputChatBox( "Oh, that item is no longer.", client, 230, 95, 95 )
 			return
 		end
 		
@@ -132,7 +132,7 @@ addEventHandler( "items:update_position", root,
 		local id = exports.common:getRealWorldItemID( object )
 		
 		if ( not isElement( object ) ) or ( not worldItems[ id ] ) then
-			outputChatBox( "Oh, that item is no longer.", client, 230, 95, 95, false )
+			outputChatBox( "Oh, that item is no longer.", client, 230, 95, 95 )
 			return
 		end
 		

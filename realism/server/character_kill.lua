@@ -50,8 +50,8 @@ function characterKill( characterID, causeOfDeath )
 			if ( characterPlayer ) then
 				exports.accounts:characterSelection( player )
 				
-				outputChatBox( "You were character killed by an administrator.", player, 230, 180, 95, false )
-				outputChatBox( " Cause of death: " .. causeOfDeath, player, 230, 180, 95, false )
+				outputChatBox( "You were character killed by an administrator.", player, 230, 180, 95 )
+				outputChatBox( " Cause of death: " .. causeOfDeath, player, 230, 180, 95 )
 			else
 				exports.accounts:updateCharacters( player )
 			end

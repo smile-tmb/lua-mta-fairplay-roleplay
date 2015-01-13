@@ -130,10 +130,10 @@ function openTicketBrowser( forceEnd, stayClosed )
 			if ( getTickets( )[ id ] ) then
 				openTicket( id )
 			else
-				outputChatBox( "This ticket does not exist anymore.", 230, 95, 95, false )
+				outputChatBox( "This ticket does not exist anymore.", 230, 95, 95 )
 			end
 		else
-			outputChatBox( "Please select a ticket from the list.", 230, 95, 95, false )
+			outputChatBox( "Please select a ticket from the list.", 230, 95, 95 )
 		end
 	end
 	addEventHandler( "onClientGUIClick", ticketBrowser.button.open, ticket, false )
@@ -486,10 +486,10 @@ function createTicketWindow( forceEnd, stayClosed )
 				if ( message:len( ) >= 15 ) and ( message:len( ) <= 1000 ) then
 					triggerServerEvent( "admin:new_ticket", localPlayer, targetName, message, selectedType )
 				else
-					outputChatBox( "Message length is not sufficient. Minimum length is 15 and maximum length is 1000 characters.", 230, 95, 95, false )
+					outputChatBox( "Message length is not sufficient. Minimum length is 15 and maximum length is 1000 characters.", 230, 95, 95 )
 				end
 			else
-				outputChatBox( "Please select the ticket type.", 230, 95, 95, false )
+				outputChatBox( "Please select the ticket type.", 230, 95, 95 )
 			end
 		end, false
 	)

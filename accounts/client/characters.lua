@@ -78,7 +78,7 @@ function showCharacterSelection( forceEnd )
 				
 				triggerServerEvent( "characters:play", localPlayer, characterName )
 			else
-				outputChatBox( "That character is dead, you cannot play on it anymore.", 230, 95, 95, false )
+				outputChatBox( "That character is dead, you cannot play on it anymore.", 230, 95, 95 )
 			end
 		end
 	end
