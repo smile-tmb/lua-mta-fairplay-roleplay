@@ -150,7 +150,7 @@ function showLoginMenu( forceEnd )
 				if ( not password:find( username ) ) then
 					if ( password:len( ) >= minimumPasswordLength ) then
 						if ( password:len( ) <= maximumPasswordLength ) then
-							exports.messages:createMessage( "Registering account, please wait.", "login", nil, true )
+							exports.messages:createMessage( "Registering account, please wait.", "login", nil, false )
 							guiSetEnabled( accounts_login_view.window, false )
 							
 							triggerServerEvent( "accounts:register", localPlayer, username, password )
@@ -173,7 +173,7 @@ function showLoginMenu( forceEnd )
 		else
 			exports.messages:createMessage( "Username must be at least " .. minimumUsernameLength .. " characters long.", "login" )
 			guiSetEnabled( accounts_login_view.window, false )
-		end
+		endz
 	end
 	
 	addEventHandler( "onClientGUIClick", accounts_login_view.button.register, processRegister, false )
