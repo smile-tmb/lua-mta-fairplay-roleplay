@@ -191,15 +191,17 @@ function spawnAllVehicles( )
 	
 	local vehicles = exports.database:query( "SELECT * FROM `vehicles` WHERE `is_deleted` = '0' ORDER BY `id`" )
 	
-	vehiclesToLoadCount = #vehicles
-	
-	for _, vehicle in ipairs( vehicles ) do
-		local spawnCoroutine = coroutine.create( spawn )
-		coroutine.resume( spawnCoroutine, vehicle, false, true )
-		table.insert( threads, spawnCoroutine )
+	if ( vehicles ) then
+		vehiclesToLoadCount = #vehicles
+		
+		for _, vehicle in ipairs( vehicles ) do
+			local spawnCoroutine = coroutine.create( spawn )
+			coroutine.resume( spawnCoroutine, vehicle, false, true )
+			table.insert( threads, spawnCoroutine )
+		end
+		
+		setTimer( resumeCoroutines, 1000, 4 )
 	end
-	
-	setTimer( resumeCoroutines, 1000, 4 )
 end
 
 function resumeCoroutines( )
