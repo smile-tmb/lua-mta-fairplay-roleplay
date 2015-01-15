@@ -298,14 +298,27 @@ function toggleLights( player )
 	end
 end
 
+function bindKeys( player, state )
+	local player = player or source
+	local fn = state and bindKey or unbindKey
+
+	fn( player, "J", "down", toggleEngine )
+	fn( player, "K", "down", toggleLock )
+	fn( player, "L", "down", toggleLights )
+end
+
+addEventHandler( "onPlayerJoin", root,
+	function( )
+		bindKeys( source )
+	end
+)
+
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		spawnAllVehicles( )
 		
 		for _, player in ipairs( getElementsByType( "player" ) ) do
-			bindKey( player, "J", "down", toggleEngine )
-			bindKey( player, "K", "down", toggleLock )
-			bindKey( player, "L", "down", toggleLights )
+			bindKeys( player )
 		end
 	end
 )
