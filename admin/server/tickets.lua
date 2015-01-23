@@ -133,8 +133,12 @@ end
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		setTimer( function( )
-			for _, data in ipairs( exports.database:query( "SELECT * FROM `ticket_logs` WHERE `closed_state` = '0' ORDER BY `id` ASC, `assigned_to` ASC, `type` ASC" ) ) do
-				loadTicket( data.id )
+			local query = exports.database:query( "SELECT * FROM `ticket_logs` WHERE `closed_state` = '0' ORDER BY `id` ASC, `assigned_to` ASC, `type` ASC" )
+			
+			if ( query ) then
+				for _, data in ipairs( query ) do
+					loadTicket( data.id )
+				end
 			end
 		end, 500, 1 )
 	end
