@@ -29,10 +29,6 @@ local factionSelector = {
 
 local factions = { }
 
-function showFactionMenu( forceClose )
-	--todo
-end
-
 function getFactionByID( id )
 	for index, faction in pairs( factions ) do
 		if ( faction.id == id ) then
@@ -41,6 +37,10 @@ function getFactionByID( id )
 	end
 	
 	return false
+end
+
+function showFactionMenu( forceClose )
+	--todo
 end
 
 function showFactionSelector( forceClose )
