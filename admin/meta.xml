@@ -35,6 +35,7 @@
 	<script src="shared/tickets.lua" type="shared" cache="false" />
 	
 	<script src="server/utility.lua" />
+	<script src="server/faction_admin.lua" />
 	<script src="server/player_admin.lua" />
 	<script src="server/server.lua" />
 	<script src="server/vehicle_admin.lua" />
