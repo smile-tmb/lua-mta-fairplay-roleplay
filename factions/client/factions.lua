@@ -67,39 +67,68 @@ function showFactionSelector( forceClose )
 	guiGridListAddColumn( factionSelector.factions, "Name", 0.6 )
 	guiGridListAddColumn( factionSelector.factions, "Type", 0.25 )
 	
-	local defaultFaction = exports.common:getPlayerDefaultFaction( localPlayer )
-	
-	if ( defaultFaction > 0 ) then
+	if ( exports.common:count( factions ) == 0 ) then
 		local row = guiGridListAddRow( factionSelector.factions )
 		
-		guiGridListSetItemText( factionSelector.factions, row, 2, "Default faction", true, false )
+		guiGridListSetItemText( factionSelector.factions, row, 2, "You are not in any faction", true, false )
+	else
+		local defaultFaction = exports.common:getPlayerDefaultFaction( localPlayer )
+		local faction = ( defaultFaction and defaultFaction > 0 ) and getFactionByID( defaultFaction ) or false
 		
-		local faction = getFactionByID( defaultFaction )
-		local row = guiGridListAddRow( factionSelector.factions )
-		
-		guiGridListSetItemText( factionSelector.factions, row, 1, faction.id, false, true )
-		guiGridListSetItemText( factionSelector.factions, row, 2, faction.name, false, false )
-		guiGridListSetItemText( factionSelector.factions, row, 3, getFactionType( faction.type ), false, false )
-		
-		if ( exports.common:count( factions ) > 1 ) then
+		if ( faction ) then
 			local row = guiGridListAddRow( factionSelector.factions )
 			
-			guiGridListSetItemText( factionSelector.factions, row, 2, "Alternate factions", true, false )
-		end
-	end
-	
-	for _, faction in pairs( factions ) do
-		if ( defaultFaction ~= faction.id ) then
+			guiGridListSetItemText( factionSelector.factions, row, 2, "Default faction", true, false )
+			
 			local row = guiGridListAddRow( factionSelector.factions )
 			
 			guiGridListSetItemText( factionSelector.factions, row, 1, faction.id, false, true )
 			guiGridListSetItemText( factionSelector.factions, row, 2, faction.name, false, false )
 			guiGridListSetItemText( factionSelector.factions, row, 3, getFactionType( faction.type ), false, false )
+			
+			if ( exports.common:count( factions ) > 1 ) then
+				local row = guiGridListAddRow( factionSelector.factions )
+				
+				guiGridListSetItemText( factionSelector.factions, row, 2, "Alternate factions", true, false )
+			end
+		end
+		
+		for _, faction in pairs( factions ) do
+			if ( defaultFaction ~= faction.id ) then
+				local row = guiGridListAddRow( factionSelector.factions )
+				
+				guiGridListSetItemText( factionSelector.factions, row, 1, tostring( faction.id ), false, true )
+				guiGridListSetItemText( factionSelector.factions, row, 2, tostring( faction.name ), false, false )
+				guiGridListSetItemText( factionSelector.factions, row, 3, getFactionType( faction.type ), false, false )
+			end
 		end
 	end
 	
+	addEventHandler( "onClientGUIClick", factionSelector.factions,
+		function( )
+			local row, column = guiGridListGetSelectedItem( factionSelector.factions )
+			if ( row ~= -1 ) and ( column ~= -1 ) then
+				if ( row == 1 ) then
+					guiSetEnabled( factionSelector.button.set, false )
+				elseif ( row > 1 ) then
+					guiSetEnabled( factionSelector.button.set, true )
+				end
+				
+				if ( row ~= -1 ) then
+					guiSetEnabled( factionSelector.button.open, true )
+				else
+					guiSetEnabled( factionSelector.button.set, false )
+				end
+			end
+		end, false
+	)
+	
 	factionSelector.button.open = guiCreateButton( 10, 273, 392, 29, "Open faction panel", false, factionSelector.window )
+	guiSetEnabled( factionSelector.button.open, false )
+	
 	factionSelector.button.set = guiCreateButton( 10, 312, 392, 29, "Set as main faction", false, factionSelector.window )
+	guiSetEnabled( factionSelector.button.set, false )
+	
 	factionSelector.button.close = guiCreateButton( 10, 351, 392, 29, "Close window", false, factionSelector.window )
 	
 	local function openFactionMenu( )
@@ -147,13 +176,20 @@ end
 
 addEvent( "factions:update", true )
 addEventHandler( "factions:update", root,
-	function( serverFaction )
-		local faction, index = getFactionByID( serverFaction.id )
-		
-		if ( faction ) then
-			factions[ index ] = serverFaction
-		else
-			table.insert( factions, serverFaction )
+	function( serverFactions )
+		if ( exports.common:count( serverFactions ) == 0 ) then
+			factions = { }
+		elseif ( exports.common:count( serverFactions ) == 1 ) then
+			serverFactions = serverFactions[ 1 ]
+			local faction, index = getFactionByID( serverFactions.id )
+			
+			if ( faction ) then
+				factions[ index ] = serverFactions
+			else
+				table.insert( factions, serverFactions )
+			end
+		elseif ( exports.common:count( serverFactions ) > 1 ) then
+			factions = serverFactions
 		end
 		
 		if ( isElement( factionSelector.window ) ) then
