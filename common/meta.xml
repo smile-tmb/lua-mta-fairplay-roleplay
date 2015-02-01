@@ -93,6 +93,7 @@
 	<export function="getPlayerByAccountID" type="shared" />
 	<export function="getPlayerByCharacterID" type="shared" />
 	<export function="getPlayerByID" type="shared" />
+	<export function="getPlayerDefaultFaction" type="shared" />
 	<export function="getPlayerFromPartialName" type="shared" />
 	<export function="getPlayerID" type="shared" />
 	<export function="getPlayerName" type="shared" />

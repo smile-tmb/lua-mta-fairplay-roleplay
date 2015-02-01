@@ -40,6 +40,10 @@ function getPlayerByID( id )
 	return false
 end
 
+function getPlayerDefaultFaction( player )
+	return ( isElement( player ) and getElementData( player, "character:default_faction" ) ) and tonumber( getElementData( player, "character:default_faction" ) ) or false
+end
+
 function getPlayerFromPartialName( string, player )
 	if ( not string ) then
 		return false

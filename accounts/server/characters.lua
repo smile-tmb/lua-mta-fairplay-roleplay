@@ -216,6 +216,8 @@ function characterSelection( player )
 	removeElementData( player, "character:origin" )
 	removeElementData( player, "character:look" )
 	removeElementData( player, "character:date_of_birth" )
+	removeElementData( player, "character:default_faction" )
+	
 	removeElementData( player, "character:weight" )
 	removeElementData( player, "character:max_weight" )
 	
@@ -259,6 +261,7 @@ function spawnCharacter( player, character, fade )
 				exports.security:modifyElementData( player, "character:origin", character.origin, true )
 				exports.security:modifyElementData( player, "character:look", character.look, true )
 				exports.security:modifyElementData( player, "character:date_of_birth", character.date_of_birth, true )
+				exports.security:modifyElementData( player, "character:default_faction", character.default_faction, true )
 				
 				local languages = exports.database:query_single( "SELECT * FROM `languages` WHERE `character_id` = ?", character.id )
 				

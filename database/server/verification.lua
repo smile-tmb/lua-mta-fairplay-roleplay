@@ -48,6 +48,7 @@ database.verification = {
 		{ name = "name", type = "varchar", length = 255, default = "" },
 		{ name = "gender", type = "varchar", length = 255, default = "" },
 		{ name = "skin_color", type = "varchar", length = 255, default = "" },
+		{ name = "default_faction", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "date_of_birth", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "origin", type = "varchar", length = 255, default = "" },
 		{ name = "look", type = "varchar", length = 255, default = "" },
