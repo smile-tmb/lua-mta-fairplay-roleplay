@@ -296,6 +296,7 @@ function spawnCharacter( player, character, fade )
 				setPlayerName( player, character.name )
 				
 				exports.items:loadItems( player )
+				exports.factions:loadPlayerFactions( player )
 				
 				triggerClientEvent( player, "characters:onSpawn", player )
 				
