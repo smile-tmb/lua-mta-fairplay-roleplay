@@ -242,6 +242,7 @@ function loadFaction( id )
 		local faction = {
 			id = query.id,
 			name = query.name,
+			type = query.type,
 			motd = query.motd,
 			ranks = ranks,
 			players = { }
@@ -307,5 +308,26 @@ end
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		setTimer( loadFactions, 100, 1 )
+	end
+)
+
+addEvent( "factions:set_as_main", true )
+addEventHandler( "factions:set_as_main", root,
+	function( factionID )
+		if ( client ~= source ) then
+			return
+		end
+		
+		local faction = getFactionByID( factionID )
+		
+		if ( faction ) and ( isPlayerInFaction( client, factionID ) ) then
+			if ( exports.common:getPlayerDefaultFaction( client ) ~= factionID ) then
+				if ( exports.database:execute( "UPDATE `characters` SET `default_faction` = ? WHERE `id` = ?", factionID, exports.common:getCharacterID( client ) ) ) then
+					outputChatBox( "You set " .. faction.name .. " as your default faction.", client, 230, 180, 95 )
+					exports.security:modifyElementData( client, "character:default_faction", factionID, true )
+					triggerClientEvent( client, "factions:update", client, faction )
+				end
+			end
+		end
 	end
 )

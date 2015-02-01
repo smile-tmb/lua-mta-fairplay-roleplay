@@ -22,4 +22,9 @@
 	SOFTWARE.
 ]]
 
+factionTypes = { "Other", "Law", "Medical", "News", "Gang", "Mafia" }
 factionRankCount = 20
+
+function getFactionType( type )
+	return factionTypes[ type ] or "Unknown"
+end
