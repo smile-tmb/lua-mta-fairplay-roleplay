@@ -90,17 +90,21 @@ local ticketBrowser = {
     button = { }
 }
 
-function openTicketBrowser( forceEnd, stayClosed )
+function openTicketBrowser( forceEnd, forceClose )
 	if ( isElement( ticketBrowser.window ) ) then
 		destroyElement( ticketBrowser.window )
 		showCursor( false )
 		
-		if ( stayClosed ) then
+		if ( forceClose ) then
 			return
 		end
 	end
 	
 	if ( forceEnd ) then
+		return
+	end
+	
+	if ( not exports.common:isPlayerPlaying( localPlayer ) ) then
 		return
 	end
 	
@@ -179,6 +183,10 @@ function openTicket( id, forceEnd )
 	activeTicket = nil
 	
 	if ( forceEnd ) then
+		return
+	end
+	
+	if ( not exports.common:isPlayerPlaying( localPlayer ) ) then
 		return
 	end
 	
@@ -331,6 +339,10 @@ function closeTicketWindow( forceEnd )
 		return
 	end
 	
+	if ( not exports.common:isPlayerPlaying( localPlayer ) ) then
+		return
+	end
+	
 	if ( isElement( ticket.window ) ) then
 		guiSetEnabled( ticket.window, false )
 	end
@@ -378,17 +390,21 @@ local newTicket = {
     button = { }
 }
 
-function createTicketWindow( forceEnd, stayClosed )
+function createTicketWindow( forceEnd, forceClose )
 	if ( isElement( newTicket.window ) ) then
 		destroyElement( newTicket.window )
 		showCursor( false, false )
 		
-		if ( stayClosed ) then
+		if ( forceClose ) then
 			return
 		end
 	end
 	
 	if ( forceEnd ) then
+		return
+	end
+	
+	if ( not exports.common:isPlayerPlaying( localPlayer ) ) then
 		return
 	end
 	
