@@ -84,7 +84,7 @@ function scoreboardHUD( )
 	local screenHeight = screenHeight
 	
 	-- background
-	local scoreboardWidth, scoreboardHeight = screenWidth / 3, screenHeight / 2 - 6 -- - 6 is custom
+	local scoreboardWidth, scoreboardHeight = screenWidth / 4, screenHeight / 2 - 6 -- - 6 is custom
 	local scoreboardX, scoreboardY = ( screenWidth - scoreboardWidth ) / 2, ( screenHeight - scoreboardHeight ) / 2
 	
 	dxDrawRectangle( scoreboardX, scoreboardY, scoreboardWidth, scoreboardHeight, tocolor( 0, 0, 0, 0.825 * 255 ), true )
