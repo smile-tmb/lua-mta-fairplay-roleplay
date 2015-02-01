@@ -47,6 +47,7 @@
 	<export function="setPlayerFactionRank" />
 	<export function="setCharacterFactionRank" />
 	<export function="setPlayerFactionLeader" />
+	<export function="loadPlayerFactions" />
 
 	<!--
 	<export function="loadFaction" />

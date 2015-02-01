@@ -93,7 +93,7 @@ function addCharacterToFaction( characterID, id, rank, isLeader )
 			local player = exports.common:getPlayerByCharacterID( data.id )
 
 			if ( player ) then
-				triggerClientEvent( player, "factions:update", player, faction )
+				triggerClientEvent( player, "factions:update", player, { faction } )
 			end
 		end
 
@@ -119,7 +119,7 @@ function removeCharacterFromFaction( characterID, id )
 			local player = exports.common:getPlayerByCharacterID( data.id )
 
 			if ( player ) then
-				triggerClientEvent( player, "factions:update", player, faction )
+				triggerClientEvent( player, "factions:update", player, { faction } )
 			end
 		end
 
@@ -164,10 +164,10 @@ function getCharacterFactions( characterID )
 		return playerFactions
 	end
 
-	return false
+	return { }
 end
 
-function getPlayerFactions( player, id )
+function getPlayerFactions( player )
 	return getCharacterFactions( exports.common:getCharacterID( player ) )
 end
 
@@ -186,7 +186,7 @@ function setCharacterFactionRank( characterID, id, rank )
 			local player = exports.common:getPlayerByCharacterID( data.id )
 
 			if ( player ) then
-				triggerClientEvent( player, "factions:update", player, faction )
+				triggerClientEvent( player, "factions:update", player, { faction } )
 			end
 		end
 
@@ -214,7 +214,7 @@ function setCharacterFactionLeader( characterID, id, isLeader )
 			local player = exports.common:getPlayerByCharacterID( data.id )
 
 			if ( player ) then
-				triggerClientEvent( player, "factions:update", player, faction )
+				triggerClientEvent( player, "factions:update", player, { faction } )
 			end
 		end
 
@@ -278,7 +278,7 @@ function loadFaction( id )
 				local player = exports.common:getPlayerByCharacterID( data.character_id )
 
 				if ( player ) then
-					triggerClientEvent( player, "factions:update", player, faction )
+					triggerClientEvent( player, "factions:update", player, { faction } )
 				end
 			end
 		end
@@ -305,6 +305,20 @@ function loadFactions( )
 	return false
 end
 
+function loadPlayerFactions( player )
+	local playerFactions = { }
+	
+	for _, factionID in ipairs( getPlayerFactions( player ) ) do
+		local faction = getFactionByID( factionID )
+		
+		if ( faction ) then
+			table.insert( playerFactions, faction )
+		end
+	end
+	
+	triggerClientEvent( player, "factions:update", player, factions )
+end
+
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
 		setTimer( loadFactions, 100, 1 )
@@ -325,7 +339,7 @@ addEventHandler( "factions:set_as_main", root,
 				if ( exports.database:execute( "UPDATE `characters` SET `default_faction` = ? WHERE `id` = ?", factionID, exports.common:getCharacterID( client ) ) ) then
 					outputChatBox( "You set " .. faction.name .. " as your default faction.", client, 230, 180, 95 )
 					exports.security:modifyElementData( client, "character:default_faction", factionID, true )
-					triggerClientEvent( client, "factions:update", client, faction )
+					triggerClientEvent( client, "factions:update", client, { faction } )
 				end
 			end
 		end
