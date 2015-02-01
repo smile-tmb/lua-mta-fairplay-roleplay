@@ -72,7 +72,7 @@ addCommandHandler( { "deletefaction", "removefaction" },
 )
 
 addCommandHandler( { "addplayerfaction", "addplayertofaction", "addtofaction" },
-	function( player, cmd, targetPlayer, factionID )
+	function( player, cmd, targetPlayer, factionID, rank, isLeader )
 		if ( exports.common:isPlayerServerAdmin( player ) ) then
 			local factionID = tonumber( factionID )
 			
@@ -83,8 +83,8 @@ addCommandHandler( { "addplayerfaction", "addplayertofaction", "addtofaction" },
 					local faction = exports.factions:getFactionByID( factionID )
 					
 					if ( faction ) then
-						if ( not exports.factions:isCharacterInFaction( targetPlayer, factionID ) ) then
-							if ( exports.factions:addCharacterToFaction( exports.common:getCharacterID( targetPlayer ), factionID ) ) then
+						if ( not exports.factions:isPlayerInFaction( targetPlayer, factionID ) ) then
+							if ( exports.factions:addPlayerToFaction( targetPlayer, factionID, rank, isLeader == "1" ) ) then
 								outputChatBox( "You were added to " .. faction.name .. ".", targetPlayer, 230, 180, 95 )
 								outputChatBox( exports.common:getPlayerName( targetPlayer ) .. " was added to faction " .. faction.name .. " (" .. factionID .. ").", player, 95, 230, 95 )
 							else
@@ -100,7 +100,7 @@ addCommandHandler( { "addplayerfaction", "addplayertofaction", "addtofaction" },
 					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
 				end
 			else
-				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [faction id]", player, 230, 180, 95 )
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [faction id] <[rank]> <[leader: 1=yes, 0=no]>", player, 230, 180, 95 )
 			end
 		end
 	end
@@ -118,8 +118,8 @@ addCommandHandler( { "removeplayerfaction", "removeplayerfromfaction", "removefr
 					local faction = exports.factions:getFactionByID( factionID )
 					
 					if ( faction ) then
-						if ( exports.factions:isCharacterInFaction( targetPlayer, factionID ) ) then
-							if ( exports.factions:removeCharacterFromFaction( exports.common:getCharacterID( targetPlayer ), factionID ) ) then
+						if ( exports.factions:isPlayerInFaction( targetPlayer, factionID ) ) then
+							if ( exports.factions:removePlayerFromFaction( targetPlayer, factionID ) ) then
 								outputChatBox( "You were removed from " .. faction.name .. ".", targetPlayer, 230, 180, 95 )
 								outputChatBox( exports.common:getPlayerName( targetPlayer ) .. " was removed from faction " .. faction.name .. " (" .. factionID .. ").", player, 95, 230, 95 )
 							else
@@ -136,6 +136,80 @@ addCommandHandler( { "removeplayerfaction", "removeplayerfromfaction", "removefr
 				end
 			else
 				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [faction id]", player, 230, 180, 95 )
+			end
+		end
+	end
+)
+
+addCommandHandler( { "setplayerfactionrank", "setplayerrank", "changeplayerfactionrank", "changeplayerrank", "setfactionrank", "changefactionrank" },
+	function( player, cmd, targetPlayer, factionID, rank )
+		if ( exports.common:isPlayerServerAdmin( player ) ) then
+			local factionID = tonumber( factionID )
+			local rank = tonumber( rank ) or false
+			
+			if ( targetPlayer ) and ( factionID ) and ( rank ) then
+				targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
+				
+				if ( targetPlayer ) then
+					local faction = exports.factions:getFactionByID( factionID )
+					
+					if ( faction ) then
+						if ( exports.factions:isPlayerInFaction( targetPlayer, factionID ) ) then
+							local changed, rank = exports.factions:setPlayerFactionRank( targetPlayer, factionID, rank )
+							
+							if ( changed ) then
+								outputChatBox( "Your faction rank for " .. faction.name .. " was changed to " .. faction.ranks[ rank ].name .. ".", targetPlayer, 230, 180, 95 )
+								outputChatBox( exports.common:getPlayerName( targetPlayer, true ) .. " faction rank set to " .. faction.ranks[ rank ].name .. " on " .. faction.name .. ".", player, 95, 230, 95 )
+							else
+								outputChatBox( "Something went wrong when setting targeted player's faction rank. Please retry.", player, 230, 95, 95 )
+							end
+						else
+							outputChatBox( "Targeted player is not in that faction.", player, 230, 95, 95 )
+						end
+					else
+						outputChatBox( "Could not find a faction with that identifier.", player, 230, 95, 95 )
+					end
+				else
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
+				end
+			else
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [faction id] [rank]", player, 230, 180, 95 )
+			end
+		end
+	end
+)
+
+addCommandHandler( { "setplayerfactionleader", "setplayerleader", "changeplayerfactionleader", "changeplayerleader", "setfactionleader", "changefactionleader" },
+	function( player, cmd, targetPlayer, factionID, isLeader )
+		if ( exports.common:isPlayerServerAdmin( player ) ) then
+			local factionID = tonumber( factionID )
+			local isLeader = isLeader == "1"
+			
+			if ( targetPlayer ) and ( factionID ) then
+				targetPlayer = exports.common:getPlayerFromPartialName( targetPlayer, player )
+				
+				if ( targetPlayer ) then
+					local faction = exports.factions:getFactionByID( factionID )
+					
+					if ( faction ) then
+						if ( exports.factions:isPlayerInFaction( targetPlayer, factionID ) ) then
+							if ( exports.factions:setPlayerFactionLeader( targetPlayer, factionID, isLeader ) ) then
+								outputChatBox( "Your faction rank leader status for " .. faction.name .. " was changed to " .. ( isLeader and "leader" or "member" ) .. ".", targetPlayer, 230, 180, 95 )
+								outputChatBox( exports.common:getPlayerName( targetPlayer, true ) .. " faction leader status set to " .. ( isLeader and "leader" or "member" ) .. " on " .. faction.name .. ".", player, 95, 230, 95 )
+							else
+								outputChatBox( "Something went wrong when setting targeted player's faction leader status. Please retry.", player, 230, 95, 95 )
+							end
+						else
+							outputChatBox( "Targeted player is not in that faction.", player, 230, 95, 95 )
+						end
+					else
+						outputChatBox( "Could not find a faction with that identifier.", player, 230, 95, 95 )
+					end
+				else
+					outputChatBox( "Could not find a player with that identifier.", player, 230, 95, 95 )
+				end
+			else
+				outputChatBox( "SYNTAX: /" .. cmd .. " [partial player name] [faction id] [leader: 1=yes, 0=no]", player, 230, 180, 95 )
 			end
 		end
 	end
