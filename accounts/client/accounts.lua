@@ -37,6 +37,8 @@ local maximumPasswordLength = 100
 
 function showBackground( )
 	dxDrawRectangle( 0, 0, screenWidth, screenHeight, tocolor( 0, 0, 0, 0.5 * 255 ), false )
+	dxDrawRectangle( 0, 0, screenWidth, 75, tocolor( 0, 0, 0, 255 ), false )
+	dxDrawRectangle( 0, screenHeight - 75, screenWidth, 75, tocolor( 0, 0, 0, 255 ), false )
 end
 
 function showLoginMenu( forceEnd )
