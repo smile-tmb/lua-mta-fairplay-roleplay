@@ -48,7 +48,8 @@ function getFactionByName( name )
 	return false
 end
 
-function createFaction( name )
+function createFaction( name, type )
+	local type = type or 1
 	local ranks = { }
 
 	for i = 1, factionRankCount do
@@ -58,7 +59,7 @@ function createFaction( name )
 		} )
 	end
 
-	local id = exports.database:insert_id( "INSERT INTO `factions` (`name`, `ranks`) VALUES (?, ?)", name, toJSON( ranks ) )
+	local id = exports.database:insert_id( "INSERT INTO `factions` (`name`, `type`, `ranks`) VALUES (?, ?, ?)", name, type, toJSON( ranks ) )
 
 	return id and loadFaction( id ) or false
 end
@@ -80,6 +81,9 @@ function deleteFaction( id )
 end
 
 function addCharacterToFaction( characterID, id, rank, isLeader )
+	rank = tonumber( rank ) or 1
+	isLeader = type( isLeader ) == "boolean" and isLeader or false
+	
 	if ( not isCharacterInFaction( characterID, id ) ) and ( exports.database:execute( "INSERT INTO `factions_characters` (`character_id`, `faction_id`, `rank`, `is_leader`) VALUES (?, ?, ?, ?)", characterID, id, rank, isLeader ) ) then
 		local faction = getFactionByID( id )
 
@@ -170,7 +174,9 @@ end
 function loadFaction( id )
 	local _, index = getFactionByID( id )
 
-	factions[ index ] = nil
+	if ( factions[ index ] ) then
+		factions[ index ] = nil
+	end
 
 	local query = exports.database:query_single( "SELECT * FROM `factions` WHERE `id` = ? LIMIT 1", id )
 
@@ -221,7 +227,7 @@ function loadFaction( id )
 
 		table.insert( factions, faction )
 
-		return true
+		return getFactionByID( id )
 	end
 
 	return false
