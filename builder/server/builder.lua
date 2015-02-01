@@ -29,12 +29,6 @@ local compiler_address = "http://luac.mtasa.com/?compile=" .. ( compile_script a
 local resource_config_file = "meta.xml"
 local combined_script_file_name = "script"
 
-addEventHandler( "onPlayerJoin", root,
-	function( )
-		outputChatBox( "There is nothing on this server at this time. Sorry.", source, 255, 0, 0, false )
-	end
-)
-
 function load_resource( resource_name )
 	local resource = getResourceFromName( resource_name )
 	
