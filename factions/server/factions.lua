@@ -138,7 +138,7 @@ function isCharacterInFaction( characterID, id, checkForLeadership )
 
 	if ( faction ) then
 		for index, data in pairs( faction.players ) do
-			if ( data.character_id == characterID ) and ( ( not checkForLeadership ) or ( data.leader ) ) then
+			if ( data.id == characterID ) and ( ( not checkForLeadership ) or ( data.leader ) ) then
 				return index
 			end
 		end
@@ -169,6 +169,63 @@ end
 
 function getPlayerFactions( player, id )
 	return getCharacterFactions( exports.common:getCharacterID( player ) )
+end
+
+function setCharacterFactionRank( characterID, id, rank )
+	rank = tonumber( rank ) or 1
+	rank = math.max( 1, math.min( factionRankCount, rank ) )
+	local index = isCharacterInFaction( characterID, id )
+
+	if ( index ) and ( rank ) and ( exports.database:execute( "UPDATE `factions_characters` SET `rank` = ? WHERE `character_id` = ? AND `faction_id` = ?", rank, characterID, id ) ) then
+		local faction = getFactionByID( id )
+		
+		
+		faction.players[ index ].rank = rank
+
+		for _, data in pairs( faction.players ) do
+			local player = exports.common:getPlayerByCharacterID( data.id )
+
+			if ( player ) then
+				triggerClientEvent( player, "factions:update", player, faction )
+			end
+		end
+
+		return true, rank
+	end
+
+	return false
+end
+
+function setPlayerFactionRank( player, id, rank )
+	return setCharacterFactionRank( exports.common:getCharacterID( player ), id, rank )
+end
+
+function setCharacterFactionLeader( characterID, id, isLeader )
+	isLeader = type( isLeader ) == "boolean" and isLeader or false
+	local index = isCharacterInFaction( characterID, id )
+
+	if ( index ) and ( exports.database:execute( "UPDATE `factions_characters` SET `is_leader` = ? WHERE `character_id` = ? AND `faction_id` = ?", isLeader, characterID, id ) ) then
+		local faction = getFactionByID( id )
+		
+		
+		faction.players[ index ].leader = isLeader
+
+		for _, data in pairs( faction.players ) do
+			local player = exports.common:getPlayerByCharacterID( data.id )
+
+			if ( player ) then
+				triggerClientEvent( player, "factions:update", player, faction )
+			end
+		end
+
+		return true
+	end
+
+	return false
+end
+
+function setPlayerFactionLeader( player, id, isLeader )
+	return setCharacterFactionLeader( exports.common:getCharacterID( player ), id, isLeader )
 end
 
 function loadFaction( id )
@@ -207,7 +264,7 @@ function loadFaction( id )
 
 		if ( players ) then
 			for _, data in ipairs( players ) do
-				local rank = data.rank
+				local rank = tonumber( data.rank ) or 1
 
 				if ( not faction.ranks[ rank ] ) then
 					rank = math.min( factionRankCount, math.max( 1, rank ) )
