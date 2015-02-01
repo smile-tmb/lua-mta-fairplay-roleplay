@@ -306,6 +306,6 @@ end
 
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
-		loadFactions( )
+		setTimer( loadFactions, 100, 1 )
 	end
 )
