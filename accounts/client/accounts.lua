@@ -108,7 +108,7 @@ function showLoginMenu( forceEnd )
 		end
 	)
 	
-	function processLogin( )
+	local function processLogin( )
 		local username = guiGetText( accounts_login_view.edit.username )
 		local password = guiGetText( accounts_login_view.edit.password )
 		
@@ -130,18 +130,15 @@ function showLoginMenu( forceEnd )
 		exports.messages:createMessage( "Username and/or password is incorrect.", "login" )
 		guiSetEnabled( accounts_login_view.window, false )
 	end
-	
 	addEventHandler( "onClientGUIClick", accounts_login_view.button.login, processLogin, false )
 	
-	addEventHandler( "onClientKey", root,
-		function( button, pressOrRelease )
-			if ( isElement( accounts_login_view.window ) ) then
-				if ( button == "enter" ) and ( pressOrRelease ) and ( guiGetEnabled( accounts_login_view.button.login ) ) then
-					processLogin( )
-				end
-			end
+	local function triggerLogin( )
+		if ( guiGetEnabled( accounts_login_view.button.login ) ) then
+			processLogin( )
 		end
-	)
+	end
+	addEventHandler( "onClientGUIAccepted", accounts_login_view.edit.username, triggerLogin )
+	addEventHandler( "onClientGUIAccepted", accounts_login_view.edit.password, triggerLogin )
 	
 	function processRegister( )
 		local username = guiGetText( accounts_login_view.edit.username )
