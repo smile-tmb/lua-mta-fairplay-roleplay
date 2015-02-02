@@ -207,7 +207,6 @@ function setCharacterFactionLeader( characterID, id, isLeader )
 	if ( index ) and ( exports.database:execute( "UPDATE `factions_characters` SET `is_leader` = ? WHERE `character_id` = ? AND `faction_id` = ?", isLeader, characterID, id ) ) then
 		local faction = getFactionByID( id )
 		
-		
 		faction.players[ index ].leader = isLeader
 
 		for _, data in pairs( faction.players ) do
