@@ -23,16 +23,18 @@
 ]]
 
 addCommandHandler( { "createvehicle", "newvehicle", "createveh", "makeveh", "makevehicle", "makecar", "createcar" },
-	function( player, cmd, modelID, ownerID, faction, isBulletproof )
+	function( player, cmd, modelID, ownerID, isBulletproof, modelsetID )
 		if ( exports.common:isPlayerServerAdmin( player ) ) then
-			if ( modelID ) and ( ownerID ) and ( faction ) then
-				modelID = tonumber( modelID )
-				
+			modelID = tonumber( modelID )
+			ownerID = tonumber( ownerID )
+			modelsetID = tonumber( modelsetID )
+			isBulletproof = isBulletproof == "1"
+
+			if ( modelID ) and ( ownerID ) then
 				if ( exports.common:isValidVehicleModelID( modelID ) ) then
-					ownerID = tonumber( ownerID )
-					faction = tonumber( faction ) == 1
+					isFaction = ownerID < 0
 					
-					if ( not faction ) then
+					if ( not isFaction ) then
 						local targetCharacter = exports.accounts:getCharacter( ownerID )
 						
 						if ( not targetCharacter ) then
@@ -52,13 +54,11 @@ addCommandHandler( { "createvehicle", "newvehicle", "createveh", "makeveh", "mak
 						end
 					end
 					
-					isBulletproof = tonumber( isBulletproof ) == 1
-					
 					local x, y, z = exports.common:nextToPosition( player )
 					local rotation = getPedRotation( player )
 					local interior, dimension = getElementInterior( player ), getElementDimension( player )
 					
-					local vehicleID, vehicle = exports.vehicles:new( modelID, x, y, z, nil, nil, rotation, interior, dimension, nil, nil, ownerID, faction, nil, nil, isBulletproof )
+					local vehicleID, vehicle = exports.vehicles:new( modelID, x, y, z, nil, nil, rotation, interior, dimension, nil, nil, ownerID, isFaction, nil, nil, isBulletproof )
 					
 					if ( vehicleID ) then
 						outputChatBox( "You created a " .. getVehicleNameFromModel( modelID ) .. " with ID " .. vehicleID .. ".", player, 95, 230, 95 )
@@ -73,7 +73,7 @@ addCommandHandler( { "createvehicle", "newvehicle", "createveh", "makeveh", "mak
 					outputChatBox( "This vehicle ID is not valid.", player, 230, 95, 95 )
 				end
 			else
-				outputChatBox( "SYNTAX: /" .. cmd .. " [model id] [owner id] [faction: 0/1] [bulletproof: 0/1]", player, 230, 180, 95 )
+				outputChatBox( "SYNTAX: /" .. cmd .. " [model id] [owner id: negative=faction, positive=character] [bulletproof: 0/1]", player, 230, 180, 95 )
 			end
 		end
 	end
