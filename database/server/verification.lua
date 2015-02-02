@@ -112,7 +112,6 @@ database.verification = {
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "model_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
-		{ name = "custom", type = "text" },
 		{ name = "pos_x", type = "float", default = 0 },
 		{ name = "pos_y", type = "float", default = 0 },
 		{ name = "pos_z", type = "float", default = 0 },
@@ -144,7 +143,19 @@ database.verification = {
 		{ name = "is_deleted", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_broken", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_bulletproof", type = "tinyint", length = 1, default = 0, is_unsigned = true },
-		{ name = "created_by", type = "int", length = 11, default = 0, is_unsigned = true }
+		{ name = "modelset_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true }
+	},
+	vehicles_model_sets = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "make", type = "varchar", length = 50, default = "GTA" },
+		{ name = "model", type = "varchar", length = 50, default = "" },
+		{ name = "year", type = "smallint", length = 4, default = 2004, is_unsigned = true },
+		{ name = "price", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "gta_model_id", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	worlditems = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },

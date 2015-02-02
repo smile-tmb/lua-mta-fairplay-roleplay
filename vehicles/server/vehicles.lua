@@ -48,7 +48,7 @@ function getVehicleData( id )
 	return vehicles[ id ] or false
 end
 
-function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, variantA, variantB, ownerID, faction, color, isLocked, isBulletproof )
+function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, variantA, variantB, ownerID, faction, color, isLocked, isBulletproof, modelSetID )
 	rotX, rotY, rotZ = rotX or 0, rotY or 0, rotZ or 0
 	interior, dimension = interior or 0, dimension or 0
 	variantA, variantB = variantA or 255, variantB or 255
@@ -57,9 +57,10 @@ function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, 
 	isLocked = isLocked or true
 	engineOn = engineOn or false
 	isBulletproof = isBulletproof or false
+	modelSetID = modelSetID or 0
 	
-	local numberplate = getNumberPlate( )
-	local vehicleID = exports.database:insert_id( "INSERT INTO `vehicles` (`model_id`, `pos_x`, `pos_y`, `pos_z`, `rot_x`, `rot_y`, `rot_z`, `interior`, `dimension`, `respawn_pos_x`, `respawn_pos_y`, `respawn_pos_z`, `respawn_rot_x`, `respawn_rot_y`, `respawn_rot_z`, `respawn_interior`, `respawn_dimension`, `numberplate`, `variant_1`, `variant_2`, `owner_id`, `color`, `is_locked`, `is_bulletproof`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, numberplate, variantA, variantB, ownerID, color, isLocked, isBulletproof )
+	local numberplate = makeNumberPlate( )
+	local vehicleID = exports.database:insert_id( "INSERT INTO `vehicles` (`model_id`, `pos_x`, `pos_y`, `pos_z`, `rot_x`, `rot_y`, `rot_z`, `interior`, `dimension`, `respawn_pos_x`, `respawn_pos_y`, `respawn_pos_z`, `respawn_rot_x`, `respawn_rot_y`, `respawn_rot_z`, `respawn_interior`, `respawn_dimension`, `numberplate`, `variant_1`, `variant_2`, `owner_id`, `color`, `is_locked`, `is_bulletproof`, `model_set_id`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, numberplate, variantA, variantB, ownerID, color, isLocked, isBulletproof, modelSetID )
 	
 	if ( vehicleID ) and ( not faction ) then
 		exports.items:giveItem( exports.common:getPlayerByCharacterID( ownerID ) or ownerID, 7, vehicleID, nil, nil, nil, true )
@@ -83,6 +84,8 @@ function spawn( vehicleID, respawnVehicle, hasCoroutine )
 		end
 
 		vehicles[ data.id ] = data
+		vehicles[ data.id ].panel_states = fromJSON( vehicles[ data.id ].panel_states )
+		vehicles[ data.id ].door_states = fromJSON( vehicles[ data.id ].door_states )
 		
 		local posX, posY, posZ = data[ ( respawnVehicle and "respawn_" or "" ) .. "pos_x" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "pos_y" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "pos_z" ]
 		local rotX, rotY, rotZ = data[ ( respawnVehicle and "respawn_" or "" ) .. "rot_x" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "rot_y" ], data[ ( respawnVehicle and "respawn_" or "" ) .. "rot_z" ]
@@ -104,9 +107,10 @@ function spawn( vehicleID, respawnVehicle, hasCoroutine )
 			toggleVehicleRespawn( vehicle, false )
 			
 			exports.security:modifyElementData( vehicle, "vehicle:id", data.id, true )
-			exports.security:modifyElementData( vehicle, "vehicle:custom", data.custom, true )
+			exports.security:modifyElementData( vehicle, "vehicle:model_set_id", data.model_set_id, true )
 			exports.security:modifyElementData( vehicle, "vehicle:engine", data.is_engine_on == 1, true )
 			exports.security:modifyElementData( vehicle, "vehicle:broken", data.is_broken == 1, true )
+			exports.security:modifyElementData( vehicle, "vehicle:owner", data.owner_id, true )
 			
 			local colors = fromJSON( data.color )
 			
@@ -162,6 +166,7 @@ function save( vehicle )
 	local vehicleID = exports.common:getRealVehicleID( vehicle )
 	
 	if ( vehicleID ) then
+		local vehicleData = getVehicleData( vehicleID ) or { }
 		local posX, posY, posZ = getElementPosition( vehicle )
 		local rotX, rotY, rotZ = getElementRotation( vehicle )
 		local interior, dimension = getElementInterior( vehicle ), getElementDimension( vehicle )
@@ -178,7 +183,7 @@ function save( vehicle )
 			doors[ i ] = getVehicleDoorState( vehicle, i )
 		end
 		
-		return exports.database:execute( "UPDATE `vehicles` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rot_x` = ?, `rot_y` = ?, `rot_z` = ?, `interior` = ?, `dimension` = ?, `panel_states` = ?, `door_states` = ?, `is_locked` = ?, `is_engine_on` = ?, `is_broken` = ?, `headlight_state` = ? WHERE `id` = ?", posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, toJSON( panels ), toJSON( doors ), isVehicleLocked( vehicle ), getVehicleEngineState( vehicle ), exports.common:isVehicleBroken( vehicle ), getVehicleOverrideLights( vehicle ) == 2, vehicleID )
+		return exports.database:execute( "UPDATE `vehicles` SET `pos_x` = ?, `pos_y` = ?, `pos_z` = ?, `rot_x` = ?, `rot_y` = ?, `rot_z` = ?, `interior` = ?, `dimension` = ?, `panel_states` = ?, `door_states` = ?, `is_locked` = ?, `is_engine_on` = ?, `is_broken` = ?, `headlight_state` = ?, `attributes` = ? WHERE `id` = ?", posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, toJSON( panels ), toJSON( doors ), isVehicleLocked( vehicle ), getVehicleEngineState( vehicle ), exports.common:isVehicleBroken( vehicle ), getVehicleOverrideLights( vehicle ) == 2, vehicleData.model_set_id or 0, vehicleID )
 	end
 end
 
@@ -224,8 +229,21 @@ function resumeCoroutines( )
 	end
 end
 
-function getNumberPlate( )
-	return "1337LEET"
+function makeNumberPlate( )
+	local numberplate
+
+	local function generate( )
+		math.randomseed( getTickCount( ) )
+
+		numberplate = getRandomString( 2 ) .. math.random( 0, 9 ) .. "-"
+		numberplate = numberplate .. getRandomString( 1 ) .. math.random( 0, 9 ) .. getRandomString( 1 ) .. math.random( 0, 9 )
+	end
+
+	while ( not numberplate ) or ( isNumberPlateInUse( numberplate ) ) do
+		generate( )
+	end
+
+	return numberplate
 end
 
 function isNumberPlateInUse( numberplate )
@@ -282,7 +300,7 @@ function toggleLock( player )
 		
 		if ( vehicle ) then
 			setVehicleLocked( vehicle, not isVehicleLocked( vehicle ) )
-			exports.chat:outputLocalActionMe( player, ( isVehicleLocked( vehicle ) and "" or "un" ) .. "locks the " .. getVehicleName( vehicle ) .. "." )
+			exports.chat:outputLocalActionMe( player, ( isVehicleLocked( vehicle ) and "" or "un" ) .. "locks the " .. exports.common:getVehicleName( vehicle ) .. "." )
 		else
 			outputChatBox( "You require a key to toggle the locks of this vehicle.", player, 230, 95, 95 )
 		end
@@ -330,9 +348,21 @@ addEventHandler( "onResourceStop", resourceRoot,
 )
 
 addEventHandler( "onVehicleEnter", root,
-	function( )
-		if ( exports.common:getRealVehicleID( source ) ) then
+	function( player )
+		local vehicleID = exports.common:getRealVehicleID( source )
+
+		if ( vehicleID ) then
 			setVehicleEngineState( source, exports.common:getRealVehicleEngineState( source ) )
+
+			if ( exports.common:isPlayerServerTrialAdmin( player ) ) then
+				local isFactionVehicle = exports.common:isFactionVehicle( source )
+				local ownerID = exports.common:getVehicleOwner( source )
+				local owner = isFactionVehicle and exports.factions:getFactionByID( ownerID ) or exports.accounts:getCharacter( ownerID )
+
+				if ( owner ) and ( owner.name ) then
+					outputChatBox( "(( This " .. exports.common:getVehicleName( vehicle ) .. " belongs to " .. owner.name .. ". ))", player, 230, 180, 95 )
+				end
+			end
 		end
 	end
 )
