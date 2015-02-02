@@ -24,32 +24,11 @@ This is a Multi Theft Auto Roleplay gamemode, designed specifically for FairPlay
 
 #### Starting via F8 console
 
-`srun resources = { "security", "database", "common", "messages", "accounts", "admin", "realism", "items", "inventory", "chat", "vehicles", "factions", "scoreboard", "superman" } for _, resource in ipairs( resources ) do startResource( getResourceFromName( resource ) ) end`
+`srun startResource( getResourceFromName( "initializer" ) )`
 
 #### Starting via mtaserver.conf
 
-`<resource src="security" startup="1" protected="0" />
-<resource src="database" startup="1" protected="0" />
-<resource src="common" startup="1" protected="0" />
-<resource src="messages" startup="1" protected="0" />
-<resource src="accounts" startup="1" protected="0" />
-<resource src="admin" startup="1" protected="0" />
-<resource src="realism" startup="1" protected="0" />
-<resource src="items" startup="1" protected="0" />
-<resource src="inventory" startup="1" protected="0" />
-<resource src="chat" startup="1" protected="0" />
-<resource src="vehicles" startup="1" protected="0" />
-<resource src="factions" startup="1" protected="0" />
-<resource src="scoreboard" startup="1" protected="0" />
-<resource src="superman" startup="1" protected="0" />`
-
-#### Starting via **initializer**
-
-##### F8 console
-`srun startResource( getResourceFromName( "initializer" ) )`
-
-##### mtaserver.conf
-`<resource src="initializer" startup="1" protected="1" />`
+`<resource src="initializer" startup="1" protected="0" />`
 
 ### Git programs
 
