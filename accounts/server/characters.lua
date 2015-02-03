@@ -79,10 +79,10 @@ addEventHandler( "characters:create", root,
 				characterName = characterName:gsub( "%s", "_" )
 				
 				if ( not getCharacterByName( characterName ) ) then
-					local characterID = exports.database:insert_id( "INSERT INTO `characters` (`account`, `skin_id`, `name`, `pos_x`, `pos_y`, `pos_z`, `rotation`, `interior`, `dimension`, `date_of_birth`, `gender`, `skin_color`, `origin`, `look`, `created_time`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", exports.common:getAccountID( client ), characterSkinModel, characterName, defaultSpawnX, defaultSpawnY, defaultSpawnZ, defaultSpawnRotation, defaultSpawnInterior, defaultSpawnDimension, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook, "NOW()" )
+					local characterID = exports.database:insert_id( "INSERT INTO `characters` (`account`, `skin_id`, `name`, `pos_x`, `pos_y`, `pos_z`, `rotation`, `interior`, `dimension`, `date_of_birth`, `gender`, `skin_color`, `origin`, `look`, `created`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", exports.common:getAccountID( client ), characterSkinModel, characterName, defaultSpawnX, defaultSpawnY, defaultSpawnZ, defaultSpawnRotation, defaultSpawnInterior, defaultSpawnDimension, characterDateOfBirth, characterGender, characterSkinColor, characterOrigin, characterLook )
 					
 					if ( characterID ) then
-						exports.database:execute( "INSERT INTO `languages` (`character_id`, `language_1`) VALUES (?, ?)", characterID, characterLanguage or 1 )
+						exports.database:execute( "INSERT INTO `languages` (`character_id`, `language_1`, `created`) VALUES (?, ?, NOW())", characterID, characterLanguage or 1 )
 						
 						exports.messages:destroyMessage( client, "selection" )
 						
