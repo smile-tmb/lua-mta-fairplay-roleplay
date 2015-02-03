@@ -71,6 +71,7 @@
 	<export function="count" type="shared" />
 	<export function="findByValue" type="shared" />
 	<export function="formatDate" type="shared" />
+	<export function="formatMoney" type="shared" />
 	<export function="formatString" type="shared" />
 	<export function="getDaysInMonth" type="shared" />
 	<export function="getRandomString" type="shared" />

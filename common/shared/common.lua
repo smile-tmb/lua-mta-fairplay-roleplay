@@ -99,6 +99,20 @@ function formatDate( string, preparedString )
 	return preparedString and day .. " of " .. month .. " " .. date[ 1 ] .. " " .. dateAndTime[ 2 ] or { day = day, month = month, year = date[ 1 ], hour = time[ 1 ], minute = time[ 2 ], second = time[ 3 ] }
 end
 
+function formatMoney( number )  
+	local formatted = number
+
+	while ( true ) do
+		formatted, k = string.gsub( formatted, "^(-?%d+)(%d%d%d)", '%1,%2' )
+		
+		if ( k == 0 ) then
+			break
+		end
+	end
+
+	return formatted
+end
+
 function formatString( string )
 	return howToWrite( string ) and string .. "'" or string .. "'s"
 end
