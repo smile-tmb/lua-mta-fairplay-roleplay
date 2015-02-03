@@ -22,7 +22,7 @@
 	SOFTWARE.
 ]]
 
-database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, factions = { "factions", "factions_characters" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles", "vehicles_model_sets" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, factions = { "factions", "factions_characters" }, interiors = { "interiors" }, items = { "inventory", "worlditems" }, shops = { "shops" }, vehicles = { "vehicles", "vehicles_model_sets" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -127,6 +127,23 @@ database.verification = {
 		{ name = "skill_2", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "skill_3", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
+	},
+	shops = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "name", type = "varchar", length = 50, default = "Interior" },
+		{ name = "type", type = "tinyint", length = 2, default = 1 },
+		{ name = "model_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "pos_x", type = "float", default = 0 },
+		{ name = "pos_y", type = "float", default = 0 },
+		{ name = "pos_z", type = "float", default = 0 },
+		{ name = "interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
+		{ name = "rotation", type = "smallint", length = 3, default = 0 },
+		{ name = "is_deleted", type = "tinyint", length = 1, default = 0 },
+		{ name = "is_disabled", type = "tinyint", length = 1, default = 0 },
+		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	ticket_logs = {
