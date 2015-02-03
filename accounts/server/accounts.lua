@@ -29,7 +29,7 @@ function get( id )
 end
 
 function new( username, password )
-	local id = exports.database:insert_id( "INSERT INTO `accounts` (`username`, `password`) VALUES (?, ?)", username, exports.security:hashString( password ) )
+	local id = exports.database:insert_id( "INSERT INTO `accounts` (`username`, `password`, `created`) VALUES (?, ?, NOW())", username, exports.security:hashString( password ) )
 
 	if ( id ) then
 		local query = exports.database:query_single( "SELECT COUNT(*) AS `count` FROM `accounts`" )
@@ -108,7 +108,7 @@ function register( username, password )
 	local query = exports.database:query_single( "SELECT NULL FROM `accounts` WHERE `username` = ?", username )
 	
 	if ( not query ) then
-		local accountID = exports.database:insert_id( "INSERT INTO `accounts` (`username`, `password`) VALUES (?, ?)", username, exports.security:hashString( password ) )
+		local accountID = new( username, password )
 		
 		if ( accountID ) then
 			return accountID
