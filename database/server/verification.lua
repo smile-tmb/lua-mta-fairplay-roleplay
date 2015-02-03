@@ -22,7 +22,7 @@
 	SOFTWARE.
 ]]
 
-database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, factions = { "factions", "factions_characters" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles" } }
+database.configuration.automated_resources = { accounts = { "accounts", "characters" }, admin = { "ticket_logs" }, chat = { "languages" }, factions = { "factions", "factions_characters" }, items = { "inventory", "worlditems" }, vehicles = { "vehicles", "vehicles_model_sets" } }
 database.configuration.default_charset = get( "default_charset" ) or "utf8"
 database.configuration.default_engine = get( "default_engine" ) or "InnoDB"
 database.utility = { }
@@ -39,7 +39,9 @@ database.verification = {
 		{ name = "last_login", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "last_action", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "last_ip", type = "varchar", length = 128, default = "0.0.0.0" },
-		{ name = "last_serial", type = "varchar", length = 32, default = "13371337133713371337133713371337" }
+		{ name = "last_serial", type = "varchar", length = 32, default = "13371337133713371337133713371337" },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	characters = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -63,27 +65,53 @@ database.verification = {
 		{ name = "is_dead", type = "smallint", length = 1, default = 0, is_unsigned = true },
 		{ name = "cause_of_death", type = "text" },
 		{ name = "last_played", type = "timestamp", default = "0000-00-00 00:00:00" },
-		{ name = "created_time", type = "timestamp", default = "0000-00-00 00:00:00" }
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	factions = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "name", type = "varchar", length = 50, default = "" },
 		{ name = "type", type = "smallint", length = 3, default = 1, is_unsigned = true },
 		{ name = "motd", type = "text" },
-		{ name = "ranks", type = "text" }
+		{ name = "ranks", type = "text" },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	factions_characters = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "character_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "faction_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "rank", type = "tinyint", length = 3, default = 0, is_unsigned = true },
-		{ name = "is_leader", type = "tinyint", length = 1, default = 0, is_unsigned = true }
+		{ name = "is_leader", type = "tinyint", length = 1, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
+	},
+	interiors = {
+		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
+		{ name = "name", type = "varchar", length = 50, default = "Interior" },
+		{ name = "type", type = "tinyint", length = 2, default = 1 },
+		{ name = "price", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "pos_x", type = "float", default = 0 },
+		{ name = "pos_y", type = "float", default = 0 },
+		{ name = "pos_z", type = "float", default = 0 },
+		{ name = "interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
+		{ name = "target_pos_x", type = "float", default = 0 },
+		{ name = "target_pos_y", type = "float", default = 0 },
+		{ name = "target_pos_z", type = "float", default = 0 },
+		{ name = "target_interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "target_dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
+		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	inventory = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
 		{ name = "owner_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "item_id", type = "smallint", length = 3, default = 0, is_unsigned = true },
-		{ name = "item_value", type = "varchar", length = 1000, default = "" }
+		{ name = "item_value", type = "varchar", length = 1000, default = "" },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	languages = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -93,7 +121,9 @@ database.verification = {
 		{ name = "language_3", type = "smallint", length = 3, default = 0, is_unsigned = true },
 		{ name = "skill_1", type = "smallint", length = 3, default = 100, is_unsigned = true },
 		{ name = "skill_2", type = "smallint", length = 3, default = 0, is_unsigned = true },
-		{ name = "skill_3", type = "smallint", length = 3, default = 0, is_unsigned = true }
+		{ name = "skill_3", type = "smallint", length = 3, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	ticket_logs = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -107,7 +137,9 @@ database.verification = {
 		{ name = "assigned_time", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "assigned_to", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "closed_time", type = "timestamp", default = "0000-00-00 00:00:00" },
-		{ name = "closed_state", type = "tinyint", length = 3, default = 0, is_unsigned = true }
+		{ name = "closed_state", type = "tinyint", length = 3, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	vehicles = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -144,7 +176,9 @@ database.verification = {
 		{ name = "is_broken", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "is_bulletproof", type = "tinyint", length = 1, default = 0, is_unsigned = true },
 		{ name = "modelset_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true }
+		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	vehicles_model_sets = {
 		{ name = "id", type = "int", length = 10, is_unsigned = true, is_auto_increment = true, key_type = "primary" },
@@ -154,7 +188,7 @@ database.verification = {
 		{ name = "price", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "gta_model_id", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "modified", type = "timestamp", default = "0000-00-00 00:00:00" },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
 		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	},
 	worlditems = {
@@ -170,7 +204,9 @@ database.verification = {
 		{ name = "interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
 		{ name = "dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
 		{ name = "user_id", type = "int", length = 10, default = 0, is_unsigned = true },
-		{ name = "protection", type = "int", length = 10, default = 0 }
+		{ name = "protection", type = "int", length = 10, default = 0 },
+		{ name = "modified", type = "timestamp", default = "NOW()" },
+		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }
 	}
 }
 
@@ -180,6 +216,25 @@ function getFormattedKeyType( keyValue, keyType )
 		return "\r\n" .. ( keyType ~= "index" and keyType:upper( ) .. " " or "" ) .. "KEY (`" .. keyValue .. "`),"
 	end
 	return ""
+end
+
+databaase.utility.keywords = {
+	"CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP()", "NOW()", "LOCALTIME", "LOCALTIME()", "LOCALTIMESTAMP", "LOCALTIMESTAMP()",
+	"UTC_DATE()", "UTC_DATE", "UTC_TIME()", "UTC_TIME", "UTC_TIMESTAMP()", "UTC_TIMESTAMP",
+	"CURDATE()", "CURRENT_DATE()", "CURRENT_DATE",
+	"CURTIME()", "CURRENT_TIME()", "CURRENT_TIME",
+	"UNIX_TIMESTAMP()", "UNIX_TIMESTAMP",
+	"SYSDATE()", "SYSDATE"
+}
+function isKeyword( string )
+	if ( string ) then
+		for _, keyword in ipairs( database.utility.keywords ) do
+			if ( keyword == string ) then
+				return true
+			end
+		end
+	end
+	return false
 end
 
 function verify_table( tableName )
@@ -194,7 +249,7 @@ function verify_table( tableName )
 			local query_string = "CREATE TABLE IF NOT EXISTS `" .. tableName .. "` ("
 			
 			for columnID, columnData in ipairs( database.verification[ tableName ] ) do
-				query_string = query_string .. "\r\n`" .. columnData.name .. "` " .. columnData.type .. ( columnData.length and "(" .. columnData.length .. ")" or "" ) .. ( columnData.is_unsigned and " unsigned" or "" ) .. " " .. ( columnData.is_null and "NULL" or "NOT NULL" ) .. ( columnData.default and " DEFAULT '" .. columnData.default .. "'" or "" ) .. ( columnData.is_auto_increment and " AUTO_INCREMENT" or "" ) .. ( #database.verification[ tableName ] ~= columnID and "," or "" ) .. getFormattedKeyType( columnData.name, columnData.key_type )
+				query_string = query_string .. "\r\n`" .. columnData.name .. "` " .. columnData.type .. ( columnData.length and "(" .. columnData.length .. ")" or "" ) .. ( columnData.is_unsigned and " unsigned" or "" ) .. " " .. ( columnData.is_null and "NULL" or "NOT NULL" ) .. ( columnData.default and " DEFAULT " .. ( not isKeyword( columnData.default ) and "'" or "" ) .. columnData.default .. ( not isKeyword( columnData.default ) and "'" or "" ) or "" ) .. ( columnData.is_auto_increment and " AUTO_INCREMENT" or "" ) .. ( #database.verification[ tableName ] ~= columnID and "," or "" ) .. getFormattedKeyType( columnData.name, columnData.key_type )
 			end
 			
 			query_string = query_string .. "\r\n) ENGINE=" .. database.configuration.default_engine .. " DEFAULT CHARSET=" .. database.configuration.default_charset .. ";"
