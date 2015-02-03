@@ -33,8 +33,8 @@ function get( id )
 	return interiors[ id ] or false
 end
 
-function create( startX, startY, startZ, startInterior, startDimension, targetX, targetY, targetZ, targetInterior, targetDimension, name, type, price, createdBy )
-	local id = exports.database:insert_id( "INSERT INTO `interiors` (`pos_x`, `pos_y`, `pos_z`, `interior`, `dimension`, `target_pos_x`, `target_pos_y`, `target_pos_z`, `target_interior`, `target_dimension`, `name`, `type`, `price`, `created_by`, `created`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", startX or 0, startY or 0, startZ or 0, startInterior or 0, startDimension or 0, targetX or 0, targetY or 0, targetZ or 0, targetInterior or 0, targetDimension or 0, name or "", type or 1, price or 0, createdBy or 0 )
+function create( startX, startY, startZ, startInterior, startDimension, targetX, targetY, targetZ, targetInterior, targetDimension, name, type, price, ownerID, createdBy )
+	local id = exports.database:insert_id( "INSERT INTO `interiors` (`pos_x`, `pos_y`, `pos_z`, `interior`, `dimension`, `target_pos_x`, `target_pos_y`, `target_pos_z`, `target_interior`, `target_dimension`, `name`, `type`, `price`, `owner_id`, `created_by`, `created`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())", startX or 0, startY or 0, startZ or 0, startInterior or 0, startDimension or 0, targetX or 0, targetY or 0, targetZ or 0, targetInterior or 0, targetDimension or 0, name or "", type or 1, price or 0, ownerID or 0, createdBy or 0 )
 
 	if ( id ) then
 		return load( id, true )
@@ -59,22 +59,25 @@ function load( data, loadFromDatabase )
 	local data = type( data ) == "table" and data or ( loadFromDatabase and exports.database:query_single( "SELECT * FROM `interiors` WHERE `id` = ? LIMIT 1", data ) or get( data ) )
 
 	if ( data ) then
-		local entranceInterior = createPickup( data.pos_x, data.pos_y, data.pos_z )
+		local pickupIcon = data.is_disabled and 1314 or ( data.owner_id ~= 0 or data.type == 3 and 1318 or ( data.type == 4 and 1272 or 1273 ) )
+		local entranceInterior = createPickup( data.pos_x, data.pos_y, data.pos_z, 3, pickupIcon )
 		setElementInterior( entranceInterior, data.interior )
 		setElementDimension( entranceInterior, data.dimension )
 
 		if ( isElement( entranceInterior ) ) then
 			exports.security:modifyElementData( entranceInterior, "interior:id", data.id, true )
 			exports.security:modifyElementData( entranceInterior, "interior:type", data.type, true )
+			exports.security:modifyElementData( entranceInterior, "interior:owner", data.owner_id, true )
 			exports.security:modifyElementData( entranceInterior, "interior:entrance", true, true )
 
-			local exitInterior = createPickup( data.pos_x, data.pos_y, data.pos_z )
+			local exitInterior = createPickup( data.pos_x, data.pos_y, data.pos_z, 3, pickupIcon )
 			setElementInterior( exitInterior, data.interior )
 			setElementDimension( exitInterior, data.dimension )
 
 			if ( isElement( exitInterior ) ) then
 				exports.security:modifyElementData( exitInterior, "interior:id", data.id, true )
 				exports.security:modifyElementData( exitInterior, "interior:type", data.type, true )
+				exports.security:modifyElementData( exitInterior, "interior:owner", data.owner_id, true )
 
 				setElementParent( exitInterior, entranceInterior )
 
