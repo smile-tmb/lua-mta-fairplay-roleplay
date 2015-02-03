@@ -239,7 +239,7 @@ function getFormattedKeyType( keyValue, keyType )
 	return ""
 end
 
-databaase.utility.keywords = {
+database.utility.keywords = {
 	"CURRENT_TIMESTAMP", "CURRENT_TIMESTAMP()", "NOW()", "LOCALTIME", "LOCALTIME()", "LOCALTIMESTAMP", "LOCALTIMESTAMP()",
 	"UTC_DATE()", "UTC_DATE", "UTC_TIME()", "UTC_TIME", "UTC_TIMESTAMP()", "UTC_TIMESTAMP",
 	"CURDATE()", "CURRENT_DATE()", "CURRENT_DATE",
