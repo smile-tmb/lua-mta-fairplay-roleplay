@@ -58,7 +58,7 @@ addCommandHandler( { "createvehicle", "newvehicle", "createveh", "makeveh", "mak
 					local rotation = getPedRotation( player )
 					local interior, dimension = getElementInterior( player ), getElementDimension( player )
 					
-					local vehicleID, vehicle = exports.vehicles:new( modelID, x, y, z, nil, nil, rotation, interior, dimension, nil, nil, ownerID, isFaction, nil, nil, isBulletproof )
+					local vehicleID, vehicle = exports.vehicles:create( modelID, x, y, z, nil, nil, rotation, interior, dimension, nil, nil, ownerID, isFaction, nil, nil, isBulletproof )
 					
 					if ( vehicleID ) then
 						outputChatBox( "You created a " .. getVehicleNameFromModel( modelID ) .. " with ID " .. vehicleID .. ".", player, 95, 230, 95 )
