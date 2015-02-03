@@ -28,8 +28,7 @@ local threads = { }
 local loadingVehiclesGlobalID
 local vehiclesToLoadCount = 0
 
-local _get = get
-
+_get = get
 function get( id )
 	return exports.database:query_single( "SELECT * FROM `vehicles` WHERE `id` = ? AND `is_deleted` = '0'", id )
 end
@@ -66,10 +65,10 @@ function new( modelID, posX, posY, posZ, rotX, rotY, rotZ, interior, dimension, 
 		exports.items:giveItem( exports.common:getPlayerByCharacterID( ownerID ) or ownerID, 7, vehicleID, nil, nil, nil, true )
 	end
 	
-	return vehicleID, spawn( vehicleID, true )
+	return vehicleID, load( vehicleID, true )
 end
 
-function spawn( vehicleID, respawnVehicle, hasCoroutine )
+function load( vehicleID, respawnVehicle, hasCoroutine )
 	local data = type( vehicleID ) == "table" and vehicleID or get( vehicleID )
 	
 	if ( hasCoroutine ) then
@@ -139,7 +138,7 @@ function spawn( vehicleID, respawnVehicle, hasCoroutine )
 	return false
 end
 
-function despawn( vehicle )
+function unload( vehicle )
 	if ( save( vehicle ) ) then
 		local id = exports.common:getRealVehicleID( vehicle )
 
@@ -158,8 +157,8 @@ end
 function reload( vehicle )
 	local vehicleID = exports.common:getRealVehicleID( vehicle )
 	
-	despawn( vehicle )
-	spawn( getVehicleData( vehicleID ) )
+	unload( vehicle )
+	load( getVehicleData( vehicleID ) )
 end
 
 function save( vehicle )
@@ -195,7 +194,7 @@ function saveAllVehicles( )
 	end
 end
 
-function spawnAllVehicles( )
+function loadAllVehicles( )
 	loadingVehiclesGlobalID = exports.messages:createGlobalMessage( "Loading vehicles. Please wait.", "vehicles-loading", true, false )
 	
 	for _, vehicle in ipairs( getElementsByType( "vehicle" ) ) do
@@ -210,9 +209,9 @@ function spawnAllVehicles( )
 		vehiclesToLoadCount = #query
 		
 		for _, vehicle in ipairs( query ) do
-			local spawnCoroutine = coroutine.create( spawn )
-			coroutine.resume( spawnCoroutine, vehicle, false, true )
-			table.insert( threads, spawnCoroutine )
+			local loadCoroutine = coroutine.create( load )
+			coroutine.resume( loadCoroutine, vehicle, false, true )
+			table.insert( threads, loadCoroutine )
 		end
 		
 		setTimer( resumeCoroutines, 1000, 4 )
@@ -220,8 +219,8 @@ function spawnAllVehicles( )
 end
 
 function resumeCoroutines( )
-	for _, spawnCoroutine in ipairs( threads ) do
-		coroutine.resume( spawnCoroutine )
+	for _, loadCoroutine in ipairs( threads ) do
+		coroutine.resume( loadCoroutine )
 	end
 	
 	if ( exports.common:count( vehicles ) >= vehiclesToLoadCount ) then
@@ -333,7 +332,7 @@ addEventHandler( "onPlayerJoin", root,
 
 addEventHandler( "onResourceStart", resourceRoot,
 	function( )
-		spawnAllVehicles( )
+		loadAllVehicles( )
 		
 		for _, player in ipairs( getElementsByType( "player" ) ) do
 			bindKeys( player )

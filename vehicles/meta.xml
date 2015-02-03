@@ -32,13 +32,13 @@
 	
 	<export function="get" />
 	<export function="getVehicle" />
-	<export function="new" />
-	<export function="spawn" />
-	<export function="despawn" />
+	<export function="create" />
+	<export function="load" />
+	<export function="unload" />
 	<export function="reload" />
 	<export function="save" />
 	<export function="saveAllVehicles" />
-	<export function="spawnAllVehicles" />
+	<export function="loadAllVehicles" />
 
 	<export function="getModelSet" />
 	<export function="createModelSet" />
