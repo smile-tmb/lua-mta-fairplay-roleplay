@@ -101,6 +101,9 @@ database.verification = {
 		{ name = "target_pos_z", type = "float", default = 0 },
 		{ name = "target_interior", type = "tinyint", length = 3, default = 0, is_unsigned = true },
 		{ name = "target_dimension", type = "smallint", length = 5, default = 0, is_unsigned = true },
+		{ name = "is_deleted", type = "tinyint", length = 1, default = 0 },
+		{ name = "is_locked", type = "tinyint", length = 1, default = 1 },
+		{ name = "is_disabled", type = "tinyint", length = 1, default = 0 },
 		{ name = "created_by", type = "int", length = 10, default = 0, is_unsigned = true },
 		{ name = "modified", type = "timestamp", default = "0000-00-00 00:00:00" },
 		{ name = "created", type = "timestamp", default = "0000-00-00 00:00:00" }

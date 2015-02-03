@@ -23,6 +23,10 @@
 ]]
 
 local interiors = { }
+local threads = { }
+
+local loadingInteriorsGlobalID
+local interiorsToLoadCount = 0
 
 _get = get
 function get( id )
@@ -51,8 +55,8 @@ function delete( id )
 	return false
 end
 
-function load( id, loadFromDatabase )
-	local data = loadFromDatabase and exports.database:query_single( "SELECT * FROM `interiors` WHERE `id` = ? LIMIT 1", id ) or get( id )
+function load( data, loadFromDatabase )
+	local data = type( data ) == "table" and data or ( loadFromDatabase and exports.database:query_single( "SELECT * FROM `interiors` WHERE `id` = ? LIMIT 1", data ) or get( data ) )
 
 	if ( data ) then
 		local entranceInterior = createPickup( data.pos_x, data.pos_y, data.pos_z )
@@ -91,11 +95,50 @@ end
 function unload( id )
 	local interior = get( id )
 
-	if ( isElement( interior.entrance ) ) then
-		destroyElement( interior.entrance )
+	if ( interior ) then
+		if ( isElement( interior.entrance ) ) then
+			destroyElement( interior.entrance )
+		end
+
+		if ( isElement( interior.exit ) ) then
+			destroyElement( interior.exit )
+		end
+
+		return true
 	end
 
-	if ( isElement( interior.exit ) ) then
-		destroyElement( interior.exit )
+	return false
+end
+
+function loadAllInteriors( )
+	loadingInteriorsGlobalID = exports.messages:createGlobalMessage( "Loading interiors. Please wait.", "interiors-loading", true, false )
+	
+	for _, interior in pairs( interiors ) do
+		unload( interior.id )
+	end
+	
+	local query = exports.database:query( "SELECT * FROM `interiors` WHERE `is_deleted` = '0' ORDER BY `id`" )
+	
+	if ( query ) then
+		interiorsToLoadCount = #query
+		
+		for _, interior in ipairs( query ) do
+			local loadCoroutine = coroutine.create( load )
+			coroutine.resume( loadCoroutine, interior, false, true )
+			table.insert( threads, loadCoroutine )
+		end
+		
+		setTimer( resumeCoroutines, 1000, 4 )
+	end
+end
+addEventHandler( "onResourceStart", resourceRoot, loadAllInteriors )
+
+function resumeCoroutines( )
+	for _, loadCoroutine in ipairs( threads ) do
+		coroutine.resume( loadCoroutine )
+	end
+	
+	if ( exports.common:count( interiors ) >= interiorsToLoadCount ) then
+		exports.messages:destroyGlobalMessage( loadingInteriorsGlobalID )
 	end
 end
