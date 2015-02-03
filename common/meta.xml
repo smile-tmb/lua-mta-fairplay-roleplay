@@ -30,6 +30,7 @@
 	<script src="shared/admin.lua" type="shared" cache="false" />
 	<script src="shared/elements.lua" type="shared" cache="false" />
 	<script src="shared/factions.lua" type="shared" cache="false" />
+	<script src="shared/interiors.lua" type="shared" cache="false" />
 	<script src="shared/players.lua" type="shared" cache="false" />
 	<script src="shared/vehicles.lua" type="shared" cache="false" />
 	<script src="shared/worlditems.lua" type="shared" cache="false" />
@@ -85,6 +86,12 @@
 	
 	<!-- shared/factions.lua -->
 	<export function="getFactionID" type="shared" />
+	
+	<!-- shared/interiors.lua -->
+	<export function="getInteriorID" type="shared" />
+	<export function="getInteriorName" type="shared" />
+	<export function="getInteriorOwner" type="shared" />
+	<export function="isFactionInterior" type="shared" />
 	
 	<!-- shared/players.lua -->
 	<export function="getAccountID" type="shared" />
